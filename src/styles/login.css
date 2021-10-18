@@ -1,0 +1,25 @@
+#col-der {
+  background-image: url("../images/fondo.png");
+  background-size: cover;
+}
+
+#col-izq {
+  background: white;
+}
+
+#titulo-principal,
+#recuperar-pass {
+  color: #f0313d;
+}
+
+#recuperar-pass {
+  text-decoration: underline;
+}
+
+#boton-login {
+  background-color: #f0313d;
+}
+
+#boton-login:hover {
+  background-color: #ec2d3a;
+}

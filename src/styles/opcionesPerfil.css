@@ -1,0 +1,24 @@
+#opciones-perfil {
+  margin-top: 50px;
+  box-sizing: border-box;
+}
+
+li:hover {
+  cursor: pointer;
+}
+
+#opcion-mi-perfil {
+  border: 3px solid #236f8e;
+}
+
+#opcion-ventas-hoy {
+  border: 3px solid #f0313d;
+}
+
+#opcion-ventas-mes {
+  border: 3px solid #6e4034;
+}
+
+/* .opcion-perfil {
+  margin-left: 12px;
+} */
