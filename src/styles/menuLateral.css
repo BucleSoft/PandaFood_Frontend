@@ -1,15 +1,20 @@
 #sidebar {
   background-image: url("../images/fondo.png");
   background-size: cover;
+  background-color: rgb(25, 28, 31);
+  min-width: 224px;
 }
 
 .menu-item {
-  background-color: rgb(25, 28, 31, 0.9);
-  border-color: rgba(14, 14, 14, 0.288);
+  background-color: rgb(25, 28, 31, 0.8);
+}
+
+.activated {
+  background-color: #f0313d;
 }
 
 .menu-item:hover {
   cursor: pointer;
-  background-color: rgb(235, 36, 31, 0.7);
+  background-color: #f0313d;
   /* background-color: rgb(53, 53, 53, 0.8); */
 }

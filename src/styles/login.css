@@ -1,3 +1,11 @@
+.loginInput {
+  @apply text-lg max-w-lg border-2 border-gray-300 h-12 p-2 rounded-lg focus:outline-none text-gray-700 shadow-lg;
+}
+
+#logo-sidebar {
+  width: 100%;
+}
+
 #col-der {
   background-image: url("../images/fondo.png");
   background-size: cover;
@@ -22,4 +30,8 @@
 
 #boton-login:hover {
   background-color: #ec2d3a;
+}
+
+.tablaItem {
+  cursor: pointer;
 }

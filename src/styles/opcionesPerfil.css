@@ -1,3 +1,13 @@
+#cifra {
+  font-size: 30px;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+#tituloOpcion {
+  margin-bottom: -10px;
+}
+
 #opciones-perfil {
   margin-top: 50px;
   box-sizing: border-box;
@@ -11,12 +21,39 @@ li:hover {
   border: 3px solid #236f8e;
 }
 
+#opcion-mi-perfil:hover {
+  background-color: #236f8e;
+  transition: background-color ease-in 0.18s;
+}
+
+#opcion-mi-perfil:not(:hover) {
+  transition: background-color ease-in 0.3s;
+}
+
 #opcion-ventas-hoy {
   border: 3px solid #f0313d;
 }
 
+#opcion-ventas-hoy:hover {
+  background-color: #f0313d;
+  transition: background-color ease-in 0.18s;
+}
+
+#opcion-ventas-hoy:not(:hover) {
+  transition: background-color ease-in 0.3s;
+}
+
 #opcion-ventas-mes {
   border: 3px solid #6e4034;
+}
+
+#opcion-ventas-mes:hover {
+  background-color: #6e4034;
+  transition: background-color ease-in 0.18s;
+}
+
+#opcion-ventas-mes:not(:hover) {
+  transition: background-color ease-in 0.3s;
 }
 
 /* .opcion-perfil {

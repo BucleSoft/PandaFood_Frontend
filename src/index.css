@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -9,10 +13,63 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #191c1f;
+  background: rgb(23, 24, 28);
+  /* background: #ffffff; */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.titulo {
+  color: #f0313d;
+}
+
+.formInput {
+  background-color: rgb(33, 34, 39);
+  color: white;
+  border-color: gray;
+}
+
+.formInput:focus {
+  border-color: #ffffff;
+  transition: border-color 0.8s;
+}
+
+.formInput:not(:focus) {
+  border-color: rgb(87, 87, 87);
+  transition: border-color 0.8s;
+}
+
+.formInputInactive {
+  background-color: rgb(40, 41, 46);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.botonPrincipalInput {
+  background-color: #f0313d;
+}
+
+.botonPrincipalInput:hover {
+  background-color: #f1323f;
+  transition: background-color ease 0.3s;
+}
+
+.botonInput {
+  background-color: rgb(40, 41, 46);
+}
+
+.botonInput:hover {
+  background-color: rgb(42, 43, 48);
+  transition: background-color ease 0.3s;
 }
