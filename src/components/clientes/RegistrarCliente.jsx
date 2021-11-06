@@ -17,7 +17,7 @@ export const RegistrarCliente = () => {
         estado: 'Activo'
     });
 
-    const { cedula, nombre, direccion, celular, estado } = clientesValues;
+    const { cedula, nombre, direccion, celular } = clientesValues;
 
     const configMensaje = {
         position: "bottom-center",

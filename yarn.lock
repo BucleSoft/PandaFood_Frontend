@@ -1651,16 +1651,6 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
-"@sweetalert2/theme-dark@^5.0.7":
-  version "5.0.7"
-  resolved "https://registry.yarnpkg.com/@sweetalert2/theme-dark/-/theme-dark-5.0.7.tgz#c6f336b77bb3663c350a140dc063bdf1c6a9a27f"
-  integrity sha512-bpCePN9R48VRGWdfbfDqTAH1w3Ip4zytYQtxSI+5FRwhCfbrTMCd9u++2x6NcCyf2tKOVnipX1ZUMlXOujkeyA==
-
-"@sweetalert2/themes@^5.0.7":
-  version "5.0.7"
-  resolved "https://registry.yarnpkg.com/@sweetalert2/themes/-/themes-5.0.7.tgz#ebfa80cb25197e8eb1066c9478f6b2abb6af772d"
-  integrity sha512-PGfW6t/rFjFhMMyPuA6OduODDd9PV4hGMcdBQ4+5VUYr45gSvDIIlpJpX/cZ9KkQdpiqrLV/39wcDP74hBt/zw==
-
 "@testing-library/dom@^7.28.1":
   version "7.31.2"
   resolved "https://registry.npmjs.org/@testing-library/dom/-/dom-7.31.2.tgz"
@@ -10762,16 +10752,6 @@ svgo@^1.0.0, svgo@^1.2.2:
     stable "^0.1.8"
     unquote "~1.1.1"
     util.promisify "~1.0.0"
-
-sweetalert2-react-content@^4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/sweetalert2-react-content/-/sweetalert2-react-content-4.2.0.tgz#ab4a6e02e37150dd0ea34d00179ec76952e3f442"
-  integrity sha512-eB324swnq10UJH8nAH2S6GHuAKDgH6GpGU8vI+ulYdmlPzpb0T5QPc7O4RFNRx28GzVZUnfvtpxZbKtZ5/KOnQ==
-
-sweetalert2@^11.1.9:
-  version "11.1.9"
-  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.1.9.tgz#f3948198119fab2de7014ccd7840cc4a6d671185"
-  integrity sha512-ox+BjtAbO8mJrbQH9TsNwMwLeTfV+ve33CVz/kKn5D/DhRiSqnw2rWL4HuBlh9Z4yqYlTD5viR5Z2K5D3avM7Q==
 
 symbol-tree@^3.2.4:
   version "3.2.4"

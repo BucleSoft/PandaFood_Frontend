@@ -10,26 +10,30 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
 
     const { bandera } = useBanderaContext();
 
-    const configMensaje = {
-        position: "bottom-center",
-        background: "#191c1f !important",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-    };
+    useEffect(() => {
+        const buscarUsuario = async () => {
 
-    useEffect(async () => {
-        await axiosPetition("usuarios");
-        setData(respuesta.usuarios.reverse());
-        if (!respuesta.ok) {
-            toast.error(
-                "Ha ocurrido un error al intentar obtener la lista de usuarios.",
-                configMensaje
-            );
+            const configMensaje = {
+                position: "bottom-center",
+                background: "#191c1f !important",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+            };
+
+            await axiosPetition("usuarios");
+            setData(respuesta.usuarios.reverse());
+            if (!respuesta.ok) {
+                toast.error(
+                    "Ha ocurrido un error al intentar obtener la lista de usuarios.",
+                    configMensaje
+                );
+            }
         }
+        buscarUsuario();
     }, [bandera]);
 
     return (
@@ -67,6 +71,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                         return <TablaUsuarios key={datos.uid} props={datos} />
                     }
 
+                    return '';
                 })}
             </tbody>
         </table>

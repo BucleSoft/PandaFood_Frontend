@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { HeaderTabla } from '../../components/clientes/HeaderTabla';
 import { Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -6,7 +6,6 @@ import { BanderaContext } from '../../context/banderaContext';
 
 export const ConsultarClientes = () => {
 
-    const [filtro, setFiltro] = useState('Autorizado');
     const [busqueda, setBusqueda] = useState('');
     const [bandera, setBandera] = useState(true);
 

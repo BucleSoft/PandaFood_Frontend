@@ -14,7 +14,7 @@ export const TablaUsuarios = ({ props }) => {
 
     let { cedula, nombre, tipo_usuario, estado } = props;
 
-    const { usuarioEditar, setUsuarioEditar } = useConsultarUsuarioContext();
+    const { setUsuarioEditar } = useConsultarUsuarioContext();
     const { bandera, setBandera } = useBanderaContext();
 
     const history = useHistory();
@@ -89,13 +89,15 @@ export const TablaUsuarios = ({ props }) => {
                     <img
                         className="tablaItem" src={Lapiz}
                         onClick={obtenerInfoUsuario}
+                        alt="ícono-lápiz"
                     ></img>
                     {estado === 'Autorizado'
                         ?
                         <img
                             className="ml-3 tablaItem"
                             src={Eliminar}
-                            onClick={gestionarAcceso}></img>
+                            onClick={gestionarAcceso}
+                            alt="ícono-eliminar"></img>
                         :
 
                         <FontAwesomeIcon

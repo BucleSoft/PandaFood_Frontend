@@ -1,35 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
-import { useBanderaContext } from '../../context/banderaContext';
 import { TablaClientes } from './TablaClientes';
 
-export const HeaderTabla = ({ mostrar, busqueda }) => {
+export const HeaderTabla = () => {
 
     const [data, setData] = useState([]);
 
-    const { bandera } = useBanderaContext();
+    useEffect(() => {
+        const buscarClientes = async () => {
 
-    const configMensaje = {
-        position: "bottom-center",
-        background: "#191c1f !important",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-    };
+            const configMensaje = {
+                position: "bottom-center",
+                background: "#191c1f !important",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+            };
 
-    useEffect(async () => {
-        await axiosPetition("clientes");
-        setData(respuesta.clientes.reverse());
-        if (!respuesta.ok) {
-            toast.error(
-                "Ha ocurrido un error al intentar obtener la lista de clientes.",
-                configMensaje
-            );
+            await axiosPetition("clientes");
+            setData(respuesta.clientes.reverse());
+            if (!respuesta.ok) {
+                toast.error(
+                    "Ha ocurrido un error al intentar obtener la lista de clientes.",
+                    configMensaje
+                );
+            }
         }
+        buscarClientes();
     }, []);
 
     return (
@@ -60,7 +61,6 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
             </thead>
             <tbody>
                 {data?.map((datos, key) => {
-                    return <TablaClientes key={datos.uid} props={datos} />
 
                     // if (mostrar === 'Todos' && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
                     //     return <TablaClientes key={datos.uid} props={datos} />
@@ -68,6 +68,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                     //     return <TablaClientes key={datos.uid} props={datos} />
                     // }
 
+                    return <TablaClientes key={datos.uid} props={datos} />
                 })}
             </tbody>
         </table>

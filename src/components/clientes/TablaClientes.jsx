@@ -8,14 +8,12 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndoAlt } from '@fortawesome/free-solid-svg-icons';
 import { useConsultarClienteContext } from '../../context/consultarClienteContext';
-// import { useBanderaContext } from '../../context/banderaContext';
 
 export const TablaClientes = ({ props }) => {
 
-    let { cedula, nombre, direccion, celular, puntos, estado } = props;
+    let { cedula, nombre, puntos, estado } = props;
 
-    const { clienteEditar, setClienteEditar } = useConsultarClienteContext();
-    // const { bandera, setBandera } = useBanderaContext();
+    const { setClienteEditar } = useConsultarClienteContext();
 
     const history = useHistory();
 
@@ -41,25 +39,6 @@ export const TablaClientes = ({ props }) => {
             toast.error(respuesta.msg, configMensaje);
         }
     }
-
-    // const gestionarAcceso = async () => {
-
-    //     if (estado === 'Autorizado') {
-    //         await axiosPetition(`clientes/acceso/${cedula}`, { estado: 'No autorizado' }, 'PUT');
-    //     } else {
-    //         await axiosPetition(`clientes/acceso/${cedula}`, { estado: 'Autorizado' }, 'PUT');
-    //     }
-
-    //     if (respuesta.ok) {
-    //         toast.success('Estado de cliente habilitado/deshabilitado correctamente.', configMensaje);
-    //         if (estado === 'Activo') {
-    //             estado = 'Inactivo';
-    //         } else {
-    //             estado = 'Activo';
-    //         }
-    //         setBandera(!bandera);
-    //     }
-    // }
 
     return (
         <>
@@ -89,13 +68,14 @@ export const TablaClientes = ({ props }) => {
                     <img
                         className="tablaItem" src={Lapiz}
                         onClick={obtenerInfoCliente}
+                        alt="ícono lápiz"
                     ></img>
                     {estado === 'Activo'
                         ?
                         <img
                             className="ml-3 tablaItem"
                             src={Eliminar}
-                        // onClick={gestionarAcceso}
+                            alt="ícono eliminar"
                         >
                         </img>
                         :
@@ -103,7 +83,6 @@ export const TablaClientes = ({ props }) => {
                         <FontAwesomeIcon
                             className='ml-2 text-blue-500 tablaItem recoverIcon'
                             icon={faUndoAlt}
-                        // onClick={gestionarAcceso} 
                         />
                     }
                 </td>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import logo from '../images/logo-PandaFood.svg';
 import '../styles/login.css';
 import { useHistory } from 'react-router-dom';
@@ -74,7 +74,7 @@ export const LoginPage = () => {
                                 <input type="checkbox" />
                                 <label className="ml-1">Recuérdame</label>
                             </div>
-                            <a id="recuperar-pass" href="#">Olvidé mi contraseña</a>
+                            <a id="recuperar-pass" href="https://www.google.com.co">Olvidé mi contraseña</a>
                         </div>
                         {/* <Link to={redirect} className="text-lg h-14 text-white rounded-lg shadow-2xl"> */}
                         <button type="submit" id="boton-login" className="text-lg h-14 w-full text-white rounded-lg shadow-2xl focus:outline-none">Iniciar Sesión</button>

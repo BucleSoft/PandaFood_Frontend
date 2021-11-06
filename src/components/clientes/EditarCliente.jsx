@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,29 +7,15 @@ import { useHistory, Link } from 'react-router-dom';
 import { useConsultarClienteContext } from '../../context/consultarClienteContext';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-import "@sweetalert2/theme-dark/dark.css";
+import { EditarPuntos } from './modales/EditarPuntos';
 
 export const EditarCliente = () => {
 
-    const MySwal = withReactContent(Swal)
-
-    const editarPuntos = () => {
-        MySwal.fire({
-            title: <p>Editar puntos</p>,
-            footer: 'Copyright 2018',
-            theme: 'dark'
-        }).then(() => {
-            return MySwal.fire(<p>Shorthand works too</p>)
-        });
-    }
-
     const { clienteEditar } = useConsultarClienteContext();
 
-    const repContraseña = useRef();
+    const [hidden, setHidden] = useState(true);
 
-    const [campoInactivo, setCampoInactivo] = useState(true);
+    const [puntosCliente, setPuntosCliente] = useState(clienteEditar?.puntos);
 
     const history = useHistory();
 
@@ -38,29 +24,16 @@ export const EditarCliente = () => {
         nombre: clienteEditar?.nombre,
         celular: clienteEditar?.celular,
         direccion: clienteEditar?.direccion,
-        contraseña: '',
-        contraseñaActual: '',
-        estado: clienteEditar?.estado,
-        puntos: clienteEditar?.puntos
+        estado: clienteEditar?.estado
     });
 
-    const { cedula, nombre, celular, direccion, contraseña, contraseñaActual, estado, puntos } = clientesValues;
+    const { cedula, nombre, celular, direccion, estado } = clientesValues;
 
     useEffect(() => {
         if (cedula === '' || cedula === undefined || cedula === null) {
             history.push('/clientes');
         }
     });
-
-    useEffect(() => {
-        if (contraseñaActual === '') {
-            setCampoInactivo(true);
-            clientesValues.contraseña = '';
-            repContraseña.current.value = '';
-        } else {
-            setCampoInactivo(false);
-        }
-    }, [contraseñaActual]);
 
     const configMensaje = {
         position: "bottom-center",
@@ -77,45 +50,16 @@ export const EditarCliente = () => {
         e.preventDefault();
 
         if (cedula !== '') {
+            await axiosPetition(`clientes/${cedula}`, clientesValues, 'PUT');
 
-            if (contraseñaActual.length !== 0) {
-
-                if (repContraseña.current.value.length === 0 || contraseña.length === 0) {
-                    toast.error('Llene los campos de la contraseña nueva o borre la información de la contraseña actual.', configMensaje);
-                } else {
-                    if (repContraseña.current.value === contraseña) {
-                        await axiosPetition(`clientes/${cedula}`, clientesValues, 'PUT');
-
-                        if (respuesta.ok === false) {
-                            toast.error(respuesta.msg, configMensaje);
-                        } else {
-                            history.push('/clientes');
-                        }
-
-                    } else {
-                        toast.error('Las contraseñas no coinciden.', configMensaje);
-                    }
-                }
+            if (respuesta.ok === false) {
+                toast.error(respuesta.msg, configMensaje);
             } else {
-                await axiosPetition(`clientes/${cedula}`, clientesValues, 'PUT');
-
-                if (respuesta.ok === false) {
-                    toast.error(respuesta.msg, configMensaje);
-                } else {
-                    history.push('/clientes');
-                }
-
+                history.push('/clientes');
             }
-
         } else {
             toast.error('Ingrese una cédula válida por favor.', configMensaje);
         }
-
-    }
-
-    const limpiarCampos = () => {
-        resetClientes();
-        repContraseña.current.value = '';
     }
 
     return (
@@ -151,30 +95,6 @@ export const EditarCliente = () => {
                                 placeholder="Celular del cliente"
                                 autoComplete="off" />
                             <input
-                                type="password"
-                                name="contraseñaActual"
-                                value={contraseñaActual}
-                                onChange={handleClientesChange}
-                                className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                                placeholder="Contraseña actual (opcional)"
-                                autoComplete="off" />
-                            <input type="password"
-                                name="contraseña"
-                                value={contraseña}
-                                onChange={handleClientesChange}
-                                className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${campoInactivo ? 'formInputInactive' : ''}`}
-                                placeholder="Nueva contraseña"
-                                autoComplete="off"
-                                disabled={campoInactivo} />
-                            <input
-                                type="password"
-                                name="rep-contraseña"
-                                ref={repContraseña}
-                                className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${campoInactivo ? 'formInputInactive' : ''}`}
-                                placeholder="Repetir contraseña"
-                                autoComplete="off"
-                                disabled={campoInactivo} />
-                            <input
                                 type="text"
                                 name="direccion"
                                 value={direccion}
@@ -195,13 +115,16 @@ export const EditarCliente = () => {
                         <div className="flex flex-col mb-12 mr-52">
                             <h2 className="text-3xl font-semibold titulo">Puntos del cliente</h2>
                             <div className="flex justify-center">
-                                <p className="text-8xl text-white">{puntos}</p>
+                                <p className="text-8xl text-white">{puntosCliente}</p>
                                 <div className="flex items-start mt-2">
                                     <button className="ml-2 cursor-pointer outline-none">
                                         <FontAwesomeIcon
                                             className='text-white text-xl'
                                             icon={faEdit}
-                                            onClick={editarPuntos}
+                                            onClick={() => {
+                                                setHidden(false);
+                                                console.log(puntosCliente);
+                                            }}
                                         />
                                     </button>
                                 </div>
@@ -216,7 +139,7 @@ export const EditarCliente = () => {
                             <button
                                 type="button"
                                 className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
-                                onClick={limpiarCampos}
+                                onClick={resetClientes}
                             >
                                 Limpiar
                             </button>
@@ -233,6 +156,7 @@ export const EditarCliente = () => {
                 </form>
             </div >
             <ToastContainer theme='dark' />
+            <EditarPuntos hidden={hidden} setHidden={setHidden} puntos={puntosCliente} setPuntos={setPuntosCliente} />
         </div >
     );
 }

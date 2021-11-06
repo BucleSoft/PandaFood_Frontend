@@ -73,3 +73,15 @@ input[type="number"] {
   background-color: rgb(42, 43, 48);
   transition: background-color ease 0.3s;
 }
+
+#fondoModal {
+  background-color: rgb(23, 24, 28, 0.4);
+}
+
+#modal {
+  background-color: rgb(33, 34, 39);
+}
+
+.inputModal {
+  background-color: rgb(40, 41, 46);
+}

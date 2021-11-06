@@ -29,7 +29,7 @@ export const MenuLateral = () => {
     return (
         <div id="sidebar" className="flex flex-col h-screen">
             <ul className="text-white h-full">
-                <li><img id="logo-sidebar" className="ml-1" src={logo_sidebar} /></li>
+                <li><img id="logo-sidebar" className="ml-1" src={logo_sidebar} alt="logo-pandafood" /></li>
                 <li
                     onClick={() => setActive('perfil')}
                     className={`flex text-md mr-2 ml-2 mb-3 mt-4 h-10 items-center menu-item rounded-lg ${active === "perfil" ? "activated" : ''}`}

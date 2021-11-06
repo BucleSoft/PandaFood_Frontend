@@ -11,7 +11,7 @@ export const RegistrarUsuario = () => {
 
     const history = useHistory();
 
-    const [usuariosValues, handleUsuariosChange, resetUsuarios, formatearTexto] = useForm({
+    const [usuariosValues, handleUsuariosChange, resetUsuarios] = useForm({
         cedula: '',
         nombre: '',
         celular: '',
