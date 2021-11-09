@@ -13,7 +13,7 @@ export const ConsultarUsuario = () => {
     return (
         <BanderaContext.Provider value={{ bandera, setBandera }} >
             <div className="w-full h-screen overflow-y-scroll">
-                <div className="flex flex-col h-ufll w-full ml-10 mt-12">
+                <div className="flex flex-col h-full w-full ml-10 mt-12">
                     <h2 className="text-left text-4xl mb-4 titulo">Consultar usuarios</h2>
                     <div className="flex mb-4">
                         <select
@@ -31,7 +31,7 @@ export const ConsultarUsuario = () => {
                             className="w-80 p-2 pl-8 pr-8 mr-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                             placeholder="Busque un usuario"
                             autoComplete="off"
-                            vaue={busqueda}
+                            value={busqueda}
                             onChange={(e) => setBusqueda(e.target.value)} />
                         <Link to="/usuarios/registrar" className="text-lg content-center w-80 rounded-lg focus:outline-none botonPrincipalInput">
                             <button

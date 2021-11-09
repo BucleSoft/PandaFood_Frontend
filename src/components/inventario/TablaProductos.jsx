@@ -30,35 +30,35 @@ export const TablaClientes = ({ props }) => {
         progress: undefined,
     };
 
-    const obtenerInfoCliente = async () => {
-        resetRespuesta();
-        await axiosPetition(`clientes/${cedula}`);
-        if (respuesta.ok) {
-            setClienteEditar(respuesta.cliente);
-            history.push('/clientes/editar');
-        } else {
-            toast.error(respuesta.msg, configMensaje);
-        }
-    }
+    // const obtenerInfoCliente = async () => {
+    //     resetRespuesta();
+    //     await axiosPetition(`clientes/${cedula}`);
+    //     if (respuesta.ok) {
+    //         setClienteEditar(respuesta.cliente);
+    //         history.push('/clientes/editar');
+    //     } else {
+    //         toast.error(respuesta.msg, configMensaje);
+    //     }
+    // }
 
-    const inhabilitarCliente = async () => {
+    // const inhabilitarCliente = async () => {
 
-        if (estado === 'Activo') {
-            await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Inactivo' }, 'PUT');
-        } else {
-            await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Activo' }, 'PUT');
-        }
+    //     if (estado === 'Activo') {
+    //         await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Inactivo' }, 'PUT');
+    //     } else {
+    //         await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Activo' }, 'PUT');
+    //     }
 
-        if (respuesta.ok) {
-            toast.success('Cliente habilitado/deshabilitado correctamente.', configMensaje);
-            if (estado === 'Activo') {
-                estado = 'Inactivo';
-            } else {
-                estado = 'Activo';
-            }
-            setBandera(!bandera);
-        }
-    }
+    //     if (respuesta.ok) {
+    //         toast.success('Cliente habilitado/deshabilitado correctamente.', configMensaje);
+    //         if (estado === 'Activo') {
+    //             estado = 'Inactivo';
+    //         } else {
+    //             estado = 'Activo';
+    //         }
+    //         setBandera(!bandera);
+    //     }
+    // }
 
     return (
         <>
@@ -87,7 +87,7 @@ export const TablaClientes = ({ props }) => {
                 <td className="flex px-5 py-3 text-sm justify-center">
                     <img
                         className="tablaItem" src={Lapiz}
-                        onClick={obtenerInfoCliente}
+                        // onClick={obtenerInfoCliente}
                         alt="ícono lápiz"
                     ></img>
                     {estado === 'Activo'
@@ -96,7 +96,7 @@ export const TablaClientes = ({ props }) => {
                             className="ml-3 tablaItem"
                             src={Eliminar}
                             alt="ícono eliminar"
-                            onClick={inhabilitarCliente}
+                        // onClick={inhabilitarCliente}
                         >
                         </img>
                         :
@@ -104,7 +104,7 @@ export const TablaClientes = ({ props }) => {
                         <FontAwesomeIcon
                             className='ml-2 text-blue-500 tablaItem recoverIcon'
                             icon={faUndoAlt}
-                            onClick={inhabilitarCliente}
+                        // onClick={inhabilitarCliente}
                         />
                     }
                 </td>

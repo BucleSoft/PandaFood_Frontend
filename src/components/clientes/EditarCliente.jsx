@@ -33,7 +33,7 @@ export const EditarCliente = () => {
         if (cedula === '' || cedula === undefined || cedula === null) {
             history.push('/clientes');
         }
-    });
+    }, []);
 
     const configMensaje = {
         position: "bottom-center",
@@ -48,10 +48,9 @@ export const EditarCliente = () => {
 
     const actualizarCliente = async (e) => {
         e.preventDefault();
-
         if (cedula !== '') {
-            await axiosPetition(`clientes/${cedula}`, clientesValues, 'PUT');
-
+            const data = { ...clientesValues, puntos: puntosCliente }
+            await axiosPetition(`clientes/${cedula}`, data, 'PUT');
             if (respuesta.ok === false) {
                 toast.error(respuesta.msg, configMensaje);
             } else {
@@ -99,6 +98,7 @@ export const EditarCliente = () => {
                                 name="direccion"
                                 value={direccion}
                                 onChange={handleClientesChange}
+                                onBlur={formatearTexto}
                                 className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                                 placeholder="Dirección del cliente"
                                 autoComplete="off" />
@@ -117,13 +117,14 @@ export const EditarCliente = () => {
                             <div className="flex justify-center">
                                 <p className="text-8xl text-white">{puntosCliente}</p>
                                 <div className="flex items-start mt-2">
-                                    <button className="ml-2 cursor-pointer outline-none">
+                                    <button
+                                        type="button"
+                                        className="ml-2 cursor-pointer outline-none">
                                         <FontAwesomeIcon
                                             className='text-white text-xl'
                                             icon={faEdit}
                                             onClick={() => {
                                                 setHidden(false);
-                                                console.log(puntosCliente);
                                             }}
                                         />
                                     </button>
@@ -139,9 +140,9 @@ export const EditarCliente = () => {
                             <button
                                 type="button"
                                 className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
-                                onClick={resetClientes}
+                                onClick={() => resetClientes()}
                             >
-                                Limpiar
+                                Restaurar
                             </button>
                             <Link to="/clientes">
                                 <button

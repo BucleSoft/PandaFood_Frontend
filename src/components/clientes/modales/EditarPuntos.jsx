@@ -1,7 +1,18 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 export const EditarPuntos = ({ hidden, setHidden, puntos = 0, setPuntos }) => {
 
+    const configMensaje = {
+        position: "bottom-center",
+        background: "#191c1f !important",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+    };
 
     const puntosCliente = useRef();
 
@@ -9,10 +20,14 @@ export const EditarPuntos = ({ hidden, setHidden, puntos = 0, setPuntos }) => {
         puntosCliente.current.focus();
     });
 
-    const guardarPuntos = (e) => {
+    const guardarPuntos = async (e) => {
         e.preventDefault();
-        setPuntos(puntosCliente.current.value);
-        setHidden(true);
+        if (puntosCliente.current.value.trim().length === 0) {
+            toast.error('Los puntos son obligatorios.', configMensaje);
+        } else {
+            setPuntos(puntosCliente.current.value);
+            setHidden(true);
+        }
     }
 
     return (

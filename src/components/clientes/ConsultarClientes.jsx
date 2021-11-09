@@ -6,6 +6,7 @@ import { BanderaContext } from '../../context/banderaContext';
 
 export const ConsultarClientes = () => {
 
+    const [filtro, setFiltro] = useState('Activo');
     const [busqueda, setBusqueda] = useState('');
     const [bandera, setBandera] = useState(true);
 
@@ -15,6 +16,15 @@ export const ConsultarClientes = () => {
                 <div className="flex flex-col h-ufll w-full ml-10 mt-12">
                     <h2 className="text-left text-4xl mb-4 titulo">Consultar clientes</h2>
                     <div className="flex mb-4">
+                        <select
+                            name="estado"
+                            className="w-80 p-2 pl-8 pr-8 mr-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
+                            value={filtro}
+                            onChange={(e) => setFiltro(e.target.value)}>
+                            <option value="Todos">Todos los estados</option>
+                            <option value="Activo">Activos</option>
+                            <option value="Inactivo">Inactivos</option>
+                        </select>
                         <input
                             type="text"
                             name="cedula"
@@ -32,7 +42,7 @@ export const ConsultarClientes = () => {
                         </Link>
                     </div>
                     <div className="w-full contenedorTabla">
-                        <HeaderTabla />
+                        <HeaderTabla mostrar={filtro} busqueda={busqueda} />
                     </div>
                 </div>
                 <ToastContainer theme="dark" />

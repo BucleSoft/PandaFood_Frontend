@@ -7,6 +7,7 @@ import { UsuariosRegistrarPage } from './pages/usuarios/UsuariosRegistrarPage';
 import { UsuariosEditarPage } from './pages/usuarios/UsuariosEditarPage';
 import { ConsultarUsuarioContext } from './context/consultarUsuarioContext';
 import { ConsultarClienteContext } from './context/consultarClienteContext';
+import { ConsultarProductos } from './components/inventario/ConsultarProductos';
 import {
   BrowserRouter as Router,
   Switch,
@@ -16,6 +17,8 @@ import { PrivateLayout } from './layouts/PrivateLayout';
 import { ClientesPage } from './pages/clientes/ClientesPage';
 import { ClientesRegistrarPage } from './pages/clientes/ClientesRegistrarPage';
 import { ClientesEditarPage } from './pages/clientes/ClientesEditarPage';
+import { InventarioPage } from './pages/inventario/InventarioPage';
+import { InventarioRegistrarPage } from './pages/inventario/InventarioRegistrarPage';
 
 function App() {
 
@@ -55,6 +58,12 @@ function App() {
                 <UsuariosEditarPage />
               </Route>
             </ConsultarUsuarioContext.Provider>
+            <Route exact path="/inventario">
+              <ConsultarProductos />
+            </Route>
+            <Route exact path="/inventario/registrar">
+              <InventarioRegistrarPage />
+            </Route>
           </PrivateLayout>
         </Switch>
       </Router>
