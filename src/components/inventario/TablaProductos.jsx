@@ -6,16 +6,14 @@ import { useHistory } from 'react-router-dom';
 import { axiosPetition, respuesta, resetRespuesta } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUndoAlt } from '@fortawesome/free-solid-svg-icons';
-import { useConsultarClienteContext } from '../../context/consultarClienteContext';
+import { faUndoAlt, faCoffee, faBreadSlice } from '@fortawesome/free-solid-svg-icons';
 import { useBanderaContext } from '../../context/banderaContext';
 
-export const TablaClientes = ({ props }) => {
+export const TablaProductos = ({ props }) => {
 
-    let { cedula, nombre, puntos, estado } = props;
+    let { identificador, nombre, precio, stock, categoria } = props;
 
-    const { setClienteEditar } = useConsultarClienteContext();
-    const { bandera, setBandera } = useBanderaContext();
+    // const { bandera, setBandera } = useBanderaContext();
 
     const history = useHistory();
 
@@ -64,7 +62,7 @@ export const TablaClientes = ({ props }) => {
         <>
             <tr>
                 <td className="px-5 py-3   text-sm text-left">
-                    <p className="text-white whitespace-no-wrap">{cedula}</p>
+                    <p className="text-white whitespace-no-wrap">{identificador}</p>
                 </td>
                 <td className="px-5 py-3   text-sm">
                     <div>
@@ -73,19 +71,41 @@ export const TablaClientes = ({ props }) => {
                         </p>
                     </div>
                 </td>
-                <td className="px-5 py-3   text-sm text-left">
-                    <p className="text-white whitespace-no-wrap">{puntos}</p>
+                <td className="px-5 py-3 text-sm text-left">
+                    <p className="text-white whitespace-no-wrap">{precio}</p>
+                </td>
+                <td className="px-5 py-3 text-sm text-left">
+                    <p className="text-white whitespace-no-wrap">{stock}</p>
+                </td>
+                <td className="text-white">
+                    {
+                        categoria === 'Bebida' ?
+                            <FontAwesomeIcon
+                                className='mr-1'
+                                icon={faCoffee}
+                            />
+                            :
+                            <FontAwesomeIcon
+                                className='mr-1'
+                                icon={faBreadSlice}
+                            />
+                    }
                 </td>
                 <td className="px-5 py-3   text-sm text-center">
                     <span
-                        className={`relative inline-block px-3 py-1 font-semibold ${estado === 'Activo' ? 'text-green-900' : 'text-red-900'} leading-tight`}>
+                        className={`relative inline-block px-3 py-1 font-semibold ${categoria === 'Bebida' ? 'text-green-900' : 'text-red-900'} leading-tight`}>
                         <span aria-hidden
-                            className={`absolute inset-0 ${estado === 'Activo' ? 'bg-green-200' : 'bg-red-300'} opacity-50 rounded-full`}></span>
-                        <span className="relative">{estado}</span>
+                            className={`absolute inset-0 ${categoria === 'Bebida' ? 'bg-green-200' : 'bg-red-300'} opacity-50 rounded-full`}></span>
+                        <span className="relative">{categoria}</span>
                     </span>
                 </td>
                 <td className="flex px-5 py-3 text-sm justify-center">
                     <img
+                        className="tablaItem" src={Lapiz}
+                        // onClick={obtenerInfoCliente}
+                        alt="ícono lápiz"
+                    ></img>
+                    {/* <img
                         className="tablaItem" src={Lapiz}
                         // onClick={obtenerInfoCliente}
                         alt="ícono lápiz"
@@ -106,7 +126,7 @@ export const TablaClientes = ({ props }) => {
                             icon={faUndoAlt}
                         // onClick={inhabilitarCliente}
                         />
-                    }
+                    } */}
                 </td>
             </tr>
             <tr id="espacio"></tr>

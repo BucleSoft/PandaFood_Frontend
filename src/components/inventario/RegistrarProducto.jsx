@@ -13,8 +13,8 @@ export const RegistrarProducto = () => {
         identificador: '',
         nombre: '',
         precio: '',
-        stock: '',
-        categoria: ''
+        stock: 0,
+        categoria: 'Comida'
     });
 
     const { identificador, nombre, precio, stock, categoria } = productosValues;
@@ -40,7 +40,7 @@ export const RegistrarProducto = () => {
             if (respuesta.ok) {
                 resetProductos();
                 toast.success('Producto registrado correctamente.', configMensaje);
-                history.push('/productos');
+                history.push('/inventario');
             } else {
                 toast.error(respuesta.msg, configMensaje);
             }
@@ -64,30 +64,42 @@ export const RegistrarProducto = () => {
                         <input
                             name="nombre"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                            placeholder="Nombre del cliente"
+                            placeholder="Nombre del producto"
                             value={nombre}
                             onChange={handleProductosChange}
                             onBlur={formatearTexto}
                             autoComplete="off" />
                         <input
                             type="number"
-                            name="direccion"
+                            name="precio"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                            placeholder="Dirección del cliente"
+                            placeholder="Precio del producto"
                             value={precio}
                             onChange={handleProductosChange}
                             onBlur={formatearTexto}
                             autoComplete="off" />
-                        <input
-                            type="number"
-                            name="celular"
+                        <select
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                            value={stock}
+                            name="categoria"
                             onChange={handleProductosChange}
-                            placeholder="Celular del cliente"
-                            autoComplete="off" />
+                            value={categoria}
+                        >
+                            <option>Comida</option>
+                            <option>Bebida</option>
+                        </select>
                         <div>
-
+                            <div className="flex flex-col mb-12">
+                                <h2 className="text-3xl font-semibold titulo">Stock del producto</h2>
+                                <div className="flex justify-center">
+                                    <input
+                                        type="number"
+                                        className="bigInput w-40 text-8xl text-white border-b-2 text-center bg-transparent focus:outline-none"
+                                        name="stock"
+                                        value={stock}
+                                        onChange={handleProductosChange}
+                                    />
+                                </div>
+                            </div>
                             <button
                                 type="submit"
                                 className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput">

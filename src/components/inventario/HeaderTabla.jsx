@@ -10,31 +10,33 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
 
     // const { bandera } = useBanderaContext();
 
-    // useEffect(() => {
-    //     const buscarClientes = async () => {
+    useEffect(() => {
+        const buscarProductos = async () => {
 
-    //         const configMensaje = {
-    //             position: "bottom-center",
-    //             background: "#191c1f !important",
-    //             autoClose: 3000,
-    //             hideProgressBar: false,
-    //             closeOnClick: true,
-    //             pauseOnHover: false,
-    //             draggable: true,
-    //             progress: undefined,
-    //         };
+            const configMensaje = {
+                position: "bottom-center",
+                background: "#191c1f !important",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+            };
 
-    //         await axiosPetition("clientes");
-    //         setData(respuesta.clientes.reverse());
-    //         if (!respuesta.ok) {
-    //             toast.error(
-    //                 "Ha ocurrido un error al intentar obtener la lista de clientes.",
-    //                 configMensaje
-    //             );
-    //         }
-    //     }
-    //     buscarClientes();
-    // }, [bandera]);
+            await axiosPetition("productos");
+            setData(respuesta.productos.reverse());
+            console.log("Data", data);
+
+            if (!respuesta.ok) {
+                toast.error(
+                    "Ha ocurrido un error al intentar obtener la lista de productos.",
+                    configMensaje
+                );
+            }
+        }
+        buscarProductos();
+    }, []);
 
     return (
         <table className="leading-normal w-full tabla">
@@ -53,7 +55,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                         Precio
                     </th>
                     <th
-                        className="px-5 py-3 border-b-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Stock
                     </th>
                     <th
@@ -62,19 +64,18 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                     </th>
                     <th
                         className="px-5 py-3 border-b-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Disponibilidad
+                    </th>
+                    <th
+                        className="px-5 py-3 border-b-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Acciones
                     </th>
                 </tr>
             </thead>
             <tbody>
-                {/* {data?.map((datos, key) => {
-
-                    if (mostrar === 'Todos' && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
-                        return <TablaClientes key={datos.uid} props={datos} />
-                    } else if (datos.estado === mostrar && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
-                        return <TablaClientes key={datos.uid} props={datos} />
-                    }
-                })} */}
+                {data.map((datos, key) => {
+                    return <TablaProductos key={datos.uid} props={datos} />
+                })}
             </tbody>
         </table>
     )

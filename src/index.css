@@ -26,6 +26,22 @@ code {
   color: #f0313d;
 }
 
+.bigInput {
+  background-color: none;
+  color: white;
+  border-color: rgb(23, 24, 28);
+}
+
+.bigInput:focus {
+  border-color: #ffffff;
+  transition: border-color 0.8s;
+}
+
+.bigInput:not(:focus) {
+  border-color: rgb(23, 24, 28);
+  transition: border-color 0.8s;
+}
+
 .formInput {
   background-color: rgb(33, 34, 39);
   color: white;
