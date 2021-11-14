@@ -5,11 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCoffee, faBreadSlice, faCheckCircle, faTimesCircle, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
 import { HeaderTabla } from './HeaderTabla';
 
-export const ConsultarProductos = () => {
+export const ConsultarInsumos = () => {
     return (
         <div className="w-full h-screen overflow-y-scroll">
             <div className="flex flex-col h-full w-full ml-10 mt-12">
-                <h2 className="text-left text-4xl mb-4 titulo">Consultar inventario</h2>
+                <h2 className="text-left text-4xl mb-4 titulo">Consultar insumos</h2>
                 <div className="flex flex-col items-start">
                     <p className="text-white font-semibold mb-2">Filtros:</p>
                     <div className="mb-2">
@@ -58,16 +58,16 @@ export const ConsultarProductos = () => {
                         type="text"
                         name="cedula"
                         className="px-32 mr-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                        placeholder="Busca un producto"
+                        placeholder="Busca un insumo"
                         autoComplete="off"
                     // value={busqueda}
                     // onChange={(e) => setBusqueda(e.target.value)} 
                     />
-                    <Link to="/inventario/registrar" className="text-lg content-center w-80 rounded-lg focus:outline-none botonPrincipalInput">
+                    <Link to="/insumos/registrar" className="text-lg content-center w-80 rounded-lg focus:outline-none botonPrincipalInput">
                         <button
                             className="text-white p-2 rounded-lg content-center focus:outline-none botonPrincipalInput"
                         >
-                            Nuevo producto
+                            Nuevo insumo
                         </button>
                     </Link>
                 </div>

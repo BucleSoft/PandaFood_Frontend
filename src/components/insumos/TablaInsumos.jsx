@@ -6,12 +6,15 @@ import { useHistory } from 'react-router-dom';
 import { axiosPetition, respuesta, resetRespuesta } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUndoAlt, faCoffee, faBreadSlice } from '@fortawesome/free-solid-svg-icons';
 import { useBanderaContext } from '../../context/banderaContext';
+import { faCoffee, faBreadSlice, faCheckCircle, faTimesCircle, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
+import { useConsultarInsumoContext } from '../../context/consultarInsumoContext';
 
-export const TablaProductos = ({ props }) => {
+export const TablaInsumos = ({ props }) => {
 
-    let { identificador, nombre, precio, stock, categoria } = props;
+    let { identificador, nombre, stock, categoria, disponibilidad } = props;
+
+    const { setInsumoEditar } = useConsultarInsumoContext();
 
     // const { bandera, setBandera } = useBanderaContext();
 
@@ -28,16 +31,16 @@ export const TablaProductos = ({ props }) => {
         progress: undefined,
     };
 
-    // const obtenerInfoCliente = async () => {
-    //     resetRespuesta();
-    //     await axiosPetition(`clientes/${cedula}`);
-    //     if (respuesta.ok) {
-    //         setClienteEditar(respuesta.cliente);
-    //         history.push('/clientes/editar');
-    //     } else {
-    //         toast.error(respuesta.msg, configMensaje);
-    //     }
-    // }
+    const obtenerInfoInsumo = async () => {
+        resetRespuesta();
+        await axiosPetition(`insumos/${identificador}`);
+        if (respuesta.ok) {
+            setInsumoEditar(respuesta.insumo);
+            history.push('/insumos/editar');
+        } else {
+            toast.error(respuesta.msg, configMensaje);
+        }
+    }
 
     // const inhabilitarCliente = async () => {
 
@@ -72,9 +75,6 @@ export const TablaProductos = ({ props }) => {
                     </div>
                 </td>
                 <td className="px-5 py-3 text-sm text-left">
-                    <p className="text-white whitespace-no-wrap">{precio}</p>
-                </td>
-                <td className="px-5 py-3 text-sm text-left">
                     <p className="text-white whitespace-no-wrap">{stock}</p>
                 </td>
                 <td className="text-white">
@@ -83,26 +83,35 @@ export const TablaProductos = ({ props }) => {
                             <FontAwesomeIcon
                                 className='mr-1'
                                 icon={faCoffee}
+                                title='Bebida'
                             />
                             :
                             <FontAwesomeIcon
                                 className='mr-1'
                                 icon={faBreadSlice}
+                                title='Comida'
                             />
                     }
                 </td>
                 <td className="px-5 py-3   text-sm text-center">
                     <span
-                        className={`relative inline-block px-3 py-1 font-semibold ${categoria === 'Bebida' ? 'text-green-900' : 'text-red-900'} leading-tight`}>
+                        className={`relative inline-block px-3 py-1 font-semibold ${disponibilidad === 'Disponible' ? 'text-green-900' : 'text-red-900'} leading-tight`}>
                         <span aria-hidden
-                            className={`absolute inset-0 ${categoria === 'Bebida' ? 'bg-green-200' : 'bg-red-300'} opacity-50 rounded-full`}></span>
-                        <span className="relative">{categoria}</span>
+                            className={`absolute inset-0 ${disponibilidad === 'Disponible' ? 'bg-green-200' : 'bg-red-300'} opacity-50 rounded-full`}></span>
+                        <span className="relative">
+                            <FontAwesomeIcon
+                                className='mr-1 text-green-900'
+                                icon={faCheckCircle}
+                            />
+                            {
+                                disponibilidad
+                            }</span>
                     </span>
                 </td>
                 <td className="flex px-5 py-3 text-sm justify-center">
                     <img
                         className="tablaItem" src={Lapiz}
-                        // onClick={obtenerInfoCliente}
+                        onClick={obtenerInfoInsumo}
                         alt="ícono lápiz"
                     ></img>
                     {/* <img

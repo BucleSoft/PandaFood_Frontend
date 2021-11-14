@@ -2,28 +2,36 @@ import './App.css';
 import { useState } from 'react';
 import { LoginPage } from './pages/LoginPage';
 import { PerfilPage } from './pages/PerfilPage';
-import { UsuariosPage } from './pages/usuarios/UsuariosPage';
-import { UsuariosRegistrarPage } from './pages/usuarios/UsuariosRegistrarPage';
-import { UsuariosEditarPage } from './pages/usuarios/UsuariosEditarPage';
+
 import { ConsultarUsuarioContext } from './context/consultarUsuarioContext';
 import { ConsultarClienteContext } from './context/consultarClienteContext';
-import { ConsultarProductos } from './components/inventario/ConsultarProductos';
+import { ConsultarInsumoContext } from './context/consultarInsumoContext';
+import { ConsultarProductos } from './components/insumos/ConsultarInsumos';
+
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
 import { PrivateLayout } from './layouts/PrivateLayout';
+
+import { UsuariosPage } from './pages/usuarios/UsuariosPage';
+import { UsuariosRegistrarPage } from './pages/usuarios/UsuariosRegistrarPage';
+import { UsuariosEditarPage } from './pages/usuarios/UsuariosEditarPage';
+
 import { ClientesPage } from './pages/clientes/ClientesPage';
 import { ClientesRegistrarPage } from './pages/clientes/ClientesRegistrarPage';
 import { ClientesEditarPage } from './pages/clientes/ClientesEditarPage';
-import { InventarioPage } from './pages/inventario/InventarioPage';
-import { InventarioRegistrarPage } from './pages/inventario/InventarioRegistrarPage';
+
+import { InsumosPage } from './pages/insumos/InsumosPage';
+import { InsumosRegistrarPage } from './pages/insumos/InsumosRegistrarPage';
+import { InsumosEditarPage } from './pages/insumos/InsumosEditarPage';
 
 function App() {
 
   const [usuarioEditar, setUsuarioEditar] = useState();
   const [clienteEditar, setClienteEditar] = useState();
+  const [insumoEditar, setInsumoEditar] = useState();
 
   return (
     <div className="App">
@@ -58,12 +66,17 @@ function App() {
                 <UsuariosEditarPage />
               </Route>
             </ConsultarUsuarioContext.Provider>
-            <Route exact path="/inventario">
-              <ConsultarProductos />
-            </Route>
-            <Route exact path="/inventario/registrar">
-              <InventarioRegistrarPage />
-            </Route>
+            <ConsultarInsumoContext.Provider value={{ insumoEditar, setInsumoEditar }}>
+              <Route exact path="/insumos">
+                <InsumosPage />
+              </Route>
+              <Route exact path="/insumos/registrar">
+                <InsumosRegistrarPage />
+              </Route>
+              <Route exact path="/insumos/editar">
+                <InsumosEditarPage />
+              </Route>
+            </ConsultarInsumoContext.Provider>
           </PrivateLayout>
         </Switch>
       </Router>

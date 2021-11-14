@@ -21,8 +21,8 @@ export const MenuLateral = () => {
             setActive('facturas');
         } else if (url.includes('clientes')) {
             setActive('clientes');
-        } else if (url.includes('inventario')) {
-            setActive('inventario');
+        } else if (url.includes('insumos')) {
+            setActive('insumos');
         } else if (url.includes('usuarios')) {
             setActive('usuarios');
         }
@@ -73,14 +73,14 @@ export const MenuLateral = () => {
                         Generar Facturas
                     </li>
                 </Link>
-                <Link to="/inventario">
+                <Link to="/insumos">
                     <li
-                        className={`flex text-md mr-2 ml-2 mb-3 h-10 items-center menu-item rounded-lg ${active === "inventario" ? "activated" : ''}`}
-                        onClick={() => setActive('inventario')}>
+                        className={`flex text-md mr-2 ml-2 mb-3 h-10 items-center menu-item rounded-lg ${active === "insumos" ? "activated" : ''}`}
+                        onClick={() => setActive('insumos')}>
                         <FontAwesomeIcon
                             className="mr-2 ml-4"
                             icon={faBreadSlice} />
-                        Inventario
+                        Insumos
                     </li>
                 </Link>
                 <Link to="/clientes">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
-import { TablaProductos } from './TablaProductos';
+import { TablaInsumos } from './TablaInsumos';
 import { useBanderaContext } from '../../context/banderaContext';
 
 export const HeaderTabla = ({ mostrar, busqueda }) => {
@@ -11,7 +11,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
     // const { bandera } = useBanderaContext();
 
     useEffect(() => {
-        const buscarProductos = async () => {
+        const buscarInsumos = async () => {
 
             const configMensaje = {
                 position: "bottom-center",
@@ -24,18 +24,17 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                 progress: undefined,
             };
 
-            await axiosPetition("productos");
-            setData(respuesta.productos.reverse());
-            console.log("Data", data);
+            await axiosPetition("insumos");
+            setData(respuesta.insumos?.reverse());
 
             if (!respuesta.ok) {
                 toast.error(
-                    "Ha ocurrido un error al intentar obtener la lista de productos.",
+                    "Ha ocurrido un error al intentar obtener la lista de insumos.",
                     configMensaje
                 );
             }
         }
-        buscarProductos();
+        buscarInsumos();
     }, []);
 
     return (
@@ -48,11 +47,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                     </th>
                     <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Nombre del producto
-                    </th>
-                    <th
-                        className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Precio
+                        Nombre del insumo
                     </th>
                     <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -73,8 +68,8 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                 </tr>
             </thead>
             <tbody>
-                {data.map((datos, key) => {
-                    return <TablaProductos key={datos.uid} props={datos} />
+                {data?.map((datos, key) => {
+                    return <TablaInsumos key={datos.uid} props={datos} />
                 })}
             </tbody>
         </table>
