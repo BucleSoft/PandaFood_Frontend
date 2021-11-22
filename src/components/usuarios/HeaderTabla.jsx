@@ -25,7 +25,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
             };
 
             await axiosPetition("usuarios");
-            setData(respuesta.usuarios.reverse());
+            setData(respuesta.usuarios?.reverse());
             if (!respuesta.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de usuarios.",

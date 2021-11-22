@@ -1,0 +1,14 @@
+.verde {
+  background-color: rgba(167, 243, 208);
+  color: rgb(6, 78, 59, 1);
+}
+
+.amarillo {
+  background-color: #fadf63;
+  color: #46351d;
+}
+
+.rojo {
+  background-color: rgb(252, 169, 169);
+  color: rgb(127, 29, 29);
+}

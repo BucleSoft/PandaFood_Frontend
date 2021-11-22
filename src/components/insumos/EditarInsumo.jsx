@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
@@ -9,19 +9,21 @@ import { useConsultarInsumoContext } from '../../context/consultarInsumoContext'
 export const EditarInsumo = () => {
 
     const { insumoEditar } = useConsultarInsumoContext();
-
+    console.log(insumoEditar);
     const history = useHistory();
+
+    const [unidades, setUnidades] = useState(insumoEditar?.stock === null ? 'Gramos' : 'Unidades');
 
     const [insumosValues, handleInsumosChange, resetInsumos, formatearTexto] = useForm({
         identificador: insumoEditar?.identificador,
         nombre: insumoEditar?.nombre,
-        stock: insumoEditar?.stock,
+        stock: insumoEditar?.stock !== null ? insumoEditar?.stock : '',
+        gramaje: insumoEditar?.gramaje !== null ? insumoEditar?.gramaje : '',
         categoria: insumoEditar?.categoria,
-        disponibilidad: '',
         estado: insumoEditar?.estado
     });
 
-    const { identificador, nombre, stock, categoria, estado } = insumosValues;
+    let { identificador, nombre, stock, gramaje, categoria } = insumosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -42,15 +44,30 @@ export const EditarInsumo = () => {
 
     const actualizarInsumo = async (e) => {
         e.preventDefault();
-        if (identificador !== '') {
-            await axiosPetition(`insumos/${identificador}`, insumosValues, 'PUT');
-            if (respuesta.ok === false) {
-                toast.error(respuesta.msg, configMensaje);
-            } else {
-                history.push('/insumos');
-            }
+        if (insumosValues.stock === '' && insumosValues.gramaje === '') {
+            toast.error('Ingresa un stock o un gramaje del insumo.');
+        } else if (insumosValues.stock !== '' && insumosValues.gramaje !== '') {
+            toast.error('Ingresa un stock o un gramaje, pero no ambos.');
         } else {
-            toast.error('Ingrese un identificador válido por favor.', configMensaje);
+            if (identificador !== '') {
+                await axiosPetition(`insumos/${identificador}`, insumosValues, 'PUT');
+                if (respuesta.ok === false) {
+                    toast.error(respuesta.msg, configMensaje);
+                } else {
+                    history.push('/insumos');
+                }
+            } else {
+                toast.error('Ingrese un identificador válido por favor.', configMensaje);
+            }
+        }
+    }
+
+    const reiniciar = () => {
+        resetInsumos();
+        if (insumoEditar?.stock === null) {
+            setUnidades('Gramos');
+        } else {
+            setUnidades('Unidades');
         }
     }
 
@@ -85,30 +102,49 @@ export const EditarInsumo = () => {
                             <option>Comida</option>
                             <option>Bebida</option>
                         </select>
+                        <select
+                            className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
+                            name="unidades"
+                            value={unidades}
+                            onChange={(e) => {
+                                setUnidades(e.target.value);
+                                insumosValues.gramaje = '';
+                                insumosValues.stock = '';
+                            }}
+                        >
+                            <option>Unidades</option>
+                            <option>Gramos</option>
+                        </select>
+                        <input
+                            type="number"
+                            className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidades !== 'Unidades' ? 'hidden' : ''}`}
+                            name="stock"
+                            value={stock}
+                            onChange={handleInsumosChange}
+                            placeholder='Stock'
+                            autoComplete='off'
+                        />
+                        <input
+                            type="number"
+                            className={`w-80 p-2 pl-8 pr-8 mr-1 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidades !== 'Gramos' ? 'hidden' : ''}`}
+                            name="gramaje"
+                            value={gramaje}
+                            onChange={handleInsumosChange}
+                            placeholder='Gramaje'
+                            autoComplete='off'
+                        />
                         <div>
-                            <div className="flex flex-col mb-12">
-                                <h2 className="text-3xl font-semibold titulo">Stock del insumo</h2>
-                                <div className="flex justify-center">
-                                    <input
-                                        type="number"
-                                        className="bigInput w-40 text-8xl text-white border-b-2 text-center bg-transparent focus:outline-none"
-                                        name="stock"
-                                        value={stock}
-                                        onChange={handleInsumosChange}
-                                    />
-                                </div>
-                            </div>
                             <button
                                 type="submit"
                                 className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput">
-                                Registrar insumo
+                                Actualizar insumo
                             </button>
                             <button
                                 type="button"
                                 className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
-                                onClick={resetInsumos}
+                                onClick={reiniciar}
                             >
-                                Limpiar
+                                Restaurar
                             </button>
                             <Link to="/insumos">
                                 <button

@@ -1,0 +1,8 @@
+.filtro {
+  background-color: rgba(48, 49, 56, 0.356);
+  /* background-color: #f0313d; */
+}
+
+.filtroSeleccionado {
+  background-color: rgb(52, 53, 59);
+}

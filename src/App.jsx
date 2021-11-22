@@ -6,7 +6,6 @@ import { PerfilPage } from './pages/PerfilPage';
 import { ConsultarUsuarioContext } from './context/consultarUsuarioContext';
 import { ConsultarClienteContext } from './context/consultarClienteContext';
 import { ConsultarInsumoContext } from './context/consultarInsumoContext';
-import { ConsultarProductos } from './components/insumos/ConsultarInsumos';
 
 import {
   BrowserRouter as Router,
@@ -26,6 +25,9 @@ import { ClientesEditarPage } from './pages/clientes/ClientesEditarPage';
 import { InsumosPage } from './pages/insumos/InsumosPage';
 import { InsumosRegistrarPage } from './pages/insumos/InsumosRegistrarPage';
 import { InsumosEditarPage } from './pages/insumos/InsumosEditarPage';
+
+import { MenuPage } from './pages/menú/MenuPage';
+import { RegistrarProductoPage } from './pages/menú/RegistrarProductoPage';
 
 function App() {
 
@@ -77,6 +79,12 @@ function App() {
                 <InsumosEditarPage />
               </Route>
             </ConsultarInsumoContext.Provider>
+            <Route exact path="/menu">
+              <MenuPage />
+            </Route>
+            <Route exact path="/menu/registrar">
+              <RegistrarProductoPage />
+            </Route>
           </PrivateLayout>
         </Switch>
       </Router>

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../styles/tablaUsuarios.css';
+import '../../styles/tablaInsumos.css';
 import Lapiz from '../../assets/lapiz.svg';
 import Eliminar from '../../assets/eliminar.svg';
 import { useHistory } from 'react-router-dom';
@@ -7,14 +8,16 @@ import { axiosPetition, respuesta, resetRespuesta } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useBanderaContext } from '../../context/banderaContext';
-import { faCoffee, faBreadSlice, faCheckCircle, faTimesCircle, faHourglassHalf } from '@fortawesome/free-solid-svg-icons';
+import { faCoffee, faBreadSlice, faCheckCircle, faClock, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useConsultarInsumoContext } from '../../context/consultarInsumoContext';
 
 export const TablaInsumos = ({ props }) => {
 
-    let { identificador, nombre, stock, categoria, disponibilidad } = props;
+    let { identificador, nombre, stock, gramaje, categoria } = props;
 
     const { setInsumoEditar } = useConsultarInsumoContext();
+
+    const [disponibilidad, setDisponibilidad] = useState('Disponible');
 
     // const { bandera, setBandera } = useBanderaContext();
 
@@ -42,6 +45,35 @@ export const TablaInsumos = ({ props }) => {
         }
     }
 
+    useEffect(() => {
+        if (stock !== null && categoria === 'Bebida') {
+            if (stock > 5) {
+                setDisponibilidad('Disponible');
+            } else if (stock <= 5 && stock > 0) {
+                setDisponibilidad('Por agotarse');
+            } else {
+                setDisponibilidad('Agotado');
+            }
+        } else if (stock !== null && categoria === 'Comida') {
+            if (stock > 12) {
+                setDisponibilidad('Disponible');
+            } else if (stock <= 12 && stock > 0) {
+                setDisponibilidad('Por agotarse');
+            } else {
+                setDisponibilidad('Agotado');
+            }
+        } else if (gramaje !== null) {
+            if (gramaje > 500) {
+                setDisponibilidad('Disponible');
+            } else if (gramaje <= 500 && gramaje > 0) {
+                setDisponibilidad('Por agotarse');
+            } else {
+                setDisponibilidad('Agotado');
+            }
+        }
+
+    }, []);
+
     // const inhabilitarCliente = async () => {
 
     //     if (estado === 'Activo') {
@@ -64,10 +96,10 @@ export const TablaInsumos = ({ props }) => {
     return (
         <>
             <tr>
-                <td className="px-5 py-3   text-sm text-left">
-                    <p className="text-white whitespace-no-wrap">{identificador}</p>
+                <td className="px-5 py-3 text-sm text-left">
+                    <p className="text-white font-semibold whitespace-no-wrap">{identificador}</p>
                 </td>
-                <td className="px-5 py-3   text-sm">
+                <td className="px-5 py-3 text-sm">
                     <div>
                         <p className="text-left text-white whitespace-no-wrap">
                             {nombre}
@@ -75,7 +107,7 @@ export const TablaInsumos = ({ props }) => {
                     </div>
                 </td>
                 <td className="px-5 py-3 text-sm text-left">
-                    <p className="text-white whitespace-no-wrap">{stock}</p>
+                    <p className="text-white whitespace-no-wrap">{stock === null ? gramaje + 'g' : stock}</p>
                 </td>
                 <td className="text-white">
                     {
@@ -93,19 +125,19 @@ export const TablaInsumos = ({ props }) => {
                             />
                     }
                 </td>
-                <td className="px-5 py-3   text-sm text-center">
+                <td className="pl-14 py-3 text-sm text-left">
                     <span
-                        className={`relative inline-block px-3 py-1 font-semibold ${disponibilidad === 'Disponible' ? 'text-green-900' : 'text-red-900'} leading-tight`}>
+                        className={`w-32 relative inline-block py-1 font-semibold text-white leading-tight rounded-full`}
+                    >
                         <span aria-hidden
-                            className={`absolute inset-0 ${disponibilidad === 'Disponible' ? 'bg-green-200' : 'bg-red-300'} opacity-50 rounded-full`}></span>
+                        ></span>
                         <span className="relative">
                             <FontAwesomeIcon
-                                className='mr-1 text-green-900'
-                                icon={faCheckCircle}
+                                className='mr-1'
+                                icon={disponibilidad === 'Disponible' ? faCheckCircle : disponibilidad === 'Por agotarse' ? faClock : faTimesCircle}
                             />
-                            {
-                                disponibilidad
-                            }</span>
+                            {disponibilidad}
+                        </span>
                     </span>
                 </td>
                 <td className="flex px-5 py-3 text-sm justify-center">

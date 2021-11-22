@@ -43,7 +43,7 @@ code {
 }
 
 .formInput {
-  background-color: rgb(33, 34, 39);
+  background-color: #212227;
   color: white;
   border-color: gray;
 }
@@ -54,7 +54,7 @@ code {
 }
 
 .formInput:not(:focus) {
-  border-color: rgb(87, 87, 87);
+  border-color: #575757;
   transition: border-color 0.8s;
 }
 
@@ -82,7 +82,7 @@ input[type="number"] {
 }
 
 .botonInput {
-  background-color: rgb(40, 41, 46);
+  background-color: #28292e;
 }
 
 .botonInput:hover {

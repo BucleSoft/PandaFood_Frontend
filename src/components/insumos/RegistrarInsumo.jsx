@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
@@ -9,16 +9,19 @@ export const RegistrarInsumo = () => {
 
     const history = useHistory();
 
+    const [unidades, setUnidades] = useState('Unidades');
+
     const [insumosValues, handleInsumosChange, resetInsumos, formatearTexto] = useForm({
         identificador: '',
         nombre: '',
-        stock: 0,
+        stock: '',
+        gramaje: '',
         categoria: 'Comida',
         disponibilidad: 'Disponible',
         estado: 'Activo'
     });
 
-    const { identificador, nombre, stock, categoria } = insumosValues;
+    const { identificador, nombre, stock, gramaje, categoria } = insumosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -34,20 +37,26 @@ export const RegistrarInsumo = () => {
     const registrarInsumo = async (e) => {
         e.preventDefault();
 
-        await axiosPetition('insumos', insumosValues, 'POST');
+        if (insumosValues.stock === '' && insumosValues.gramaje === '') {
+            toast.error('Ingresa un stock o un gramaje del insumo.');
+        } else if (insumosValues.stock !== '' && insumosValues.gramaje !== '') {
+            toast.error('Ingresa un stock o un gramaje, pero no ambos.');
+        } else {
 
-        if (respuesta !== undefined) {
+            await axiosPetition('insumos', insumosValues, 'POST');
 
-            if (respuesta.ok) {
-                resetInsumos();
-                toast.success('Insumo registrado correctamente.', configMensaje);
-                history.push('/insumos');
-            } else {
-                toast.error(respuesta.msg, configMensaje);
+            if (respuesta !== undefined) {
+
+                if (respuesta.ok) {
+                    resetInsumos();
+                    toast.success('Insumo registrado correctamente.', configMensaje);
+                    history.push('/insumos');
+                } else {
+                    toast.error(respuesta.msg, configMensaje);
+                }
             }
         }
     }
-
     return (
         <div className="flex flex-col w-full h-screen overflow-y-scroll usuarios">
             <div className="ml-10">
@@ -79,19 +88,38 @@ export const RegistrarInsumo = () => {
                             <option>Comida</option>
                             <option>Bebida</option>
                         </select>
+                        <select
+                            className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
+                            name="unidades"
+                            value={unidades}
+                            onChange={(e) => {
+                                setUnidades(e.target.value);
+                                insumosValues.gramaje = '';
+                                insumosValues.stock = '';
+                            }}
+                        >
+                            <option>Unidades</option>
+                            <option>Gramos</option>
+                        </select>
+                        <input
+                            type="number"
+                            className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidades !== 'Unidades' ? 'hidden' : ''}`}
+                            name="stock"
+                            value={stock}
+                            onChange={handleInsumosChange}
+                            placeholder='Stock'
+                            autoComplete='off'
+                        />
+                        <input
+                            type="number"
+                            className={`w-80 p-2 pl-8 pr-8 mr-1 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidades !== 'Gramos' ? 'hidden' : ''}`}
+                            name="gramaje"
+                            value={gramaje}
+                            onChange={handleInsumosChange}
+                            placeholder='Gramaje'
+                            autoComplete='off'
+                        />
                         <div>
-                            <div className="flex flex-col mb-12">
-                                <h2 className="text-3xl font-semibold titulo">Stock del insumo</h2>
-                                <div className="flex justify-center">
-                                    <input
-                                        type="number"
-                                        className="bigInput w-40 text-8xl text-white border-b-2 text-center bg-transparent focus:outline-none"
-                                        name="stock"
-                                        value={stock}
-                                        onChange={handleInsumosChange}
-                                    />
-                                </div>
-                            </div>
                             <button
                                 type="submit"
                                 className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput">

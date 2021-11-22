@@ -25,7 +25,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
             };
 
             await axiosPetition("clientes");
-            setData(respuesta.clientes.reverse());
+            setData(respuesta.clientes?.reverse());
             if (!respuesta.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de clientes.",
