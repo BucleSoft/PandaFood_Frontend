@@ -57,7 +57,7 @@ export const EditarInsumo = () => {
                     history.push('/insumos');
                 }
             } else {
-                toast.error('Ingrese un identificador válido por favor.', configMensaje);
+                toast.error('Ingrese un id válido por favor.', configMensaje);
             }
         }
     }

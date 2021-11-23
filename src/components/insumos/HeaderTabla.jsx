@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { TablaInsumos } from './TablaInsumos';
 import { useBanderaContext } from '../../context/banderaContext';
 
-export const HeaderTabla = ({ filtro, busqueda }) => {
+export const HeaderTabla = ({ filtro, busqueda = '' }) => {
 
     const [data, setData] = useState([]);
 
@@ -70,7 +70,7 @@ export const HeaderTabla = ({ filtro, busqueda }) => {
             <tbody>
                 {data?.map((datos, key) => {
 
-                    const condicion = datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.identificador.toString().toLowerCase().includes(busqueda.toLowerCase());
+                    const condicion = datos.nombre?.toLowerCase().includes(busqueda.toLowerCase()) || datos.identificador?.toString().toLowerCase().includes(busqueda.toLowerCase());
 
                     switch (filtro) {
                         case 'Todos':

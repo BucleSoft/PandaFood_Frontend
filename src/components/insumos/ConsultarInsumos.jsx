@@ -29,7 +29,7 @@ export const ConsultarInsumos = () => {
                             Todos
                         </button>
                         <button
-                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Unidades' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
+                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Unidentificadorades' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
                             onClick={() => cambiarFiltro('Unidades')}>
                             <FontAwesomeIcon
                                 className='mr-1 text-white'
@@ -56,7 +56,7 @@ export const ConsultarInsumos = () => {
                             Bebidas
                         </button>
                         <button
-                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Comida' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
+                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Comidentificadora' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
                             onClick={() => cambiarFiltro('Comida')}>
                             <FontAwesomeIcon
                                 className='mr-1 text-white'
@@ -96,7 +96,7 @@ export const ConsultarInsumos = () => {
                 <div className="flex mb-4">
                     <input
                         type="text"
-                        name="busqueda"
+                        nombre="busqueda"
                         className="px-32 mr-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                         placeholder="Busca un insumo"
                         autoComplete="off"

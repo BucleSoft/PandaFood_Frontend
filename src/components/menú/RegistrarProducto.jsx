@@ -20,8 +20,14 @@ import '../../styles/registrarProducto.css';
 export const RegistrarProducto = () => {
 
     const [items, setItems] = useState([]);
-    const [insumos, setInsumos] = useState([{ nombre: 'Fresa', cantidad: 3 }]);
+    const [insumos, setInsumos] = useState([]);
     const [nuevoInsumo, setNuevoInsumo] = useState({});
+    const [categoria, setCategoria] = useState('Hamburguesa');
+    const [inputInsumo, setInputInsumo] = useState("");
+
+    useEffect(() => {
+        console.log(categoria);
+    }, [categoria]);
 
     useEffect(() => {
         const buscarInsumos = async () => {
@@ -37,6 +43,16 @@ export const RegistrarProducto = () => {
             };
 
             await axiosPetition("insumos");
+
+            respuesta.insumos?.map((datos, key) => {
+                datos.name = datos.nombre;
+                datos.id = key;
+            });
+
+            setItems(respuesta.insumos);
+
+            console.log(respuesta.insumos)
+
             if (!respuesta.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de insumos.",
@@ -44,19 +60,12 @@ export const RegistrarProducto = () => {
                 );
             }
 
-            setItems(respuesta.insumos);
         }
         buscarInsumos();
-        console.log(items)
+
     }, []);
 
-
-
-
     const handleOnSearch = (string, results) => {
-        // onSearch will have as the first callback parameter
-        // the string searched and for the second the results.
-        console.log(string, results)
     }
 
     const handleOnHover = (result) => {
@@ -64,8 +73,9 @@ export const RegistrarProducto = () => {
     }
 
     const handleOnSelect = (item) => {
-        nuevoInsumo.identificador = item.id;
-        nuevoInsumo.nombre = item.name;
+        nuevoInsumo.identificador = item.identificador;
+        nuevoInsumo.nombre = item.nombre;
+        setInputInsumo(item.nombre)
         setNuevoInsumo(nuevoInsumo);
     }
 
@@ -84,12 +94,11 @@ export const RegistrarProducto = () => {
         identificador: '',
         nombre: '',
         precio: '',
-        insumos: [],
+        insumos: insumos,
+        categoria: categoria,
         estado: 'Activo'
     });
 
-
-    const insumo = useRef('');
     const cantidad = useRef('');
 
     const { identificador, nombre, precio } = productosValues;
@@ -108,16 +117,17 @@ export const RegistrarProducto = () => {
     const registrarProducto = async (e) => {
         e.preventDefault();
 
+        productosValues.categoria = categoria;
+
         await axiosPetition('productos', productosValues, 'POST');
 
         if (respuesta !== undefined) {
 
-            console.log(respuesta);
-
             if (respuesta.ok) {
                 resetProductos();
                 toast.success('Producto registrado correctamente.', configMensaje);
-                history.push('/productos');
+                console.log(productosValues.insumos);
+                history.push('/menu');
             } else {
                 toast.error(respuesta.msg, configMensaje);
             }
@@ -125,11 +135,21 @@ export const RegistrarProducto = () => {
     }
 
     const agregarInsumo = () => {
-        nuevoInsumo.cantidad = cantidad.current.value;
-        insumos.push(nuevoInsumo);
-        setInsumos(insumos);
-        setNuevoInsumo([]);
-        insumo.current.value = '';
+
+        if (inputInsumo.trim() === '') {
+            console.log(inputInsumo.trim(), cantidad.current.value.trim())
+            toast.error("Busque y seleccione un insumo de la lista deslplegable, por favor.", configMensaje);
+        } else if (cantidad.current.value.trim() === '') {
+            toast.error("La cantidad del insumo es obligatoria.", configMensaje);
+        } else {
+            nuevoInsumo.cantidad = cantidad.current.value;
+            insumos.push(nuevoInsumo);
+            setInsumos(insumos);
+            setNuevoInsumo({});
+            cantidad.current.value = "";
+            setInputInsumo("");
+            console.log(inputInsumo);
+        }
     }
 
     return (
@@ -138,18 +158,18 @@ export const RegistrarProducto = () => {
 
                 <h2 className="text-left text-4xl mt-12 mb-8 titulo">Registrar productos</h2>
                 <section className="flex flex-wrap">
-                    <FiltroRegistrarProducto imagen={hamburguesa} texto="Hamburguesa" />
-                    <FiltroRegistrarProducto imagen={perro} texto="Perro" />
-                    <FiltroRegistrarProducto imagen={salchipapa} texto="Salchipapa" />
-                    <FiltroRegistrarProducto imagen={picada} texto="Picada" />
-                    <FiltroRegistrarProducto imagen={combo} texto="Combo" />
-                    <FiltroRegistrarProducto imagen={bebida} texto="Bebida" />
-                    <FiltroRegistrarProducto imagen={entrada} texto="Entrada" />
+                    <FiltroRegistrarProducto imagen={hamburguesa} texto="Hamburguesa" categoria="Hamburguesa" seleccionado={categoria} setCategoria={setCategoria} />
+                    <FiltroRegistrarProducto imagen={perro} texto="Perro" categoria="Perro" seleccionado={categoria} setCategoria={setCategoria} />
+                    <FiltroRegistrarProducto imagen={salchipapa} texto="Salchipapa" categoria="Salchipapa" seleccionado={categoria} setCategoria={setCategoria} />
+                    <FiltroRegistrarProducto imagen={picada} texto="Picada" categoria="Picada" seleccionado={categoria} setCategoria={setCategoria} />
+                    <FiltroRegistrarProducto imagen={combo} texto="Combo" categoria="Combo" seleccionado={categoria} setCategoria={setCategoria} />
+                    <FiltroRegistrarProducto imagen={bebida} texto="Bebida" categoria="Bebida" seleccionado={categoria} setCategoria={setCategoria} />
+                    <FiltroRegistrarProducto imagen={entrada} texto="Entrada" categoria="Entrada" seleccionado={categoria} setCategoria={setCategoria} />
                 </section>
                 <form onSubmit={registrarProducto} className="mt-8">
                     <div className="flex flex-wrap">
                         <input
-                            type="number"
+                            type="text"
                             name="identificador"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                             placeholder="Identificador del producto"
@@ -174,7 +194,7 @@ export const RegistrarProducto = () => {
                             autoComplete="off" />
                         <div id="insumosInput" style={{ width: '20rem' }} className="mr-8 mb-8 rounded-sm border-b-2">
                             <ReactSearchAutocomplete
-                                ref={insumo}
+                                inputSearchString={inputInsumo}
                                 items={items}
                                 onSearch={handleOnSearch}
                                 onHover={handleOnHover}
@@ -201,7 +221,7 @@ export const RegistrarProducto = () => {
                             <h2 className="text-white">Insumos:</h2>
                             <div id="contenedorInsumos" className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
                                 {insumos?.map((data, key) => {
-                                    return <Insumo cantidad={data.cantidad} insumo={data.nombre} />
+                                    return <Insumo key={key} cantidad={data.cantidad} insumo={data.nombre} />
                                 })}
                             </div>
                         </div>
