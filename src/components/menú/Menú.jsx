@@ -29,7 +29,7 @@ export const Menú = () => {
                 return toast('Error al cargar los productos!', configMensaje);
             }
 
-            setProductos(respuesta.productos);
+            setProductos(respuesta.productos?.reverse());
 
         }
         buscarProductos();
