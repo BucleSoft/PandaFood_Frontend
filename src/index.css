@@ -72,6 +72,14 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+button {
+  user-select: none;
+}
+
+option:hover {
+  color: #f0313d;
+}
+
 .botonPrincipalInput {
   background-color: #f0313d;
 }

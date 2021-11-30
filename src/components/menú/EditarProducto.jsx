@@ -11,12 +11,12 @@ import '../../styles/registrarProducto.css';
 import { useConsultarProductoContext } from '../../context/consultarProductoContext';
 import { Categoria } from './Categoria';
 
-export const RegistrarProducto = () => {
+export const EditarProducto = () => {
 
     const { productos, setProductos } = useConsultarProductoContext();
     const [items, setItems] = useState([]);
     const [nuevoInsumo, setNuevoInsumo] = useState({});
-    const [categoria, setCategoria] = useState('Hamburguesa');
+    const [categoria, setCategoria] = useState(productos?.categoria);
     const [inputInsumo, setInputInsumo] = useState("");
     const [categorias, setCategorias] = useState([]);
     const [tipo, setTipo] = useState('Insumos');
@@ -26,11 +26,11 @@ export const RegistrarProducto = () => {
     const history = useHistory();
 
     const [productosValues, handleProductosChange, resetProductos, formatearTexto] = useForm({
-        identificador: '',
-        nombre: '',
-        precio: '',
-        stock: '',
-        insumos: productos,
+        identificador: productos?.identificador,
+        nombre: productos?.nombre,
+        precio: productos?.precio,
+        stock: productos?.stock,
+        insumos: productos?.insumos,
         categoria: categoria,
         estado: 'Activo'
     });
@@ -38,7 +38,7 @@ export const RegistrarProducto = () => {
     const cantidad = useRef('');
     const comboCategorias = useRef('');
 
-    const { identificador, nombre, stock, precio } = productosValues;
+    const { identificador, nombre, insumos, stock, precio } = productosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -50,6 +50,20 @@ export const RegistrarProducto = () => {
         draggable: true,
         progress: undefined,
     };
+
+    useEffect(() => {
+        let posicion;
+        categorias?.find((datos, index) => {
+            const resultado = datos.nombre === productos?.categoria;
+
+            if (resultado) {
+                posicion = index;
+                setTipo(categorias[posicion].tipo);
+                console.log("TIPO", tipo)
+            }
+
+        });
+    });
 
     useEffect(() => {
         const buscarInsumos = async () => {
@@ -111,7 +125,6 @@ export const RegistrarProducto = () => {
             setCategorias(respuesta.categorias);
         }
         buscarCategorias();
-        console.log(categorias)
     }, [bandera]);
 
     const handleOnSelect = (item) => {
@@ -181,7 +194,7 @@ export const RegistrarProducto = () => {
     return (
         <div className="flex flex-col w-full h-screen overflow-y-scroll usuarios">
             <div className="ml-10">
-                <h2 className="text-left text-4xl mt-12 mb-4 titulo">Registrar productos</h2>
+                <h2 className="text-left text-4xl mt-12 mb-4 titulo">Editar productos</h2>
                 <h2
                     className="text-white underline text-left cursor-pointer"
                     onClick={() => setHidden(false)}>Nueva categoría</h2>
@@ -190,7 +203,7 @@ export const RegistrarProducto = () => {
                         <select
                             ref={comboCategorias}
                             className="w-80 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                            defaultValue="Hamburguesa"
+                            value={categoria}
                             onChange={(e) => {
                                 let posicion;
                                 categorias?.find((categoria, index) => {
@@ -281,15 +294,16 @@ export const RegistrarProducto = () => {
                         <FontAwesomeIcon className="text-white text-xl" icon={faPlus} />
                     </button>
                 </div>
-                <section className={`w-full flex flex-col items-start contenedorTabla ${tipo === 'Stock' ? 'hidden' : ''}`}>
+                <div
+                    className={`w-full flex flex-col items-start contenedorTabla ${tipo === 'Stock' ? 'hidden' : ''}`}>
                     <h2 className="text-white">Insumos:</h2>
                     <div id="contenedorInsumos"
                         className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
-                        {productos?.map((data, key) => {
+                        {insumos?.map((data, key) => {
                             return <Insumo key={key} index={key} cantidad={data.cantidad} insumo={data.nombre} />
                         })}
                     </div>
-                </section>
+                </div>
                 {/* </div> */}
                 {/* <div className="mt-8">
                             <input

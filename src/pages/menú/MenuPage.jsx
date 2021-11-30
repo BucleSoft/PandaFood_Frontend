@@ -1,10 +1,10 @@
 import React from 'react';
-import { Menú } from '../../components/menú/Menú';
+import { ConsultarProductos } from '../../components/menú/ConsultarProductos';
 
 export const MenuPage = () => {
     return (
         <>
-            <Menú />
+            <ConsultarProductos />
         </>
     );
 }
