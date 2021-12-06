@@ -4,14 +4,11 @@ import { faSearch, faPlus, faShoppingCart, faChevronRight, faChevronDown, faUndo
 import '../../styles/consultarProductos.css';
 import { Link } from 'react-router-dom';
 import { axiosPetition, respuesta } from '../../helpers/Axios';
-import { toast, Zoom } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { Card } from './Card';
 import { useCarritoContext } from '../../context/carritoContext';
-import { useHistory } from 'react-router';
 
 export const ConsultarProductos = () => {
-
-    const history = useHistory();
 
     const [filtro, setFiltro] = useState('Todos');
     const cambiarFiltro = (filtro) => {
@@ -22,7 +19,7 @@ export const ConsultarProductos = () => {
 
     const [productos, setProductos] = useState([]);
 
-    const [filtrar, setFiltrar] = useState(false);
+    const [filtrar, setFiltrar] = useState(true);
 
     const [categorias, setCategorias] = useState([]);
 
@@ -110,7 +107,8 @@ export const ConsultarProductos = () => {
                             <FontAwesomeIcon
                                 className='h-12 text-white text-2xl font-normal cursor-pointer'
                                 icon={faShoppingCart}
-                                title='Ir a la venta'>
+                                title='Ir a la venta'
+                                onClick={() => cambiarFiltro("Carrito")}>
                             </FontAwesomeIcon>
                             <p className='text-center mt-1 text-white font-semibold rounded-full numeroCarrito'>{cantidadCarrito}</p>
                         </section>
@@ -126,6 +124,11 @@ export const ConsultarProductos = () => {
                             className={`text-white px-2 py-1 rounded-xl ${filtro === 'Frecuentes' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
                             onClick={() => cambiarFiltro('Frecuentes')}>
                             Frecuentes
+                        </button>
+                        <button
+                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Carrito' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
+                            onClick={() => cambiarFiltro('Carrito')}>
+                            Carrito
                         </button>
                         <button
                             className={`text-white px-2 py-1 rounded-xl ${filtro === 'Todos' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
@@ -151,7 +154,10 @@ export const ConsultarProductos = () => {
                             </FontAwesomeIcon>
                         </button>
                     </Link>
-                    <button id='botonCarrito' className='rounded-full w-12 h-12 mt-4 flex items-center justify-center shadow-md' title='Ir a la venta' >
+                    <button
+                        id='botonCarrito'
+                        className='rounded-full w-12 h-12 mt-4 flex items-center justify-center shadow-md'
+                        title='Ir a la venta'>
                         <FontAwesomeIcon className='text-white text-2xl font-normal' icon={faShoppingCart}>
                         </FontAwesomeIcon>
                     </button>
@@ -172,6 +178,7 @@ export const ConsultarProductos = () => {
 
             <div className="pl-32 flex flex-wrap justify-start">
                 {
+
                     productos?.map((datos, key) => {
 
                         const condicion = datos.nombre.trim().toLowerCase().includes(busqueda.trim().toLowerCase());
@@ -182,15 +189,19 @@ export const ConsultarProductos = () => {
                             }
                         }
 
-                        if (condicion && datos.categoria === filtro) {
-                            return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} categoria={datos.categoria} key={key} />;
+                        if (filtro === "Carrito") {
+                            if (condicion) {
+                                return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} categoria={datos.categoria} key={key} soloAgregados={true} bandera={bandera} setBandera={setBandera} />;
+                            }
                         }
 
+                        if (condicion && datos.categoria === filtro) {
+                            return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} />;
+                        }
                     })
-
-
                 }
             </div>
+            <ToastContainer theme="dark" />
         </div>
     )
 }

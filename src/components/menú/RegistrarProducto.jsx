@@ -13,7 +13,7 @@ import { Categoria } from './Categoria';
 
 export const RegistrarProducto = () => {
 
-    const { productos, setProductos } = useConsultarProductoContext();
+    const [listaInsumos, setListaInsumos] = useState([]);
     const [items, setItems] = useState([]);
     const [nuevoInsumo, setNuevoInsumo] = useState({});
     const [categoria, setCategoria] = useState('Hamburguesa');
@@ -30,8 +30,8 @@ export const RegistrarProducto = () => {
         nombre: '',
         precio: '',
         stock: '',
-        insumos: productos,
-        categoria: categoria,
+        insumos: [],
+        categoria: '',
         estado: 'Activo'
     });
 
@@ -129,11 +129,11 @@ export const RegistrarProducto = () => {
     const registrarProducto = async (e) => {
         e.preventDefault();
 
-        if (stock === '' && productos.length === 0) {
+        if (stock === '' && listaInsumos.length === 0) {
             return toast.error("Ingresa un stock o registre los insumos del producto.", configMensaje);
         }
 
-        if (stock !== '' && productos.length !== 0) {
+        if (stock !== '' && listaInsumos.length !== 0) {
             return toast.error("Ingresa un stock o registre los insumos pero no ambos.", configMensaje);
         }
 
@@ -144,8 +144,11 @@ export const RegistrarProducto = () => {
             }
         }
 
-        productosValues.categoria = categoria;
 
+        productosValues.categoria = categoria;
+        productosValues.insumos = listaInsumos;
+
+        console.log(productosValues.insumos);
 
         await axiosPetition('productos', productosValues, 'POST');
 
@@ -154,7 +157,7 @@ export const RegistrarProducto = () => {
             if (respuesta.ok) {
                 resetProductos();
                 toast.success('Producto registrado correctamente.', configMensaje);
-                setProductos([]);
+                setListaInsumos([]);
                 history.push('/menu');
             } else {
                 toast.error(respuesta.msg, configMensaje);
@@ -170,8 +173,8 @@ export const RegistrarProducto = () => {
             toast.error("La cantidad del insumo es obligatoria.", configMensaje);
         } else {
             nuevoInsumo.cantidad = cantidad.current.value;
-            productos.push(nuevoInsumo);
-            setProductos(productos);
+            listaInsumos.push(nuevoInsumo);
+            setListaInsumos(listaInsumos);
             setNuevoInsumo({});
             cantidad.current.value = "";
             setInputInsumo("");
@@ -193,6 +196,7 @@ export const RegistrarProducto = () => {
                             defaultValue="Hamburguesa"
                             onChange={(e) => {
                                 let posicion;
+                                setCategoria(comboCategorias.current.value);
                                 categorias?.find((categoria, index) => {
                                     const resultado = categoria.nombre === comboCategorias.current.value
                                     if (resultado) {
@@ -200,10 +204,8 @@ export const RegistrarProducto = () => {
                                     }
                                 });
                                 setTipo(categorias[posicion].tipo);
-                                const index = e.nativeEvent.target.selectedIndex;
-                                setCategoria(e.nativeEvent.target[index].text);
                                 if (tipo !== 'Insumos') {
-                                    setProductos([]);
+                                    setListaInsumos([]);
                                 }
                                 if (tipo !== 'Stock') {
                                     productosValues.stock = '';
@@ -285,8 +287,8 @@ export const RegistrarProducto = () => {
                     <h2 className="text-white">Insumos:</h2>
                     <div id="contenedorInsumos"
                         className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
-                        {productos?.map((data, key) => {
-                            return <Insumo key={key} index={key} cantidad={data.cantidad} insumo={data.nombre} />
+                        {listaInsumos?.map((data, key) => {
+                            return <Insumo key={key} index={key} cantidad={data.cantidad} insumo={data.nombre} listaInsumos={listaInsumos} setListaInsumos={setListaInsumos} />
                         })}
                     </div>
                 </section>
@@ -310,7 +312,7 @@ export const RegistrarProducto = () => {
                         className="text-lg mb-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
                         onClick={() => {
                             resetProductos();
-                            setProductos([]);
+                            setListaInsumos([]);
                         }}
                     >
                         Limpiar

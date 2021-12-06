@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import '../../styles/insumos.css';
-import { useConsultarProductoContext } from '../../context/consultarProductoContext';
 
-export const Insumo = ({ index, cantidad, insumo }) => {
+export const Insumo = ({ index, cantidad, insumo, listaInsumos, setListaInsumos }) => {
 
-    const { productos, setProductos } = useConsultarProductoContext();
     const [visibilidad, setVisibilidad] = useState(true);
 
     const eliminarInsumo = async () => {
-        delete productos[index];
-        setProductos(productos);
+        await listaInsumos.splice(index, 1);
+        setListaInsumos(listaInsumos);
         setVisibilidad(false);
     }
 

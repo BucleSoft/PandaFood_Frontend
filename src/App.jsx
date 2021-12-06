@@ -31,13 +31,14 @@ import { InsumosEditarPage } from './pages/insumos/InsumosEditarPage';
 import { MenuPage } from './pages/menú/MenuPage';
 import { RegistrarProductoPage } from './pages/menú/RegistrarProductoPage';
 import { EditarProductoPage } from './pages/menú/EditarProductoPage';
+import { VentasPage } from './pages/ventas/VentasPage';
 
 function App() {
 
   const [usuarioEditar, setUsuarioEditar] = useState();
   const [clienteEditar, setClienteEditar] = useState();
   const [insumoEditar, setInsumoEditar] = useState();
-  const [productos, setProductos] = useState([]);
+  const [productos, setProductos] = useState();
   const [carrito, setCarrito] = useState([]);
 
   return (
@@ -97,6 +98,9 @@ function App() {
                 </Route>
               </ConsultarProductoContext.Provider>
             </CarritoContext.Provider>
+            <Route exact path="/ventas">
+              <VentasPage />
+            </Route>
           </PrivateLayout>
         </Switch>
       </Router>

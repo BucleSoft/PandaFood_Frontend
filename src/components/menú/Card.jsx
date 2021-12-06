@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/card.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHamburger, faCoffee, faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
-import hamburguesa from '../../images/hamburguer.jpg';
+import hamburguesa from '../../images/hamburguesa.jpeg';
 import bebida from '../../images/bebida.jpg';
 import salchipapa from '../../images/salchipapa.jpg';
 import entrada from '../../images/entrada.jpg';
 import perro from '../../images/perro.jpg';
+import picada from '../../images/picada.jpg';
+import panda from '../../images/default-image.png';
 import { useCarritoContext } from '../../context/carritoContext';
 import { useHistory } from 'react-router';
 import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { useConsultarProductoContext } from '../../context/consultarProductoContext';
 import { toast } from 'react-toastify';
 
-export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', categoria = 'Hamburguesa', bandera, setBandera }) => {
+export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', categoria = 'Hamburguesa', soloAgregados = false, bandera, setBandera }) => {
 
     const [imagen, setImagen] = useState(hamburguesa);
     const [cantidad, setCantidad] = useState(1);
@@ -38,6 +40,7 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
     };
 
     useEffect(() => {
+
         switch (categoria) {
             case "Hamburguesa":
                 setImagen(hamburguesa);
@@ -54,12 +57,18 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
             case "Perro":
                 setImagen(perro);
                 break;
+            case "Picada":
+                setImagen(picada);
+                break;
+            default:
+                setImagen(panda);
         }
     }, []);
 
     useEffect(() => {
 
         const buscarCarrito = async () => {
+
             await carrito?.find((productos, index) => {
                 const resultado = productos?.identificador === identificador;
                 if (resultado) {
@@ -67,6 +76,7 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
                     setCantidad(productos.cantidad);
                     setIndex(index);
                 }
+
             });
         }
         buscarCarrito();
@@ -84,6 +94,19 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
     }
 
     const agregarAlCarrito = async () => {
+
+        if (cantidad === '') {
+            return toast.error("La cantidad debe ser un valor numérico.", configMensaje);
+        }
+
+        if (cantidad <= 0) {
+            return toast.error("La cantidad debe ser mayor que cero.", configMensaje);
+        }
+
+        if (cantidad.toString().includes('.') || cantidad.toString().includes(',')) {
+            return toast.error("La cantidad no puede contener puntos ni comas.", configMensaje);
+        }
+
         const producto = {
             identificador,
             nombre,
@@ -130,12 +153,14 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
     }
 
     return (
-        <div className='text-white max-w-xs w-full shadow-md rounded-2xl card my-4 mr-6'>
+        <div className={`text-white max-w-xs w-full shadow-md rounded-2xl card my-4 mr-6 ${soloAgregados ? agregado === false ? "hidden" : "" : ""}`}>
+
             <img
                 src={imagen}
                 alt="Imagen del producto"
                 className=" w-full h-52 object-cover rounded-t-2xl cursor-pointer"
                 onClick={agregado ? quitarDelCarrito : agregarAlCarrito} />
+
             <div className='p-4'>
                 <div className="flex flex-wrap ">
                     <div className="flex items-center w-full justify-between min-w-0 ">
@@ -176,6 +201,12 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
                             value={cantidad}
                             onChange={(e) => setCantidad(e.target.value)}
                             disabled={agregado ? true : false}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    agregarAlCarrito();
+                                    desactivarControles();
+                                }
+                            }}
                         />
                         <div className={`flex flex-col items-center justify-center mr-4 ${controles === false ? 'hidden' : ''}`}>
                             <FontAwesomeIcon

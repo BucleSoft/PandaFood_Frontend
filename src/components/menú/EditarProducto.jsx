@@ -5,7 +5,7 @@ import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 import { Insumo } from './Insumo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import '../../styles/registrarProducto.css';
 import { useConsultarProductoContext } from '../../context/consultarProductoContext';
@@ -14,6 +14,7 @@ import { Categoria } from './Categoria';
 export const EditarProducto = () => {
 
     const { productos, setProductos } = useConsultarProductoContext();
+    const [insumo, setInsumo] = useState(productos?.insumos);
     const [items, setItems] = useState([]);
     const [nuevoInsumo, setNuevoInsumo] = useState({});
     const [categoria, setCategoria] = useState(productos?.categoria);
@@ -22,6 +23,7 @@ export const EditarProducto = () => {
     const [tipo, setTipo] = useState('Insumos');
     const [hidden, setHidden] = useState(true);
     const [bandera, setBandera] = useState(false);
+    const [auxiliarTipo, setAuxiliarTipo] = useState(false);
 
     const history = useHistory();
 
@@ -29,8 +31,7 @@ export const EditarProducto = () => {
         identificador: productos?.identificador,
         nombre: productos?.nombre,
         precio: productos?.precio,
-        stock: productos?.stock,
-        insumos: productos?.insumos,
+        stock: productos?.stock === null ? '' : productos?.stock,
         categoria: categoria,
         estado: 'Activo'
     });
@@ -38,7 +39,7 @@ export const EditarProducto = () => {
     const cantidad = useRef('');
     const comboCategorias = useRef('');
 
-    const { identificador, nombre, insumos, stock, precio } = productosValues;
+    const { identificador, nombre, stock, precio } = productosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -50,20 +51,6 @@ export const EditarProducto = () => {
         draggable: true,
         progress: undefined,
     };
-
-    useEffect(() => {
-        let posicion;
-        categorias?.find((datos, index) => {
-            const resultado = datos.nombre === productos?.categoria;
-
-            if (resultado) {
-                posicion = index;
-                setTipo(categorias[posicion].tipo);
-                console.log("TIPO", tipo)
-            }
-
-        });
-    });
 
     useEffect(() => {
         const buscarInsumos = async () => {
@@ -123,9 +110,28 @@ export const EditarProducto = () => {
             }
 
             setCategorias(respuesta.categorias);
+            setAuxiliarTipo(!auxiliarTipo);
         }
         buscarCategorias();
     }, [bandera]);
+
+    useEffect(() => {
+
+        const determinarTipo = async () => {
+            let posicion;
+            await categorias?.find((datos, index) => {
+                const resultado = datos.nombre === productos?.categoria;
+
+                if (resultado) {
+                    posicion = index;
+                    setTipo(categorias[posicion].tipo);
+                }
+
+            });
+        }
+
+        determinarTipo();
+    }, [auxiliarTipo]);
 
     const handleOnSelect = (item) => {
         nuevoInsumo.identificador = item.identificador;
@@ -139,14 +145,14 @@ export const EditarProducto = () => {
         return item
     }
 
-    const registrarProducto = async (e) => {
+    const editarProducto = async (e) => {
         e.preventDefault();
 
-        if (stock === '' && productos.length === 0) {
+        if (stock === '' && insumo.length === 0) {
             return toast.error("Ingresa un stock o registre los insumos del producto.", configMensaje);
         }
 
-        if (stock !== '' && productos.length !== 0) {
+        if (stock !== '' && insumo.length !== 0) {
             return toast.error("Ingresa un stock o registre los insumos pero no ambos.", configMensaje);
         }
 
@@ -159,8 +165,9 @@ export const EditarProducto = () => {
 
         productosValues.categoria = categoria;
 
+        productosValues.insumos = insumo;
 
-        await axiosPetition('productos', productosValues, 'POST');
+        await axiosPetition(`productos/${identificador}`, productosValues, 'PUT');
 
         if (respuesta !== undefined) {
 
@@ -175,6 +182,18 @@ export const EditarProducto = () => {
         }
     }
 
+    const buscarProducto = async () => {
+
+        await axiosPetition(`productos/${identificador}`);
+
+        if (!respuesta.ok) {
+            return toast.error("Error al obtener el producto, contacte a los desarrolladores.", configMensaje);
+        }
+
+        setInsumo(respuesta?.producto.insumos);
+
+    }
+
     const agregarInsumo = () => {
 
         if (inputInsumo.trim() === '') {
@@ -183,8 +202,7 @@ export const EditarProducto = () => {
             toast.error("La cantidad del insumo es obligatoria.", configMensaje);
         } else {
             nuevoInsumo.cantidad = cantidad.current.value;
-            productos.push(nuevoInsumo);
-            setProductos(productos);
+            insumo.push(nuevoInsumo);
             setNuevoInsumo({});
             cantidad.current.value = "";
             setInputInsumo("");
@@ -198,7 +216,7 @@ export const EditarProducto = () => {
                 <h2
                     className="text-white underline text-left cursor-pointer"
                     onClick={() => setHidden(false)}>Nueva categoría</h2>
-                <form onSubmit={registrarProducto} className="mt-1">
+                <form onSubmit={editarProducto} className="mt-1">
                     <div className="flex flex-wrap">
                         <select
                             ref={comboCategorias}
@@ -206,22 +224,21 @@ export const EditarProducto = () => {
                             value={categoria}
                             onChange={(e) => {
                                 let posicion;
+                                setCategoria(comboCategorias.current.value);
                                 categorias?.find((categoria, index) => {
                                     const resultado = categoria.nombre === comboCategorias.current.value
                                     if (resultado) {
                                         posicion = index;
                                     }
                                 });
-                                setTipo(categorias[posicion].tipo);
-                                const index = e.nativeEvent.target.selectedIndex;
-                                setCategoria(e.nativeEvent.target[index].text);
+                                const tipoCategoria = categorias[posicion].tipo;
+                                setTipo(tipoCategoria);
                                 if (tipo !== 'Insumos') {
-                                    setProductos([]);
+                                    setInsumo([]);
                                 }
                                 if (tipo !== 'Stock') {
                                     productosValues.stock = '';
                                 }
-
                             }}>
                             {
                                 categorias?.map((datos, key) => {
@@ -297,10 +314,12 @@ export const EditarProducto = () => {
                 <div
                     className={`w-full flex flex-col items-start contenedorTabla ${tipo === 'Stock' ? 'hidden' : ''}`}>
                     <h2 className="text-white">Insumos:</h2>
-                    <div id="contenedorInsumos"
+                    <div
+                        name="insumos"
+                        id="contenedorInsumos"
                         className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
-                        {insumos?.map((data, key) => {
-                            return <Insumo key={key} index={key} cantidad={data.cantidad} insumo={data.nombre} />
+                        {insumo?.map((data, key) => {
+                            return <Insumo key={key} index={key} cantidad={data.cantidad} insumo={data.nombre} listaInsumos={insumo} setListaInsumos={setInsumo} />
                         })}
                     </div>
                 </div>
@@ -315,19 +334,21 @@ export const EditarProducto = () => {
                 <div className="w-full flex flex-wrap mt-10 gap-6">
                     <button
                         type="submit"
-                        onClick={registrarProducto}
+                        onClick={editarProducto}
                         className="text-lg mb-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput">
-                        Registrar producto
+                        Actualizar producto
                     </button>
                     <button
                         type="button"
                         className="text-lg mb-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
                         onClick={() => {
+                            buscarProducto();
+                            setCategoria(productos?.categoria);
                             resetProductos();
-                            setProductos([]);
+                            setAuxiliarTipo(!auxiliarTipo);
                         }}
                     >
-                        Limpiar
+                        Restaurar
                     </button>
                     <Link to="/menu">
                         <button
