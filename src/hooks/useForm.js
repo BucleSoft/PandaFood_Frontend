@@ -24,6 +24,6 @@ export const useForm = (initialState = {}) => {
         });
     }
 
-    return [values, handleInputChange, resetForm, formatearTexto];
+    return [values, handleInputChange, resetForm, formatearTexto, setValues];
 
 }

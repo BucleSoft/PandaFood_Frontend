@@ -5,3 +5,11 @@
 .itemVentaActivado {
   background-color: #f0313d;
 }
+
+.itemTipo {
+  border-color: rgb(36, 37, 43);
+}
+
+.itemTipoSeleccionado {
+  border-color: #ffff;
+}
