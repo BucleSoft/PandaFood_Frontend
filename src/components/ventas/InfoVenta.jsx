@@ -37,6 +37,10 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
 
     const buscarCliente = async () => {
 
+        if (cedula === '') {
+            return toast.error("Digita una cédula válida", configMensaje);
+        }
+
         await axiosPetition(`clientes/${cedula}`);
 
         if (!respuesta.ok) {
@@ -57,6 +61,23 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
             puntos: respuesta.cliente.puntos,
             estado: 'Activo'
         });
+    }
+
+    const registrarCliente = async () => {
+
+        if (puntos === '') {
+            clientesValues.puntos = 0;
+        }
+
+        await axiosPetition("clientes", clientesValues, "POST");
+
+        if (!respuesta.ok) {
+            return toast.error(respuesta.msg, configMensaje);
+        }
+
+        toast.success("Cliente registrado correctamente.", configMensaje);
+        setDesactivados(true);
+
     }
 
     return (
@@ -88,7 +109,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     value={cedula}
                     onChange={handleClientesChange}
                     className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""}`}
-                    placeholder="Cédula del cliente"
+                    placeholder="Cédula del cliente *"
                     autoComplete="off"
                     onKeyPress={(e) => {
                         if (e.key === "Enter") {
@@ -103,7 +124,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     value={nombre}
                     onChange={handleClientesChange}
                     className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""}`}
-                    placeholder="Nombre del cliente"
+                    placeholder="Nombre del cliente *"
                     autoComplete="off"
                     disabled={desactivados} />
                 <input
@@ -112,7 +133,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     value={celular}
                     onChange={handleClientesChange}
                     className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""}`}
-                    placeholder="Celular del cliente"
+                    placeholder="Celular del cliente *"
                     autoComplete="off"
                     disabled={desactivados} />
                 <input
@@ -137,13 +158,15 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     type="number"
                     name="domicilio"
                     className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${tipoVenta === "Domicilio" ? "" : "hidden"}`}
-                    placeholder="Precio del domicilio"
+                    placeholder="Precio del domicilio *"
                     autoComplete="off" />
             </form>
             <div className="flex flex-wrap justify-center mt-6">
                 <button
                     type="button"
-                    className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput">
+                    className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
+                    onClick={registrarCliente}
+                    disabled={desactivados}>
                     Registrar cliente
                 </button>
                 <button

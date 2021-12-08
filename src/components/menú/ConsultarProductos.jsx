@@ -7,13 +7,11 @@ import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { Card } from './Card';
 import { useCarritoContext } from '../../context/carritoContext';
+import { useMenuContext } from '../../context/menuContext';
 
 export const ConsultarProductos = () => {
 
     const [filtro, setFiltro] = useState('Todos');
-    const cambiarFiltro = (filtro) => {
-        setFiltro(filtro);
-    }
 
     const [busqueda, setBusqueda] = useState('');
 
@@ -23,11 +21,18 @@ export const ConsultarProductos = () => {
 
     const [categorias, setCategorias] = useState([]);
 
-    const { carrito, setCarrito } = useCarritoContext();
 
     const [cantidadCarrito, setCantidadCarrito] = useState(0);
 
     const [bandera, setBandera] = useState(false);
+
+    const { carrito, setCarrito } = useCarritoContext();
+
+    const { setActive } = useMenuContext();
+
+    const cambiarFiltro = (filtro) => {
+        setFiltro(filtro);
+    }
 
     useEffect(() => {
         let cantidad = 0;
@@ -154,13 +159,16 @@ export const ConsultarProductos = () => {
                             </FontAwesomeIcon>
                         </button>
                     </Link>
-                    <button
-                        id='botonCarrito'
-                        className='rounded-full w-12 h-12 mt-4 flex items-center justify-center shadow-md'
-                        title='Ir a la venta'>
-                        <FontAwesomeIcon className='text-white text-2xl font-normal' icon={faShoppingCart}>
-                        </FontAwesomeIcon>
-                    </button>
+                    <Link to="/ventas">
+                        <button
+                            id='botonCarrito'
+                            className='rounded-full w-12 h-12 mt-4 flex items-center justify-center shadow-md'
+                            title='Ir a la venta'
+                            onClick={() => setActive('ventas')}>
+                            <FontAwesomeIcon className='text-white text-2xl font-normal' icon={faShoppingCart}>
+                            </FontAwesomeIcon>
+                        </button>
+                    </Link>
                     <button
                         id='botonCarrito'
                         className='rounded-full w-12 h-12 mt-4 flex items-center justify-center shadow-md' title='Vaciar carrito'

@@ -8,6 +8,7 @@ import { ConsultarClienteContext } from './context/consultarClienteContext';
 import { ConsultarInsumoContext } from './context/consultarInsumoContext';
 import { ConsultarProductoContext } from './context/consultarProductoContext';
 import { CarritoContext } from './context/carritoContext';
+import { MenuContext } from './context/menuContext';
 
 import {
   BrowserRouter as Router,
@@ -40,6 +41,7 @@ function App() {
   const [insumoEditar, setInsumoEditar] = useState();
   const [productos, setProductos] = useState();
   const [carrito, setCarrito] = useState([]);
+  const [active, setActive] = useState("perfil");
 
   return (
     <div className="App">
@@ -48,60 +50,62 @@ function App() {
           <Route exact path="/login">
             <LoginPage />
           </Route>
-          <PrivateLayout>
-            <CarritoContext.Provider value={{ carrito, setCarrito }}>
-              <Route exact path="/perfil">
-                <PerfilPage />
-              </Route>
-              <ConsultarClienteContext.Provider value={{ clienteEditar, setClienteEditar }}>
-                <Route exact path="/clientes">
-                  <ClientesPage />
+          <MenuContext.Provider value={{ active, setActive }}>
+            <PrivateLayout>
+              <CarritoContext.Provider value={{ carrito, setCarrito }}>
+                <Route exact path="/perfil">
+                  <PerfilPage />
                 </Route>
-                <Route exact path="/clientes/registrar">
-                  <ClientesRegistrarPage />
+                <ConsultarClienteContext.Provider value={{ clienteEditar, setClienteEditar }}>
+                  <Route exact path="/clientes">
+                    <ClientesPage />
+                  </Route>
+                  <Route exact path="/clientes/registrar">
+                    <ClientesRegistrarPage />
+                  </Route>
+                  <Route exact path="/clientes/editar">
+                    <ClientesEditarPage />
+                  </Route>
+                </ConsultarClienteContext.Provider>
+                <ConsultarUsuarioContext.Provider value={{ usuarioEditar, setUsuarioEditar }}>
+                  <Route exact path="/usuarios">
+                    <UsuariosPage />
+                  </Route>
+                  <Route exact path="/usuarios/registrar">
+                    <UsuariosRegistrarPage />
+                  </Route>
+                  <Route exact path="/usuarios/editar">
+                    <UsuariosEditarPage />
+                  </Route>
+                </ConsultarUsuarioContext.Provider>
+                <ConsultarInsumoContext.Provider value={{ insumoEditar, setInsumoEditar }}>
+                  <Route exact path="/insumos">
+                    <InsumosPage />
+                  </Route>
+                  <Route exact path="/insumos/registrar">
+                    <InsumosRegistrarPage />
+                  </Route>
+                  <Route exact path="/insumos/editar">
+                    <InsumosEditarPage />
+                  </Route>
+                </ConsultarInsumoContext.Provider>
+                <ConsultarProductoContext.Provider value={{ productos, setProductos }}>
+                  <Route exact path="/menu">
+                    <MenuPage />
+                  </Route>
+                  <Route exact path="/menu/registrar">
+                    <RegistrarProductoPage />
+                  </Route>
+                  <Route exact path="/menu/editar">
+                    <EditarProductoPage />
+                  </Route>
+                </ConsultarProductoContext.Provider>
+                <Route exact path="/ventas">
+                  <VentasPage />
                 </Route>
-                <Route exact path="/clientes/editar">
-                  <ClientesEditarPage />
-                </Route>
-              </ConsultarClienteContext.Provider>
-              <ConsultarUsuarioContext.Provider value={{ usuarioEditar, setUsuarioEditar }}>
-                <Route exact path="/usuarios">
-                  <UsuariosPage />
-                </Route>
-                <Route exact path="/usuarios/registrar">
-                  <UsuariosRegistrarPage />
-                </Route>
-                <Route exact path="/usuarios/editar">
-                  <UsuariosEditarPage />
-                </Route>
-              </ConsultarUsuarioContext.Provider>
-              <ConsultarInsumoContext.Provider value={{ insumoEditar, setInsumoEditar }}>
-                <Route exact path="/insumos">
-                  <InsumosPage />
-                </Route>
-                <Route exact path="/insumos/registrar">
-                  <InsumosRegistrarPage />
-                </Route>
-                <Route exact path="/insumos/editar">
-                  <InsumosEditarPage />
-                </Route>
-              </ConsultarInsumoContext.Provider>
-              <ConsultarProductoContext.Provider value={{ productos, setProductos }}>
-                <Route exact path="/menu">
-                  <MenuPage />
-                </Route>
-                <Route exact path="/menu/registrar">
-                  <RegistrarProductoPage />
-                </Route>
-                <Route exact path="/menu/editar">
-                  <EditarProductoPage />
-                </Route>
-              </ConsultarProductoContext.Provider>
-            </CarritoContext.Provider>
-            <Route exact path="/ventas">
-              <VentasPage />
-            </Route>
-          </PrivateLayout>
+              </CarritoContext.Provider>
+            </PrivateLayout>
+          </MenuContext.Provider>
         </Switch>
       </Router>
     </div>

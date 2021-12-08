@@ -74,25 +74,6 @@ export const TablaInsumos = ({ props }) => {
 
     }, []);
 
-    // const inhabilitarCliente = async () => {
-
-    //     if (estado === 'Activo') {
-    //         await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Inactivo' }, 'PUT');
-    //     } else {
-    //         await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Activo' }, 'PUT');
-    //     }
-
-    //     if (respuesta.ok) {
-    //         toast.success('Cliente habilitado/deshabilitado correctamente.', configMensaje);
-    //         if (estado === 'Activo') {
-    //             estado = 'Inactivo';
-    //         } else {
-    //             estado = 'Activo';
-    //         }
-    //         setBandera(!bandera);
-    //     }
-    // }
-
     return (
         <>
             <tr>

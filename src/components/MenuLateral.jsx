@@ -4,10 +4,11 @@ import '../styles/menuLateral.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUsers, faUserTie, faDollarSign, faCopy, faHamburger, faBreadSlice } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { useMenuContext } from '../context/menuContext';
 
 export const MenuLateral = () => {
 
-    const [active, setActive] = useState('perfil');
+    const { active, setActive } = useMenuContext();
 
     useEffect(() => {
         const url = window.location.href;
@@ -16,6 +17,7 @@ export const MenuLateral = () => {
         } else if (url.includes('menu')) {
             setActive('menu');
         } else if (url.includes('ventas')) {
+            console.log("Estoy en", active)
             setActive('ventas');
         } else if (url.includes('facturas')) {
             setActive('facturas');

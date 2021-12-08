@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import "../../styles/ventas.css";
+import { HeaderTabla } from './HeaderTabla';
 import { InfoVenta } from './InfoVenta';
 
 export const Ventas = () => {
 
     const [pasoSeleccionado, setPasoSeleccionado] = useState(1);
+
+    const mostrarContenido = () => {
+        switch (pasoSeleccionado) {
+            case 1:
+                return <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />;
+            case 2:
+                return <HeaderTabla />
+        }
+    }
 
     return (
         <div className="w-full h-screen justify-start overflow-y-scroll">
@@ -45,13 +55,7 @@ export const Ventas = () => {
                     </div>
                 </div>
                 {
-
-                    pasoSeleccionado === 1 ?
-
-                        <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
-                        :
-                        ""
-
+                    mostrarContenido()
                 }
             </section>
             <ToastContainer theme="dark" />
