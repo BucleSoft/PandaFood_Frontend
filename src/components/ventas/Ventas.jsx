@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import "../../styles/ventas.css";
+import { FormaPago } from './FormaPago';
 import { HeaderTabla } from './HeaderTabla';
 import { InfoVenta } from './InfoVenta';
+import { ObservacionesFinales } from './ObservacionesFinales';
 
 export const Ventas = () => {
 
     const [pasoSeleccionado, setPasoSeleccionado] = useState(1);
+
 
     const mostrarContenido = () => {
         switch (pasoSeleccionado) {
             case 1:
                 return <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />;
             case 2:
-                return <HeaderTabla />
+                return <HeaderTabla setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
+            case 3:
+                return <FormaPago setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
+            case 4:
+                return <ObservacionesFinales setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
         }
     }
 

@@ -31,6 +31,7 @@ export const EditarProducto = () => {
         identificador: productos?.identificador,
         nombre: productos?.nombre,
         precio: productos?.precio,
+        puntos: productos?.puntos,
         stock: productos?.stock === null ? '' : productos?.stock,
         categoria: categoria,
         estado: 'Activo'
@@ -39,7 +40,7 @@ export const EditarProducto = () => {
     const cantidad = useRef('');
     const comboCategorias = useRef('');
 
-    const { identificador, nombre, stock, precio } = productosValues;
+    const { identificador, nombre, stock, precio, puntos } = productosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -210,7 +211,7 @@ export const EditarProducto = () => {
     }
 
     return (
-        <div className="flex flex-col w-full h-screen overflow-y-scroll usuarios">
+        <div className="flex flex-col w-full h-screen overflow-y-scroll usuarios mx-16">
             <div className="ml-10">
                 <h2 className="text-left text-4xl mt-12 mb-4 titulo">Editar productos</h2>
                 <h2
@@ -222,6 +223,7 @@ export const EditarProducto = () => {
                             ref={comboCategorias}
                             className="w-80 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                             value={categoria}
+                            title="Categoría del producto"
                             onChange={(e) => {
                                 let posicion;
                                 setCategoria(comboCategorias.current.value);
@@ -250,14 +252,16 @@ export const EditarProducto = () => {
                             type="text"
                             name="identificador"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                            placeholder="Identificador del producto"
+                            placeholder="Identificador del producto*"
+                            title="Identificador del producto"
                             value={identificador}
                             onChange={handleProductosChange}
                             autoComplete="off" />
                         <input
                             name="nombre"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                            placeholder="Nombre del producto"
+                            placeholder="Nombre del producto*"
+                            title="Nombre del producto"
                             value={nombre}
                             onChange={handleProductosChange}
                             onBlur={formatearTexto}
@@ -268,7 +272,17 @@ export const EditarProducto = () => {
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                             value={precio}
                             onChange={handleProductosChange}
-                            placeholder="Precio del producto"
+                            placeholder="Precio del producto*"
+                            title="Precio del producto"
+                            autoComplete="off" />
+                        <input
+                            type="number"
+                            name="puntos"
+                            className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
+                            value={puntos}
+                            onChange={handleProductosChange}
+                            placeholder="Puntos del producto"
+                            title="Puntos del producto"
                             autoComplete="off" />
                         <input
                             type="number"
@@ -276,7 +290,8 @@ export const EditarProducto = () => {
                             className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${tipo === 'Insumos' ? 'hidden' : ''}`}
                             value={stock}
                             onChange={handleProductosChange}
-                            placeholder="Stock del producto"
+                            placeholder="Stock del producto*"
+                            title="Stock del producto"
                             autoComplete="off" />
                     </div>
                 </form>

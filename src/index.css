@@ -6,6 +6,10 @@
   display: none;
 }
 
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",

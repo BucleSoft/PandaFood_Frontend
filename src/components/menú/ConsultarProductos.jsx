@@ -193,18 +193,18 @@ export const ConsultarProductos = () => {
 
                         if (filtro === "Todos") {
                             if (condicion) {
-                                return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} />;
+                                return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} />;
                             }
                         }
 
                         if (filtro === "Carrito") {
                             if (condicion) {
-                                return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} categoria={datos.categoria} key={key} soloAgregados={true} bandera={bandera} setBandera={setBandera} />;
+                                return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} soloAgregados={true} bandera={bandera} setBandera={setBandera} />;
                             }
                         }
 
                         if (condicion && datos.categoria === filtro) {
-                            return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} />;
+                            return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} />;
                         }
                     })
                 }

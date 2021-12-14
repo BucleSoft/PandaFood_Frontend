@@ -17,7 +17,7 @@ export const ConsultarInsumos = () => {
     }
 
     return (
-        <div className="w-full h-screen overflow-y-scroll">
+        <div className="w-full h-screen overflow-y-scroll mx-12">
             <div className="flex flex-col h-full w-full ml-10 mt-12">
                 <h2 className="text-left text-4xl mb-4 titulo">Consultar insumos</h2>
                 <div className="flex flex-col items-start">

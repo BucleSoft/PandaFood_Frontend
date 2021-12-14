@@ -58,7 +58,7 @@ export const RegistrarInsumo = () => {
         }
     }
     return (
-        <div className="flex flex-col w-full h-screen overflow-y-scroll usuarios">
+        <div className="flex flex-col w-full h-screen overflow-y-scroll usuarios mx-14">
             <div className="ml-10">
 
                 <h2 className="text-left text-4xl mt-12 mb-12 titulo">Registrar Insumos</h2>

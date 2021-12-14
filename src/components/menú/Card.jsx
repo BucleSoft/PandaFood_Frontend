@@ -15,7 +15,7 @@ import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { useConsultarProductoContext } from '../../context/consultarProductoContext';
 import { toast } from 'react-toastify';
 
-export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', categoria = 'Hamburguesa', soloAgregados = false, bandera, setBandera }) => {
+export const Card = ({ identificador = '', precio = '0', puntos = '0', nombre = 'Sin nombre', categoria = 'Hamburguesa', soloAgregados = false, bandera, setBandera }) => {
 
     const [imagen, setImagen] = useState(hamburguesa);
     const [cantidad, setCantidad] = useState(1);
@@ -26,7 +26,7 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
     const { carrito, setCarrito } = useCarritoContext();
     const history = useHistory();
 
-    const { productos, setProductos } = useConsultarProductoContext();
+    const { setProductos } = useConsultarProductoContext();
 
     const configMensaje = {
         position: "bottom-center",
@@ -112,7 +112,9 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
             nombre,
             cantidad,
             precio,
-            categoria
+            puntos,
+            categoria,
+            pagaPuntos: false
         }
         await carrito.push(producto);
         setAuxiliar(!auxiliar);
@@ -149,7 +151,6 @@ export const Card = ({ identificador = '', precio = '0', nombre = 'Sin nombre', 
 
         setProductos(respuesta.producto);
         history.push('/menu/editar');
-        console.log(respuesta.producto);
     }
 
     return (

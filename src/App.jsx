@@ -9,6 +9,7 @@ import { ConsultarInsumoContext } from './context/consultarInsumoContext';
 import { ConsultarProductoContext } from './context/consultarProductoContext';
 import { CarritoContext } from './context/carritoContext';
 import { MenuContext } from './context/menuContext';
+import { VentaContext } from './context/ventaContext';
 
 import {
   BrowserRouter as Router,
@@ -42,6 +43,22 @@ function App() {
   const [productos, setProductos] = useState();
   const [carrito, setCarrito] = useState([]);
   const [active, setActive] = useState("perfil");
+
+  const [venta, setVenta] = useState({
+    numVenta: 0,
+    fecha: '',
+    tipoVenta: 'Restaurante',
+    formaPago: 'Efectivo',
+    domicilio: '',
+    consumir: 'llevar',
+    mesa: '',
+    cliente: '',
+    productos: [],
+    observaciones: ["Hamburguesa sin salsas", "Salchipapa sin queso"],
+    total: 0,
+    puntos: 0,
+    descuento: 0
+  });
 
   return (
     <div className="App">
@@ -100,9 +117,11 @@ function App() {
                     <EditarProductoPage />
                   </Route>
                 </ConsultarProductoContext.Provider>
-                <Route exact path="/ventas">
-                  <VentasPage />
-                </Route>
+                <VentaContext.Provider value={{ venta, setVenta }}>
+                  <Route exact path="/ventas">
+                    <VentasPage />
+                  </Route>
+                </VentaContext.Provider>
               </CarritoContext.Provider>
             </PrivateLayout>
           </MenuContext.Provider>

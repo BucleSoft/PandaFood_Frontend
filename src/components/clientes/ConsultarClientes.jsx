@@ -12,7 +12,7 @@ export const ConsultarClientes = () => {
 
     return (
         <BanderaContext.Provider value={{ bandera, setBandera }} >
-            <div className="w-full h-screen overflow-y-scroll">
+            <div className="w-full h-screen overflow-y-scroll mx-14">
                 <div className="flex flex-col h-ufll w-full ml-10 mt-12">
                     <h2 className="text-left text-4xl mb-4 titulo">Consultar clientes</h2>
                     <div className="flex mb-4">
