@@ -164,7 +164,10 @@ export const ConsultarProductos = () => {
                             id='botonCarrito'
                             className='rounded-full w-12 h-12 mt-4 flex items-center justify-center shadow-md'
                             title='Ir a la venta'
-                            onClick={() => setActive('ventas')}>
+                            onClick={() => {
+                                setActive('ventas');
+                            }
+                            }>
                             <FontAwesomeIcon className='text-white text-2xl font-normal' icon={faShoppingCart}>
                             </FontAwesomeIcon>
                         </button>
@@ -189,7 +192,7 @@ export const ConsultarProductos = () => {
 
                     productos?.map((datos, key) => {
 
-                        const condicion = datos.nombre.trim().toLowerCase().includes(busqueda.trim().toLowerCase());
+                        const condicion = (datos.nombre.trim().toLowerCase().includes(busqueda.trim().toLowerCase()) && key < 12);
 
                         if (filtro === "Todos") {
                             if (condicion) {

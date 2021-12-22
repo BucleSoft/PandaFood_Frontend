@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import scooter from "../../images/scooter.svg";
 import shop from "../../images/shop.svg";
 import eshop from "../../images/eshop.svg";
+import redimir from "../../images/puntos.svg";
 import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { useForm } from '../../hooks/useForm';
 import { toast } from 'react-toastify';
@@ -101,14 +102,14 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
 
     return (
         <div className="flex flex-col w-full">
-            <div className="flex justify-center mt-10 gap-28">
+            <div className="flex justify-center mt-10 gap-20">
                 <section
                     className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl cursor-pointer ${tipoVenta === "Domicilio" ? "itemTipoSeleccionado" : "itemTipo"}`}
                     onClick={() => {
                         setTipoVenta("Domicilio");
                         venta.tipoVenta = "Domicilio";
                     }}>
-                    <img className="w-20 mb-0" src={scooter} />
+                    <img className="w-20 mt-4 mb-2" src={scooter} />
                     <h2 className="text-white">Domicilio</h2>
                 </section>
                 <section
@@ -117,8 +118,17 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                         setTipoVenta("Restaurante");
                         venta.tipoVenta = "Restaurante";
                     }}>
-                    <img className="w-16" src={shop} />
+                    <img className="w-16 mt-3 mb-1" src={shop} />
                     <h2 className="text-white">Restaurante</h2>
+                </section>
+                <section
+                    className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl cursor-pointer ${tipoVenta === "Redimir" ? "itemTipoSeleccionado" : "itemTipo"}`}
+                    onClick={() => {
+                        setTipoVenta("Redimir");
+                        venta.tipoVenta = "Redimir";
+                    }}>
+                    <img className="w-20" src={redimir} />
+                    <h2 className="text-white ">Redimir Puntos</h2>
                 </section>
                 <section
                     className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl cursor-pointer ${tipoVenta === "Venta en linea" ? "itemTipoSeleccionado" : "itemTipo"}`}
@@ -126,7 +136,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                         setTipoVenta("Venta en linea");
                         venta.tipoVenta = "Venta en linea";
                     }}>
-                    <img className="w-16" src={eshop} />
+                    <img className="w-16 mt-4 mb-2" src={eshop} />
                     <h2 className="text-white">Ventas en línea</h2>
                 </section>
             </div>

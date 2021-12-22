@@ -21,7 +21,6 @@ export const Card = ({ identificador = '', precio = '0', puntos = '0', nombre = 
     const [cantidad, setCantidad] = useState(1);
     const [controles, setControles] = useState(false);
     const [agregado, setAgregado] = useState(false);
-    const [index, setIndex] = useState();
     const [auxiliar, setAuxiliar] = useState(false);
     const { carrito, setCarrito } = useCarritoContext();
     const history = useHistory();
@@ -74,7 +73,6 @@ export const Card = ({ identificador = '', precio = '0', puntos = '0', nombre = 
                 if (resultado) {
                     setAgregado(true);
                     setCantidad(productos.cantidad);
-                    setIndex(index);
                 }
 
             });
@@ -121,12 +119,13 @@ export const Card = ({ identificador = '', precio = '0', puntos = '0', nombre = 
     }
 
     const quitarDelCarrito = async () => {
-        setAuxiliar(!auxiliar);
-        delete carrito[index];
+        // delete carrito[index];
+        await carrito.splice(carrito.findIndex((item) => item.identificador === identificador), 1);
         setCarrito(carrito);
-        setAgregado(false);
-        setCantidad(1);
         setAuxiliar(!auxiliar);
+        setBandera(!bandera);
+        setCantidad(1);
+        setAgregado(false);
     }
 
     const activarControles = () => {

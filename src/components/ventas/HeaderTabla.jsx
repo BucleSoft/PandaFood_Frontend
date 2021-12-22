@@ -180,6 +180,7 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado }) => {
                                 return toast.error("Primero ingresa productos a la venta, por favor.", configMensaje);
                             }
                             setHidden(false);
+                            console.log(carrito)
                         }}>Aplicar descuento</h2>
                 </div>
                 <div className="flex flex-wrap justify-center mt-12">

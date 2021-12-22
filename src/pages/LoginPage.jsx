@@ -36,8 +36,6 @@ export const LoginPage = () => {
 
         if (respuesta !== undefined) {
 
-            console.log(respuesta);
-
             if (respuesta.ok) {
                 resetForm();
                 history.push('/usuarios');

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
+import { useCarritoContext } from '../../context/carritoContext';
 import "../../styles/ventas.css";
 import { FormaPago } from './FormaPago';
 import { HeaderTabla } from './HeaderTabla';
@@ -10,6 +11,16 @@ export const Ventas = () => {
 
     const [pasoSeleccionado, setPasoSeleccionado] = useState(1);
 
+    const { carrito } = useCarritoContext();
+
+    useEffect(() => {
+        carrito?.map((datos, index) => {
+            console.log(datos);
+            if (datos === undefined || datos === '' || datos === null) {
+                carrito.splice(index, 1);
+            }
+        });
+    }, []);
 
     const mostrarContenido = () => {
         switch (pasoSeleccionado) {
