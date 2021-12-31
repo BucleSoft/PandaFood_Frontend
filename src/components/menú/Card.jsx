@@ -13,15 +13,17 @@ import { useCarritoContext } from '../../context/carritoContext';
 import { useHistory } from 'react-router';
 import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { useConsultarProductoContext } from '../../context/consultarProductoContext';
+import { useVentaContext } from '../../context/ventaContext';
 import { toast } from 'react-toastify';
 
-export const Card = ({ identificador = '', precio = '0', puntos = '0', nombre = 'Sin nombre', categoria = 'Hamburguesa', soloAgregados = false, bandera, setBandera }) => {
+export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', puntos = '0', nombre = 'Sin nombre', categoria = 'Hamburguesa', soloAgregados = false, bandera, setBandera, setProductoSeleccionado, setHidden }) => {
 
     const [imagen, setImagen] = useState(hamburguesa);
     const [cantidad, setCantidad] = useState(1);
     const [controles, setControles] = useState(false);
     const [agregado, setAgregado] = useState(false);
     const [auxiliar, setAuxiliar] = useState(false);
+    const { venta } = useVentaContext();
     const { carrito, setCarrito } = useCarritoContext();
     const history = useHistory();
 
@@ -112,15 +114,26 @@ export const Card = ({ identificador = '', precio = '0', puntos = '0', nombre = 
             precio,
             puntos,
             categoria,
-            pagaPuntos: false
+            tipoUnidad
         }
         await carrito.push(producto);
         setAuxiliar(!auxiliar);
+        if (tipoUnidad === 'Insumos') {
+            setProductoSeleccionado(identificador);
+            setHidden(false);
+        }
     }
 
     const quitarDelCarrito = async () => {
-        // delete carrito[index];
-        await carrito.splice(carrito.findIndex((item) => item.identificador === identificador), 1);
+        let index = carrito.findIndex((item) => item.identificador === identificador);
+        for (let i = 0; i <= carrito[index].observaciones.length; i++) {
+            for (let j = 0; j <= venta.observaciones.length; j++) {
+                if (venta.observaciones[j] === carrito[index].observaciones[i]) {
+                    venta.observaciones.splice(j, 1);
+                }
+            }
+        }
+        await carrito.splice(index, 1);
         setCarrito(carrito);
         setAuxiliar(!auxiliar);
         setBandera(!bandera);

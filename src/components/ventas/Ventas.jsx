@@ -6,30 +6,102 @@ import { FormaPago } from './FormaPago';
 import { HeaderTabla } from './HeaderTabla';
 import { InfoVenta } from './InfoVenta';
 import { ObservacionesFinales } from './ObservacionesFinales';
+import { useVentaContext } from '../../context/ventaContext';
 
 export const Ventas = () => {
 
+    const { venta } = useVentaContext();
     const [pasoSeleccionado, setPasoSeleccionado] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [puntosGanados, setPuntosGanados] = useState(0);
+    const [descuento, setDescuento] = useState(venta?.descuento);
+    const [bandera, setBandera] = useState(false);
 
     const { carrito } = useCarritoContext();
 
     useEffect(() => {
         carrito?.map((datos, index) => {
-            console.log(datos);
             if (datos === undefined || datos === '' || datos === null) {
                 carrito.splice(index, 1);
             }
         });
     }, []);
 
+    useEffect(() => {
+        if (carrito.length <= 0) {
+            setDescuento(0);
+            venta.descuento = 0;
+        }
+    }, [bandera]);
+
+    useEffect(() => {
+        const calcularTotal = () => {
+            let precioTotal = 0;
+            carrito?.forEach((e) => {
+                const subtotal = e.precio * e.cantidad;
+                precioTotal += subtotal;
+            });
+
+            if (descuento > 0) {
+                const decimalDescuento = descuento / 100;
+                if (venta.tipoVenta === "Domicilio" && venta.domicilio !== "") {
+                    setTotal((precioTotal - (precioTotal * decimalDescuento)) + venta.domicilio);
+                    venta.total = (precioTotal - (precioTotal * decimalDescuento)) + venta.domicilio;
+                } else {
+                    setTotal(precioTotal - (precioTotal * decimalDescuento));
+                    venta.total = precioTotal - (precioTotal * decimalDescuento);
+                }
+                setPuntosGanados(Math.floor((precioTotal - (precioTotal * decimalDescuento)) / 2000));
+            } else if (descuento === 0) {
+                if (venta.tipoVenta === "Domicilio" && venta.domicilio !== "") {
+                    setTotal(precioTotal + venta.domicilio);
+                    venta.total = precioTotal + venta.domicilio;
+                } else {
+                    setTotal(precioTotal);
+                    venta.total = precioTotal;
+                }
+                setPuntosGanados(Math.floor(precioTotal / 2000));
+            }
+
+            venta.puntos = puntosGanados;
+        }
+
+        calcularTotal();
+    }, [bandera, descuento, carrito]);
+
+    useEffect(() => {
+
+        const calcularPuntos = async () => {
+            let totalPuntos = 0;
+            await carrito?.forEach((e) => {
+                const subtotal = e.puntos * e.cantidad;
+                totalPuntos += subtotal;
+            });
+            setTotal(totalPuntos);
+        }
+
+        if (venta.tipoVenta === "Redimir") {
+            setDescuento(0);
+            calcularPuntos();
+            venta.total = total;
+        }
+
+    }, [bandera]);
+
+    const aplicarDescuento = (descuento) => {
+        setDescuento(descuento);
+        venta.descuento = descuento;
+        setBandera(!bandera);
+    }
+
     const mostrarContenido = () => {
         switch (pasoSeleccionado) {
             case 1:
-                return <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />;
+                return <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} aplicarDescuento={aplicarDescuento} />;
             case 2:
-                return <HeaderTabla setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
+                return <HeaderTabla setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} puntosGanados={puntosGanados} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} aplicarDescuento={aplicarDescuento} />
             case 3:
-                return <FormaPago setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
+                return <FormaPago setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} aplicarDescuento={aplicarDescuento} />
             case 4:
                 return <ObservacionesFinales setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
         }

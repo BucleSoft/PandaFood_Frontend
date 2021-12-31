@@ -31,7 +31,7 @@ export const MenuLateral = () => {
     }, []);
 
     return (
-        <div id="sidebar" className="flex flex-col h-screen">
+        <div id="sidebar" className="hidden md:flex md:flex-col md:h-screen">
             <ul className="text-white h-full">
                 <li><img id="logo-sidebar" className="ml-1" src={logo_sidebar} alt="logo-pandafood" /></li>
                 <Link to="/perfil">

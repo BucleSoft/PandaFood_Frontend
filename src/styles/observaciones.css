@@ -1,3 +1,12 @@
 #contenedorObservaciones {
   border-color: rgb(33, 34, 39);
 }
+
+.bordeFilas {
+  border-bottom: 1px solid #80808054;
+  border-top: 1px solid #80808054;
+}
+
+.bordeCantidad {
+  border: 1.7px solid #808080d5;
+}

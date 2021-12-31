@@ -29,7 +29,7 @@ export const Descuento = ({ hidden, setHidden, descuento = '', setDescuento }) =
         if (descuentoVenta.current.value <= 0) {
             return toast.error('El descuento debe ser un valor positivo y mayor a cero.', configMensaje);
         }
-        setDescuento(descuentoVenta.current.value);
+        setDescuento(parseInt(descuentoVenta.current.value));
         setHidden(true);
 
     }
@@ -46,6 +46,7 @@ export const Descuento = ({ hidden, setHidden, descuento = '', setDescuento }) =
                 <h2 className="text-3xl mb-4 titulo">Aplicar descuento</h2>
                 <form onSubmit={aplicarDescuento}>
                     <input
+                        type="number"
                         defaultValue={descuento}
                         ref={descuentoVenta}
                         className="focus:outline-none text-5xl text-center border-b-2 border-white w-40 formInput h-auto rounded-sm" type="number"></input>

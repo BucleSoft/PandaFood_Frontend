@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LoginPage } from './pages/LoginPage';
 import { PerfilPage } from './pages/PerfilPage';
 
@@ -34,6 +34,7 @@ import { MenuPage } from './pages/menú/MenuPage';
 import { RegistrarProductoPage } from './pages/menú/RegistrarProductoPage';
 import { EditarProductoPage } from './pages/menú/EditarProductoPage';
 import { VentasPage } from './pages/ventas/VentasPage';
+import { axiosPetition, respuesta } from './helpers/Axios';
 
 function App() {
 
@@ -43,18 +44,28 @@ function App() {
   const [productos, setProductos] = useState();
   const [carrito, setCarrito] = useState([]);
   const [active, setActive] = useState("perfil");
+  const [serverInfo, setServerInfo] = useState();
+
+  useEffect(() => {
+    const obtenerInfo = async () => {
+      await axiosPetition("server/fecha");
+      setServerInfo(respuesta);
+      venta.fecha = respuesta.fecha;
+    }
+    obtenerInfo();
+  }, []);
 
   const [venta, setVenta] = useState({
-    numVenta: 0,
-    fecha: '',
+    numVenta: '',
+    fecha: null,
     tipoVenta: 'Restaurante',
     formaPago: 'Efectivo',
     domicilio: '',
-    consumir: 'llevar',
+    consume: 'restaurante',
     mesa: '',
     cliente: '',
     productos: [],
-    observaciones: ["Hamburguesa sin salsas", "Salchipapa sin queso"],
+    observaciones: [],
     total: 0,
     puntos: 0,
     descuento: 0
@@ -106,18 +117,18 @@ function App() {
                     <InsumosEditarPage />
                   </Route>
                 </ConsultarInsumoContext.Provider>
-                <ConsultarProductoContext.Provider value={{ productos, setProductos }}>
-                  <Route exact path="/menu">
-                    <MenuPage />
-                  </Route>
-                  <Route exact path="/menu/registrar">
-                    <RegistrarProductoPage />
-                  </Route>
-                  <Route exact path="/menu/editar">
-                    <EditarProductoPage />
-                  </Route>
-                </ConsultarProductoContext.Provider>
                 <VentaContext.Provider value={{ venta, setVenta }}>
+                  <ConsultarProductoContext.Provider value={{ productos, setProductos }}>
+                    <Route exact path="/menu">
+                      <MenuPage />
+                    </Route>
+                    <Route exact path="/menu/registrar">
+                      <RegistrarProductoPage />
+                    </Route>
+                    <Route exact path="/menu/editar">
+                      <EditarProductoPage />
+                    </Route>
+                  </ConsultarProductoContext.Provider>
                   <Route exact path="/ventas">
                     <VentasPage />
                   </Route>

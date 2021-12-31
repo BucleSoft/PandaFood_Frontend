@@ -5,13 +5,13 @@ import { axiosPetition, respuesta } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 import { Insumo } from './Insumo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import '../../styles/registrarProducto.css';
-import { useConsultarProductoContext } from '../../context/consultarProductoContext';
 import { Categoria } from './Categoria';
 
 export const RegistrarProducto = () => {
+
 
     const [listaInsumos, setListaInsumos] = useState([]);
     const [items, setItems] = useState([]);
@@ -22,24 +22,26 @@ export const RegistrarProducto = () => {
     const [tipo, setTipo] = useState('Insumos');
     const [hidden, setHidden] = useState(true);
     const [bandera, setBandera] = useState(false);
+    const [unidadInsumo, setUnidadInsumo] = useState('stock');
+    const identificador = useRef('');
 
     const history = useHistory();
 
     const [productosValues, handleProductosChange, resetProductos, formatearTexto] = useForm({
-        identificador: '',
         nombre: '',
         precio: '',
         puntos: '',
         stock: '',
         insumos: [],
         categoria: '',
+        tipoUnidad: '',
         estado: 'Activo'
     });
 
     const cantidad = useRef('');
     const comboCategorias = useRef('');
 
-    const { identificador, nombre, stock, puntos, precio } = productosValues;
+    const { nombre, stock, puntos, precio } = productosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -51,6 +53,21 @@ export const RegistrarProducto = () => {
         draggable: true,
         progress: undefined,
     };
+
+    useEffect(() => {
+
+        const maxProducto = async () => {
+            await axiosPetition('productos/max');
+
+            if (!respuesta.ok) {
+                return toast.error(respuesta.msg, configMensaje);
+            }
+
+            identificador.current.value = respuesta.maxCodigo;
+        }
+
+        maxProducto();
+    }, []);
 
     useEffect(() => {
         const buscarInsumos = async () => {
@@ -82,6 +99,7 @@ export const RegistrarProducto = () => {
 
             setItems(respuesta.insumos);
         }
+
         buscarInsumos();
 
     }, []);
@@ -112,16 +130,16 @@ export const RegistrarProducto = () => {
             setCategorias(respuesta.categorias);
         }
         buscarCategorias();
-        console.log(categorias)
     }, [bandera]);
 
     const handleOnSelect = (item) => {
         nuevoInsumo.identificador = item.identificador;
         nuevoInsumo.nombre = item.nombre;
+        nuevoInsumo.unidades = item.unidades;
         setInputInsumo(item.nombre)
         setNuevoInsumo(nuevoInsumo);
+        setUnidadInsumo(item.unidades);
     }
-
 
     const formatResult = (item) => {
         return item
@@ -145,11 +163,14 @@ export const RegistrarProducto = () => {
             }
         }
 
+        const listaFiltrada = listaInsumos.filter((el) => {
+            return el != null;
+        });
 
+        productosValues.identificador = identificador.current.value;
         productosValues.categoria = categoria;
-        productosValues.insumos = listaInsumos;
-
-        console.log(productosValues.insumos);
+        productosValues.insumos = listaFiltrada;
+        productosValues.tipoUnidad = tipo;
 
         await axiosPetition('productos', productosValues, 'POST');
 
@@ -169,10 +190,23 @@ export const RegistrarProducto = () => {
     const agregarInsumo = () => {
 
         if (inputInsumo.trim() === '') {
-            toast.error("Busque y seleccione un insumo de la lista deslplegable, por favor.", configMensaje);
+            toast.error("Busque y seleccione un insumo de la lista desplegable, por favor.", configMensaje);
         } else if (cantidad.current.value.trim() === '') {
             toast.error("La cantidad del insumo es obligatoria.", configMensaje);
         } else {
+
+            let agregado = false;
+
+            listaInsumos.map((dato) => {
+                if (dato.identificador === nuevoInsumo.identificador) {
+                    agregado = true;
+                }
+            });
+
+            if (agregado) {
+                return toast.error("El insumo ya se encuentra registrado, elimine el anterior", configMensaje);
+            }
+
             nuevoInsumo.cantidad = cantidad.current.value;
             listaInsumos.push(nuevoInsumo);
             setListaInsumos(listaInsumos);
@@ -196,7 +230,7 @@ export const RegistrarProducto = () => {
                             className="w-80 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                             defaultValue="Hamburguesa"
                             title="Categoría del producto"
-                            onChange={(e) => {
+                            onChange={() => {
                                 let posicion;
                                 setCategoria(comboCategorias.current.value);
                                 categorias?.find((categoria, index) => {
@@ -206,12 +240,10 @@ export const RegistrarProducto = () => {
                                     }
                                 });
                                 setTipo(categorias[posicion].tipo);
-                                if (tipo !== 'Insumos') {
-                                    setListaInsumos([]);
-                                }
-                                if (tipo !== 'Stock') {
-                                    productosValues.stock = '';
-                                }
+
+                                setListaInsumos([]);
+                                productosValues.stock = '';
+
 
                             }}>
                             {
@@ -221,14 +253,14 @@ export const RegistrarProducto = () => {
                             }
                         </select>
                         <input
+                            ref={identificador}
                             type="text"
                             name="identificador"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                             placeholder="Identificador del producto*"
                             title="Identificador del producto"
-                            value={identificador}
-                            onChange={handleProductosChange}
-                            autoComplete="off" />
+                            autoComplete="off"
+                            disabled />
                         <input
                             name="nombre"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
@@ -289,7 +321,7 @@ export const RegistrarProducto = () => {
                         type="number"
                         ref={cantidad}
                         className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                        placeholder="Cantidad del insumo"
+                        placeholder={unidadInsumo === "stock" ? "Cantidad del insumo" : "Gramaje del insumo"}
                         autoComplete="off" />
                     <button
                         type="button"
@@ -303,7 +335,7 @@ export const RegistrarProducto = () => {
                     <div id="contenedorInsumos"
                         className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
                         {listaInsumos?.map((data, key) => {
-                            return <Insumo key={key} index={key} cantidad={data.cantidad} insumo={data.nombre} listaInsumos={listaInsumos} setListaInsumos={setListaInsumos} />
+                            return <Insumo key={key} index={key} cantidad={data.cantidad} identificador={data.identificador} insumo={data.nombre} unidades={data.unidades} listaInsumos={listaInsumos} setListaInsumos={setListaInsumos} />
                         })}
                     </div>
                 </section>

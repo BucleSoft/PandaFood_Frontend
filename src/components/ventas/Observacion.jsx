@@ -1,17 +1,17 @@
-import React, { useState } from 'react'
+import React from 'react';
 
-export const Observacion = ({ index, obs, eliminarObs }) => {
-
-    const [visibilidad, setVisibilidad] = useState(true);
+export const Observacion = ({ index, obs, setHidden, setIndexObs }) => {
 
     const eliminarObservacion = () => {
-        eliminarObs(index);
-        setVisibilidad(false);
+        setIndexObs(index);
+        setHidden(false);
     }
 
     return (
-        <div className={`text-white py-1 rounded-xl w-56 h-8 mx-2 mt-2 outline-none filtro cursor-pointer ${visibilidad === false ? 'hidden' : ''}`}
-            onClick={eliminarObservacion}>
+        <div className={`text-white py-1 px-4 rounded-xl h-8 mx-2 mt-2 outline-none filtro cursor-pointer `}
+            onClick={() => {
+                eliminarObservacion();
+            }}>
             <h2 className="text-white text-sm">{obs}</h2>
         </div>
     );

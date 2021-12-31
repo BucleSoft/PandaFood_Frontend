@@ -8,7 +8,7 @@ import { useForm } from '../../hooks/useForm';
 import { toast } from 'react-toastify';
 import { useVentaContext } from '../../context/ventaContext';
 
-export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
+export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setBandera }) => {
 
 
     const { venta, setVenta } = useVentaContext();
@@ -16,8 +16,8 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
     const domicilio = useRef();
 
     const [tipoVenta, setTipoVenta] = useState(venta.tipoVenta);
-
     const [desactivados, setDesactivados] = useState(false);
+    const [auxiliar, setAuxiliar] = useState(false);
 
     const [initValues, setInitValues] = useState({
         cedula: '',
@@ -43,6 +43,23 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
         progress: undefined,
     };
 
+    const obtenerInfo = async () => {
+        await axiosPetition("server/fecha");
+        venta.fecha = respuesta.fecha;
+    }
+
+    const obtenerMax = async () => {
+        if (venta.numVenta === '') {
+            await axiosPetition("ventas/max");
+            venta.numVenta = respuesta.maxCodigo;
+        }
+    }
+
+    useEffect(() => {
+        obtenerInfo();
+        obtenerMax();
+    }, []);
+
     useEffect(() => {
 
         if (venta?.cliente !== undefined && venta?.cliente !== '') {
@@ -50,7 +67,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
         }
 
         domicilio.current.value = venta.domicilio;
-    }, []);
+    }, [auxiliar]);
 
 
     const buscarCliente = async (cedula) => {
@@ -108,6 +125,9 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     onClick={() => {
                         setTipoVenta("Domicilio");
                         venta.tipoVenta = "Domicilio";
+                        venta.formaPago = "Efectivo";
+                        venta.domicilio = '';
+                        setAuxiliar(!auxiliar);
                     }}>
                     <img className="w-20 mt-4 mb-2" src={scooter} />
                     <h2 className="text-white">Domicilio</h2>
@@ -117,6 +137,10 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     onClick={() => {
                         setTipoVenta("Restaurante");
                         venta.tipoVenta = "Restaurante";
+                        setBandera(!bandera);
+                        venta.formaPago = "Efectivo";
+                        venta.domicilio = '';
+                        setAuxiliar(!auxiliar);
                     }}>
                     <img className="w-16 mt-3 mb-1" src={shop} />
                     <h2 className="text-white">Restaurante</h2>
@@ -126,6 +150,10 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     onClick={() => {
                         setTipoVenta("Redimir");
                         venta.tipoVenta = "Redimir";
+                        venta.formaPago = "Puntos";
+                        setBandera(!bandera);
+                        venta.domicilio = '';
+                        setAuxiliar(!auxiliar);
                     }}>
                     <img className="w-20" src={redimir} />
                     <h2 className="text-white ">Redimir Puntos</h2>
@@ -135,6 +163,9 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     onClick={() => {
                         setTipoVenta("Venta en linea");
                         venta.tipoVenta = "Venta en linea";
+                        venta.formaPago = "Efectivo";
+                        venta.domicilio = '';
+                        setAuxiliar(!auxiliar);
                     }}>
                     <img className="w-16 mt-4 mb-2" src={eshop} />
                     <h2 className="text-white">Ventas en línea</h2>
@@ -196,7 +227,13 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     type="number"
                     name="domicilio"
                     ref={domicilio}
-                    onChange={() => venta.domicilio = domicilio.current.value}
+                    onChange={() => {
+                        let precioDomicilio = parseInt(domicilio.current.value);
+                        if (isNaN(precioDomicilio)) {
+                            precioDomicilio = 0;
+                        }
+                        venta.domicilio = precioDomicilio;
+                    }}
                     className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${tipoVenta === "Domicilio" ? "" : "hidden"}`}
                     placeholder="Precio del domicilio *"
                     autoComplete="off" />

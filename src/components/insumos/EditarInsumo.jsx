@@ -9,13 +9,13 @@ import { useConsultarInsumoContext } from '../../context/consultarInsumoContext'
 export const EditarInsumo = () => {
 
     const { insumoEditar } = useConsultarInsumoContext();
-    console.log(insumoEditar);
     const history = useHistory();
 
-    const [unidades, setUnidades] = useState(insumoEditar?.stock === null ? 'Gramos' : 'Unidades');
+    const [unidadesState, setUnidadesState] = useState(insumoEditar?.stock === null ? 'gramos' : 'stock');
 
     const [insumosValues, handleInsumosChange, resetInsumos, formatearTexto] = useForm({
         identificador: insumoEditar?.identificador,
+        unidades: insumoEditar?.unidades,
         nombre: insumoEditar?.nombre,
         stock: insumoEditar?.stock !== null ? insumoEditar?.stock : '',
         gramaje: insumoEditar?.gramaje !== null ? insumoEditar?.gramaje : '',
@@ -23,7 +23,7 @@ export const EditarInsumo = () => {
         estado: insumoEditar?.estado
     });
 
-    let { identificador, nombre, stock, gramaje, categoria } = insumosValues;
+    let { identificador, unidades, nombre, stock, gramaje, categoria } = insumosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -45,9 +45,9 @@ export const EditarInsumo = () => {
     const actualizarInsumo = async (e) => {
         e.preventDefault();
         if (insumosValues.stock === '' && insumosValues.gramaje === '') {
-            toast.error('Ingresa un stock o un gramaje del insumo.');
+            toast.error('Ingresa un stock o el gramaje del insumo.', configMensaje);
         } else if (insumosValues.stock !== '' && insumosValues.gramaje !== '') {
-            toast.error('Ingresa un stock o un gramaje, pero no ambos.');
+            toast.error('Ingresa un stock o el gramaje, pero no ambos.', configMensaje);
         } else {
             if (identificador !== '') {
                 await axiosPetition(`insumos/${identificador}`, insumosValues, 'PUT');
@@ -65,9 +65,9 @@ export const EditarInsumo = () => {
     const reiniciar = () => {
         resetInsumos();
         if (insumoEditar?.stock === null) {
-            setUnidades('Gramos');
+            setUnidadesState('gramos');
         } else {
-            setUnidades('Unidades');
+            setUnidadesState('stock');
         }
     }
 
@@ -84,7 +84,8 @@ export const EditarInsumo = () => {
                             placeholder="Identificador del insumo"
                             value={identificador}
                             onChange={handleInsumosChange}
-                            autoComplete="off" />
+                            autoComplete="off"
+                            disabled />
                         <input
                             name="nombre"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
@@ -107,17 +108,18 @@ export const EditarInsumo = () => {
                             name="unidades"
                             value={unidades}
                             onChange={(e) => {
-                                setUnidades(e.target.value);
+                                setUnidadesState(e.target.value);
                                 insumosValues.gramaje = '';
                                 insumosValues.stock = '';
+                                handleInsumosChange(e);
                             }}
                         >
-                            <option>Unidades</option>
-                            <option>Gramos</option>
+                            <option value="stock">Unidades</option>
+                            <option value="gramos">Gramos</option>
                         </select>
                         <input
                             type="number"
-                            className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidades !== 'Unidades' ? 'hidden' : ''}`}
+                            className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidadesState !== 'stock' ? 'hidden' : ''}`}
                             name="stock"
                             value={stock}
                             onChange={handleInsumosChange}
@@ -126,7 +128,7 @@ export const EditarInsumo = () => {
                         />
                         <input
                             type="number"
-                            className={`w-80 p-2 pl-8 pr-8 mr-1 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidades !== 'Gramos' ? 'hidden' : ''}`}
+                            className={`w-80 p-2 pl-8 pr-8 mr-1 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidadesState !== 'gramos' ? 'hidden' : ''}`}
                             name="gramaje"
                             value={gramaje}
                             onChange={handleInsumosChange}

@@ -6,14 +6,12 @@ import { useVentaContext } from '../../context/ventaContext';
 import { axiosPetition, respuesta } from '../../helpers/Axios';
 import '../../styles/tablaProductos.css';
 
-export const TablaProductos = ({ props, index, bandera, setBandera, verPuntos }) => {
+export const TablaProductos = ({ props, index, bandera, setBandera, verPuntos, verificarAlredimir, setVerificarAlRedimir }) => {
 
-    let { identificador, nombre, cantidad, precio, puntos, pagaPuntos = false } = props;
+    let { identificador, nombre, cantidad, precio, puntos } = props;
 
     const { carrito, setCarrito } = useCarritoContext();
     const { venta } = useVentaContext();
-
-    const [checked, setChecked] = useState(pagaPuntos);
 
     const configMensaje = {
         position: "bottom-center",
@@ -26,39 +24,11 @@ export const TablaProductos = ({ props, index, bandera, setBandera, verPuntos })
         progress: undefined,
     };
 
-    useEffect(() => {
-        if (venta?.cliente === '' || venta?.cliente === 0) {
-            setChecked(false);
-            carrito[index].pagaPuntos = false;
-        } else {
-            setChecked(pagaPuntos);
-        }
-    }, []);
-
     const quitarDelCarrito = async () => {
         await carrito?.splice(index, 1);
         setCarrito(carrito);
+        setVerificarAlRedimir(!verificarAlredimir);
         setBandera(!bandera);
-    }
-
-    const pagarConPuntos = async () => {
-        if (venta?.cliente === '' || venta?.cliente === 0) {
-            return toast.error("Busque un cliente en el primer paso para pagar con puntos.", configMensaje);
-        }
-
-        await axiosPetition(`clientes/${venta.cliente}`);
-
-        if (!respuesta.ok) {
-            return toast.error("Ha ocurrido un error al consultar el cliente.");
-        }
-
-        if (puntos > parseInt(respuesta.cliente.puntos)) {
-            setChecked(false);
-            carrito[index].pagaPuntos = false;
-            return toast.error("El cliente no posee suficientes puntos para comprar el producto.", configMensaje);
-        }
-        setChecked(!checked);
-        carrito[index].pagaPuntos = !checked;
     }
 
     return (
@@ -94,17 +64,7 @@ export const TablaProductos = ({ props, index, bandera, setBandera, verPuntos })
                 <td className="px-5 py-3 text-sm">
                     <div>
                         <p className="text-left text-white whitespace-no-wrap">
-                            {precio * cantidad}
-                        </p>
-                    </div>
-                </td>
-                <td className="px-9 py-3 text-sm">
-                    <div>
-                        <p className="text-left text-white whitespace-no-wrap">
-                            <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={pagarConPuntos} />
+                            {verPuntos === false ? (precio * cantidad) : puntos > 0 ? (puntos * cantidad) + " pts" : '-'}
                         </p>
                     </div>
                 </td>

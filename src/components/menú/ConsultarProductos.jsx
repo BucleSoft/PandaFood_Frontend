@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Card } from './Card';
 import { useCarritoContext } from '../../context/carritoContext';
 import { useMenuContext } from '../../context/menuContext';
+import { Observaciones } from './modales/Observaciones';
 
 export const ConsultarProductos = () => {
 
@@ -21,6 +22,7 @@ export const ConsultarProductos = () => {
 
     const [categorias, setCategorias] = useState([]);
 
+    const [hidden, setHidden] = useState(true);
 
     const [cantidadCarrito, setCantidadCarrito] = useState(0);
 
@@ -29,6 +31,8 @@ export const ConsultarProductos = () => {
     const { carrito, setCarrito } = useCarritoContext();
 
     const { setActive } = useMenuContext();
+
+    const [productoSeleccionado, setProductoSeleccionado] = useState(0);
 
     const cambiarFiltro = (filtro) => {
         setFiltro(filtro);
@@ -192,26 +196,28 @@ export const ConsultarProductos = () => {
 
                     productos?.map((datos, key) => {
 
-                        const condicion = (datos.nombre.trim().toLowerCase().includes(busqueda.trim().toLowerCase()) && key < 12);
+                        const condicion = (datos.nombre.trim().toLowerCase().includes(busqueda.trim().toLowerCase()));
 
                         if (filtro === "Todos") {
                             if (condicion) {
-                                return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} />;
+                                return <Card identificador={datos.identificador} tipoUnidad={datos.tipoUnidad} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} setProductoSeleccionado={setProductoSeleccionado} setHidden={setHidden} />;
                             }
                         }
 
                         if (filtro === "Carrito") {
                             if (condicion) {
-                                return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} soloAgregados={true} bandera={bandera} setBandera={setBandera} />;
+                                return <Card identificador={datos.identificador} tipoUnidad={datos.tipoUnidad} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} soloAgregados={true} bandera={bandera} setBandera={setBandera} setProductoSeleccionado={setProductoSeleccionado} setHidden={setHidden} />;
                             }
                         }
 
                         if (condicion && datos.categoria === filtro) {
-                            return <Card identificador={datos.identificador} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} />;
+                            return <Card identificador={datos.identificador} tipoUnidad={datos.tipoUnidad} nombre={datos.nombre} precio={datos.precio} puntos={datos.puntos} categoria={datos.categoria} key={key} bandera={bandera} setBandera={setBandera} setProductoSeleccionado={setProductoSeleccionado} setHidden={setHidden} />;
                         }
-                    })
+                    }
+                    )
                 }
             </div>
+            <Observaciones productoSeleccionado={productoSeleccionado} hidden={hidden} setHidden={setHidden} />
             <ToastContainer theme="dark" />
         </div>
     )

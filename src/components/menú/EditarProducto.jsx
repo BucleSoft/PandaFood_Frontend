@@ -24,6 +24,7 @@ export const EditarProducto = () => {
     const [hidden, setHidden] = useState(true);
     const [bandera, setBandera] = useState(false);
     const [auxiliarTipo, setAuxiliarTipo] = useState(false);
+    const [unidadesInsumo, setUnidadesInsumo] = useState("stock");
 
     const history = useHistory();
 
@@ -32,15 +33,17 @@ export const EditarProducto = () => {
         nombre: productos?.nombre,
         precio: productos?.precio,
         puntos: productos?.puntos,
-        stock: productos?.stock === null ? '' : productos?.stock,
-        categoria: categoria,
+        stock: productos?.stock,
+        categoria,
+        tipoUnidad: '',
         estado: 'Activo'
     });
 
     const cantidad = useRef('');
     const comboCategorias = useRef('');
 
-    const { identificador, nombre, stock, precio, puntos } = productosValues;
+    const { identificador, stock, nombre, precio, puntos } = productosValues;
+
 
     const configMensaje = {
         position: "bottom-center",
@@ -137,8 +140,10 @@ export const EditarProducto = () => {
     const handleOnSelect = (item) => {
         nuevoInsumo.identificador = item.identificador;
         nuevoInsumo.nombre = item.nombre;
+        nuevoInsumo.unidades = item.unidades;
         setInputInsumo(item.nombre)
         setNuevoInsumo(nuevoInsumo);
+        setUnidadesInsumo(item.unidades);
     }
 
 
@@ -149,12 +154,22 @@ export const EditarProducto = () => {
     const editarProducto = async (e) => {
         e.preventDefault();
 
-        if (stock === '' && insumo.length === 0) {
+        const listaFiltrada = insumo.filter((el) => {
+            return el != null;
+        });
+
+        productosValues.insumos = listaFiltrada;
+
+        if ((stock === '' || stock === null) && insumo.length === 0) {
             return toast.error("Ingresa un stock o registre los insumos del producto.", configMensaje);
         }
 
-        if (stock !== '' && insumo.length !== 0) {
-            return toast.error("Ingresa un stock o registre los insumos pero no ambos.", configMensaje);
+        if (tipo === 'Insumos' && (stock !== null || stock !== '')) {
+            productosValues.stock = '';
+        }
+
+        if (tipo === 'Stock' && insumo.length !== 0) {
+            productosValues.insumo = [];
         }
 
         if (tipo !== 'Insumos' && typeof stock === 'string') {
@@ -163,10 +178,8 @@ export const EditarProducto = () => {
                 productosValues.stock = stockParseado;
             }
         }
-
         productosValues.categoria = categoria;
-
-        productosValues.insumos = insumo;
+        productosValues.tipoUnidad = tipo;
 
         await axiosPetition(`productos/${identificador}`, productosValues, 'PUT');
 
@@ -202,6 +215,19 @@ export const EditarProducto = () => {
         } else if (cantidad.current.value.trim() === '') {
             toast.error("La cantidad del insumo es obligatoria.", configMensaje);
         } else {
+
+            let agregado = false;
+
+            insumo.map((dato) => {
+                if (dato.identificador === nuevoInsumo.identificador) {
+                    agregado = true;
+                }
+            });
+
+            if (agregado) {
+                return toast.error("El insumo ya se encuentra registrado, elimine el anterior", configMensaje);
+            }
+
             nuevoInsumo.cantidad = cantidad.current.value;
             insumo.push(nuevoInsumo);
             setNuevoInsumo({});
@@ -224,7 +250,7 @@ export const EditarProducto = () => {
                             className="w-80 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                             value={categoria}
                             title="Categoría del producto"
-                            onChange={(e) => {
+                            onChange={() => {
                                 let posicion;
                                 setCategoria(comboCategorias.current.value);
                                 categorias?.find((categoria, index) => {
@@ -235,12 +261,10 @@ export const EditarProducto = () => {
                                 });
                                 const tipoCategoria = categorias[posicion].tipo;
                                 setTipo(tipoCategoria);
-                                if (tipo !== 'Insumos') {
-                                    setInsumo([]);
-                                }
-                                if (tipo !== 'Stock') {
-                                    productosValues.stock = '';
-                                }
+
+                                setInsumo([]);
+                                productosValues.stock = '';
+
                             }}>
                             {
                                 categorias?.map((datos, key) => {
@@ -256,7 +280,8 @@ export const EditarProducto = () => {
                             title="Identificador del producto"
                             value={identificador}
                             onChange={handleProductosChange}
-                            autoComplete="off" />
+                            autoComplete="off"
+                            disabled />
                         <input
                             name="nombre"
                             className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
@@ -317,7 +342,7 @@ export const EditarProducto = () => {
                         type="number"
                         ref={cantidad}
                         className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                        placeholder="Cantidad del insumo"
+                        placeholder={unidadesInsumo === "stock" ? "Cantidad del insumo" : "Gramaje del insumo"}
                         autoComplete="off" />
                     <button
                         type="button"
@@ -334,7 +359,7 @@ export const EditarProducto = () => {
                         id="contenedorInsumos"
                         className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
                         {insumo?.map((data, key) => {
-                            return <Insumo key={key} index={key} cantidad={data.cantidad} insumo={data.nombre} listaInsumos={insumo} setListaInsumos={setInsumo} />
+                            return <Insumo key={key} index={key} cantidad={data.cantidad} unidades={data.unidades} insumo={data.nombre} listaInsumos={insumo} setListaInsumos={setInsumo} />
                         })}
                     </div>
                 </div>

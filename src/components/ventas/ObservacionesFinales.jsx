@@ -1,17 +1,66 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useVentaContext } from '../../context/ventaContext';
-import '../../styles/observaciones.css';
+import { toast } from 'react-toastify';
+import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { EliminarObs } from './modales/EliminarObs';
 import { Observacion } from './Observacion';
+import { useVentaContext } from '../../context/ventaContext';
+import { useCarritoContext } from '../../context/carritoContext';
+import '../../styles/observaciones.css';
 
 export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) => {
 
     const { venta, setVenta } = useVentaContext();
+    const { carrito, setCarrito } = useCarritoContext();
+
+    const observacion = useRef('');
+    const mesa = useRef('');
 
     const [consume, setConsume] = useState(venta?.consume);
+    const [observaciones, setObservaciones] = useState(venta?.observaciones);
+    const [hidden, setHidden] = useState(true);
+    const [indexObs, setIndexObs] = useState();
 
-    const eliminarObs = async (index) => {
-        await venta?.observaciones.splice(index, 1);
+    const configMensaje = {
+        position: "bottom-center",
+        background: "#191c1f !important",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+    };
+
+    const registrarVenta = async () => {
+
+        venta.productos = carrito;
+
+        await axiosPetition("ventas", venta, "POST");
+
+        if (!respuesta.ok) {
+            console.log(venta);
+            return toast.error(respuesta.msg, configMensaje);
+        }
+
+        toast.success("Venta registrada!", configMensaje);
+        setVenta({
+            numVenta: '',
+            fecha: null,
+            tipoVenta: 'Restaurante',
+            formaPago: 'Efectivo',
+            domicilio: '',
+            consume: 'restaurante',
+            mesa: '',
+            cliente: '',
+            productos: [],
+            observaciones: [],
+            total: 0,
+            puntos: 0,
+            descuento: 0
+        });
+        setCarrito([]);
+        setPasoSeleccionado(1);
     }
 
     return (
@@ -20,33 +69,49 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
             <form className="mt-4 ml-16 flex flex-wrap justify-start w-full">
                 <select
                     name="consume"
-                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput`}
+                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" || venta.tipoVenta === "Domicilio" ? "hidden" : ""}`}
                     autoComplete="off"
                     value={consume}
                     onChange={(e) => {
+                        if (e.target.value === "llevar") {
+                            venta.mesa = "";
+                        }
                         setConsume(e.target.value);
                         venta.consume = e.target.value;
                     }}
                 >
+                    <option value="restaurante" defaultValue>Comer en restaurante</option>
                     <option value="llevar">Para llevar</option>
-                    <option value="restaurante">Comer en restaurante</option>
                 </select>
                 <select
                     name="mesa"
-                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput`}
-                    autoComplete="off">
+                    ref={mesa}
+                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" ? "hidden" : ""} ${consume !== "restaurante" ? "hidden" : ""}`}
+                    autoComplete="off"
+                    onChange={() => venta.mesa = mesa.current.value}
+                >
+                    <option disabled defaultValue>Selecciona una mesa</option>
+                    <option>Sin especificar</option>
                     <option >Mesa 1</option>
                     <option>Mesa 2</option>
                 </select>
                 <input
                     type="text"
-                    name="nombre"
-                    // value={nombre}
-                    // onChange={handleClientesChange}
-                    className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput`}
+                    name="observacion"
+                    ref={observacion}
+                    className={`p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" || venta.tipoVenta === "Domicilio" ? "w-96" : "w-80"}`}
                     placeholder="Agregar observación"
                     autoComplete="off"
-                // disabled={desactivados} 
+                    onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            const obs = observacion.current.value;
+                            setObservaciones([...observaciones, obs]);
+                            venta.observaciones.push(obs);
+                            observacion.current.value = "";
+                            console.log("VENTA", venta);
+                        }
+                    }}
                 />
             </form>
 
@@ -54,8 +119,8 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 <h2 className="text-white">Observaciones:</h2>
                 <div id="contenedorObservaciones"
                     className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
-                    {venta.observaciones?.map((data, key) => {
-                        return <Observacion key={key} index={key} obs={data} eliminarObs={eliminarObs} />
+                    {observaciones?.map((data, key) => {
+                        return <Observacion key={key} index={key} obs={data} hidden={hidden} setHidden={setHidden} setIndexObs={setIndexObs} />
                     })}
                 </div>
             </section>
@@ -79,10 +144,11 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 <button
                     type="submit"
                     className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput"
-                    onClick={() => setPasoSeleccionado(pasoSeleccionado + 1)}>
+                    onClick={registrarVenta}>
                     Finalizar
                 </button>
             </div>
+            <EliminarObs hidden={hidden} setHidden={setHidden} observaciones={observaciones} index={indexObs} />
         </div>
     );
 }
