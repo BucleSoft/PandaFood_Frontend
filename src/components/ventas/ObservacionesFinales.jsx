@@ -36,10 +36,13 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
 
         venta.productos = carrito;
 
-        await axiosPetition("ventas", venta, "POST");
+        if (venta.tipoVenta === "Domicilio") {
+            await axiosPetition("ventas/domicilio", venta, "POST");
+        } else {
+            await axiosPetition("ventas", venta, "POST");
+        }
 
         if (!respuesta.ok) {
-            console.log(venta);
             return toast.error(respuesta.msg, configMensaje);
         }
 
@@ -50,6 +53,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
             tipoVenta: 'Restaurante',
             formaPago: 'Efectivo',
             domicilio: '',
+            direccion: '',
             consume: 'restaurante',
             mesa: '',
             cliente: '',
@@ -86,7 +90,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 <select
                     name="mesa"
                     ref={mesa}
-                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" ? "hidden" : ""} ${consume !== "restaurante" ? "hidden" : ""}`}
+                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" ? "hidden" : ""} ${consume !== "restaurante" || venta.tipoVenta === "Domicilio" ? "hidden" : ""}`}
                     autoComplete="off"
                     onChange={() => venta.mesa = mesa.current.value}
                 >
@@ -105,11 +109,16 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                     onKeyPress={(e) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
-                            const obs = observacion.current.value;
-                            setObservaciones([...observaciones, obs]);
-                            venta.observaciones.push(obs);
-                            observacion.current.value = "";
-                            console.log("VENTA", venta);
+                            const obs = observacion.current.value.trim();
+
+                            if (obs.length === 0) {
+                                toast.error("No se puede agregar una observación vacía.", configMensaje);
+                            } else {
+                                setObservaciones([...observaciones, obs]);
+                                venta.observaciones.push(obs);
+                                observacion.current.value = "";
+                            }
+
                         }
                     }}
                 />
@@ -133,7 +142,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 >
                     Anterior
                 </button>
-                <Link to="/menu">
+                <Link to="/factura">
                     <button
                         type="button"
                         className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"

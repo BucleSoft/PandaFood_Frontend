@@ -8,6 +8,8 @@ export const HeaderTabla = ({ filtro, busqueda = '' }) => {
 
     const [data, setData] = useState([]);
 
+    let numDatos = 0;
+
     // const { bandera } = useBanderaContext();
 
     useEffect(() => {
@@ -72,54 +74,63 @@ export const HeaderTabla = ({ filtro, busqueda = '' }) => {
 
                     const condicion = datos.nombre?.toLowerCase().includes(busqueda.toLowerCase()) || datos.identificador?.toString().toLowerCase().includes(busqueda.toLowerCase());
 
-                    switch (filtro) {
-                        case 'Todos':
-                            if (condicion) {
-                                return <TablaInsumos key={datos.uid} props={datos} />;
-                            }
-                            break;
-                        case 'Disponibles':
-                            const minimo = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
-                            const disponible = datos.stock !== null ? (datos.stock > minimo) : (datos.gramaje > minimo);
+                    if (numDatos <= 9) {
+                        switch (filtro) {
+                            case 'Todos':
+                                if (condicion) {
+                                    numDatos += 1;
+                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                }
+                                break;
+                            case 'Disponibles':
+                                const minimo = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
+                                const disponible = datos.stock !== null ? (datos.stock > minimo) : (datos.gramaje > minimo);
 
-                            if (disponible) {
-                                return <TablaInsumos key={datos.uid} props={datos} />;
-                            }
-                            break;
-                        case 'Por agotarse':
-                            const minimo_pa = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
-                            const por_agotarse = datos.stock !== null ? (datos.stock <= minimo_pa && datos.stock > 0) : (datos.gramaje <= minimo_pa && datos.gramaje > 0);
+                                if (disponible) {
+                                    numDatos += 1;
+                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                }
+                                break;
+                            case 'Por agotarse':
+                                const minimo_pa = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
+                                const por_agotarse = datos.stock !== null ? (datos.stock <= minimo_pa && datos.stock > 0) : (datos.gramaje <= minimo_pa && datos.gramaje > 0);
 
-                            if (por_agotarse) {
-                                return <TablaInsumos key={datos.uid} props={datos} />;
-                            }
-                            break;
-                        case 'Agotados':
-                            const minimo_a = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
-                            const agotado = datos.stock !== null ? (datos.stock <= minimo_a && datos.stock <= 0) : (datos.gramaje <= minimo_a && datos.gramaje <= 0);
+                                if (por_agotarse) {
+                                    numDatos += 1;
+                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                }
+                                break;
+                            case 'Agotados':
+                                const minimo_a = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
+                                const agotado = datos.stock !== null ? (datos.stock <= minimo_a && datos.stock <= 0) : (datos.gramaje <= minimo_a && datos.gramaje <= 0);
 
-                            if (agotado) {
-                                return <TablaInsumos key={datos.uid} props={datos} />;
-                            }
-                            break;
-                        case 'Bebida':
-                        case 'Comida':
-                            if (datos.categoria === filtro && condicion) {
-                                return <TablaInsumos key={datos.uid} props={datos} />;
-                            }
-                            break;
-                        case 'Unidades':
-                            if (datos.stock !== null && condicion) {
-                                return <TablaInsumos key={datos.uid} props={datos} />;
-                            }
-                            break;
-                        case 'Gramos':
-                            if (datos.stock == null && condicion) {
-                                return <TablaInsumos key={datos.uid} props={datos} />;
-                            }
-                            break;
+                                if (agotado) {
+                                    numDatos += 1;
+                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                }
+                                break;
+                            case 'Bebida':
+                            case 'Comida':
+                                if (datos.categoria === filtro && condicion) {
+                                    numDatos += 1;
+                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                }
+                                break;
+                            case 'Unidades':
+                                if (datos.stock !== null && condicion) {
+                                    numDatos += 1;
+                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                }
+                                break;
+                            case 'Gramos':
+                                if (datos.stock == null && condicion) {
+                                    numDatos += 1;
+                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                }
+                                break;
+                        }
+
                     }
-
                 }
                 )}
             </tbody>

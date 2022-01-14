@@ -7,17 +7,21 @@ import { HeaderTabla } from './HeaderTabla';
 import { InfoVenta } from './InfoVenta';
 import { ObservacionesFinales } from './ObservacionesFinales';
 import { useVentaContext } from '../../context/ventaContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
 export const Ventas = () => {
 
-    const { venta } = useVentaContext();
+    const { venta, setVenta } = useVentaContext();
+    const { carrito, setCarrito } = useCarritoContext();
+
     const [pasoSeleccionado, setPasoSeleccionado] = useState(1);
     const [total, setTotal] = useState(0);
     const [puntosGanados, setPuntosGanados] = useState(0);
     const [descuento, setDescuento] = useState(venta?.descuento);
     const [bandera, setBandera] = useState(false);
-
-    const { carrito } = useCarritoContext();
+    const [reiniciar, setReiniciar] = useState(false);
 
     useEffect(() => {
         carrito?.map((datos, index) => {
@@ -97,7 +101,7 @@ export const Ventas = () => {
     const mostrarContenido = () => {
         switch (pasoSeleccionado) {
             case 1:
-                return <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} aplicarDescuento={aplicarDescuento} />;
+                return <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} aplicarDescuento={aplicarDescuento} reiniciar={reiniciar} setReiniciar={setReiniciar} />;
             case 2:
                 return <HeaderTabla setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} puntosGanados={puntosGanados} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} aplicarDescuento={aplicarDescuento} />
             case 3:
@@ -107,8 +111,52 @@ export const Ventas = () => {
         }
     }
 
+    const reiniciarVenta = () => {
+        setVenta({
+            numVenta: '',
+            fecha: null,
+            tipoVenta: 'Restaurante',
+            formaPago: 'Efectivo',
+            domicilio: '',
+            direccion: '',
+            consume: 'restaurante',
+            mesa: '',
+            cliente: '',
+            productos: [],
+            observaciones: [],
+            total: 0,
+            puntos: 0,
+            descuento: 0
+        });
+
+        setCarrito([]);
+        setPasoSeleccionado(1);
+        setReiniciar(true);
+    }
+
     return (
         <div className="w-full h-screen justify-start overflow-y-scroll">
+            <section className='absolute right-8 bottom-8 flex flex-col justify-center overflow-hidden'>
+
+                <button
+                    id='botonAgregar'
+                    className='rounded-full w-12 h-12 flex items-center justify-center shadow-md'
+                    title='Cancelar venta'
+                    onClick={reiniciarVenta} >
+                    <FontAwesomeIcon className='text-white text-2xl font-normal' icon={faTimes}>
+                    </FontAwesomeIcon>
+                </button>
+
+                <Link to="/ventas/consultar">
+                    <button
+                        id='botonCarrito'
+                        className='rounded-full w-12 h-12 mt-4 flex items-center justify-center shadow-md'
+                        title='Consultar ventas'>
+                        <FontAwesomeIcon className='text-white text-2xl font-normal' icon={faSearch}>
+                        </FontAwesomeIcon>
+                    </button>
+                </Link>
+            </section>
             <section className="flex flex-col items-center">
                 <div className="flex pt-12 gap-14">
                     <div className="flex flex-col w-48 text-white items-center justify-start">

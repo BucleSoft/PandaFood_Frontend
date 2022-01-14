@@ -45,7 +45,6 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
             if (venta.tipoVenta === "Redimir") {
                 let sinPuntos = 0;
                 await carrito.map((elemento) => {
-                    console.log(elemento)
                     if (elemento.puntos === '' || elemento.puntos === null || elemento.puntos === '0') {
                         sinPuntos += 1;
                     }

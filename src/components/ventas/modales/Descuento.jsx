@@ -17,6 +17,7 @@ export const Descuento = ({ hidden, setHidden, descuento = '', setDescuento }) =
     const descuentoVenta = useRef();
 
     useEffect(() => {
+        descuentoVenta.current.value = '';
         descuentoVenta.current.focus();
     });
 

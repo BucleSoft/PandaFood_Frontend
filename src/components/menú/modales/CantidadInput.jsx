@@ -34,26 +34,26 @@ export const CantidadInput = ({ identificador, nombre, insumoEnLista, max, setBa
     const sumarCantidad = () => {
         if (cantidadExcepcion < max) {
             setCantidadExcepcion(cantidadExcepcion + 1);
-        }
-        if (insumoEnLista) {
-            listaExcepciones.map((dato) => {
-                if (dato.identificador === identificador) {
-                    dato.cantidad = cantidadExcepcion + 1;
-                }
-            });
+            if (insumoEnLista) {
+                listaExcepciones.map((dato) => {
+                    if (dato.identificador === identificador) {
+                        dato.cantidad = cantidadExcepcion + 1;
+                    }
+                });
+            }
         }
     }
 
     const restarCantidad = () => {
         if (cantidadExcepcion !== 1) {
             setCantidadExcepcion(cantidadExcepcion - 1);
-        }
-        if (insumoEnLista) {
-            listaExcepciones.map((dato) => {
-                if (dato.identificador === identificador) {
-                    dato.cantidad = cantidadExcepcion - 1;
-                }
-            });
+            if (insumoEnLista) {
+                listaExcepciones.map((dato) => {
+                    if (dato.identificador === identificador) {
+                        dato.cantidad = cantidadExcepcion - 1;
+                    }
+                });
+            }
         }
     }
 

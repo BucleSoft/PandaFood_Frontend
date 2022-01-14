@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition, respuesta } from '../../../helpers/Axios';
 import { toast } from 'react-toastify';
-import { TablaClientes } from './TablaClientes';
-import { useBanderaContext } from '../../context/banderaContext';
+import { TablaVentas } from './TablaVentas';
 
-export const HeaderTabla = ({ mostrar, busqueda }) => {
+export const HeaderTabla = ({ filtro, busqueda = '' }) => {
 
     const [data, setData] = useState([]);
-
-    const { bandera } = useBanderaContext();
-
     let numDatos = 0;
 
+    // const { bandera } = useBanderaContext();
+
     useEffect(() => {
-        const buscarClientes = async () => {
+        const buscarVentas = async () => {
 
             const configMensaje = {
                 position: "bottom-center",
@@ -26,37 +24,42 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                 progress: undefined,
             };
 
-            await axiosPetition("clientes");
-            setData(respuesta.clientes?.reverse());
+            await axiosPetition("ventas");
+            setData(respuesta.ventas?.reverse());
+
             if (!respuesta.ok) {
                 toast.error(
-                    "Ha ocurrido un error al intentar obtener la lista de clientes.",
+                    "Ha ocurrido un error al intentar obtener la lista de ventas.",
                     configMensaje
                 );
             }
         }
-        buscarClientes();
-    }, [bandera]);
+        buscarVentas();
+    }, []);
 
     return (
-        <table className="leading-normal w-full tabla mt-2">
+        <table className="leading-normal w-full tabla mb-14">
             <thead>
                 <tr>
                     <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Cédula
+                        Identificador
+                    </th>
+                    <th
+                        className=" py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Concepto
                     </th>
                     <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Nombre
+                        Fecha
                     </th>
                     <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Puntos
+                        Cliente
                     </th>
                     <th
-                        className="px-5 py-3 border-b-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Estado
+                        className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Total
                     </th>
                     <th
                         className="px-5 py-3 border-b-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -65,17 +68,15 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                 </tr>
             </thead>
             <tbody>
-                {data?.map((datos) => {
-                    if (numDatos <= 9 && datos.cedula !== 0) {
-                        if (mostrar === 'Todos' && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
+                {
+                    data?.map((dato, key) => {
+
+                        if (numDatos <= 9) {
                             numDatos += 1;
-                            return <TablaClientes key={datos.uid} props={datos} />
-                        } else if (datos.estado === mostrar && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
-                            numDatos += 1;
-                            return <TablaClientes key={datos.uid} props={datos} />
+                            return <TablaVentas key={key} props={dato} />
                         }
-                    }
-                })}
+                    })
+                }
             </tbody>
         </table>
     )

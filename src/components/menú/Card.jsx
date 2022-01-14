@@ -126,10 +126,12 @@ export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', 
 
     const quitarDelCarrito = async () => {
         let index = carrito.findIndex((item) => item.identificador === identificador);
-        for (let i = 0; i <= carrito[index].observaciones.length; i++) {
-            for (let j = 0; j <= venta.observaciones.length; j++) {
-                if (venta.observaciones[j] === carrito[index].observaciones[i]) {
-                    venta.observaciones.splice(j, 1);
+        if (carrito[index].observaciones !== undefined) {
+            for (let i = 0; i <= carrito[index].observaciones.length; i++) {
+                for (let j = 0; j <= venta.observaciones.length; j++) {
+                    if (venta.observaciones[j] === carrito[index].observaciones[i]) {
+                        venta.observaciones.splice(j, 1);
+                    }
                 }
             }
         }

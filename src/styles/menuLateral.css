@@ -9,12 +9,16 @@
   background-color: rgb(25, 28, 31, 0.8);
 }
 
+.menu-item-logout {
+  background-color: hsla(356, 86%, 57%, 0.555);
+}
+
 .activated {
-  background-color: #f0313d;
+  background-color: hsla(356, 86%, 57%, 0.856);
 }
 
 .menu-item:hover {
   cursor: pointer;
-  background-color: #f0313d;
+  background-color: hsla(356, 86%, 57%, 0.856);
   /* background-color: rgb(53, 53, 53, 0.8); */
 }

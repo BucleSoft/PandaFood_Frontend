@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faPlus, faShoppingCart, faChevronRight, faChevronDown, faUndo, faCartArrowDown, faBroom } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faPlus, faShoppingCart, faChevronRight, faChevronDown, faBroom } from '@fortawesome/free-solid-svg-icons';
 import '../../styles/consultarProductos.css';
 import { Link } from 'react-router-dom';
 import { axiosPetition, respuesta } from '../../helpers/Axios';

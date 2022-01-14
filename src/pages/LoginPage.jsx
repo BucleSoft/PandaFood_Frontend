@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import logo from '../images/logo-PandaFood.svg';
 import '../styles/login.css';
 import { useHistory } from 'react-router-dom';
@@ -16,6 +16,8 @@ export const LoginPage = () => {
 
     const history = useHistory();
 
+    const cedulaInput = useRef();
+
     const configMensaje = {
         position: "bottom-center",
         background: "#191c1f !important",
@@ -28,6 +30,10 @@ export const LoginPage = () => {
     };
     const { cedula, contraseña } = loginCredentials;
 
+    useEffect(() => {
+        cedulaInput.current.focus();
+    }, []);
+
     const login = async (e) => {
 
         e.preventDefault();
@@ -37,8 +43,9 @@ export const LoginPage = () => {
         if (respuesta !== undefined) {
 
             if (respuesta.ok) {
+                window.localStorage.setItem('token', respuesta.token);
                 resetForm();
-                history.push('/usuarios');
+                history.push('/menu');
 
             } else {
                 toast.error(respuesta.msg, configMensaje);
@@ -47,22 +54,29 @@ export const LoginPage = () => {
         }
     }
 
+    useEffect(() => {
+        if (window.localStorage.getItem('token') !== null) {
+            history.push('/menu');
+        }
+    }, []);
+
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2">
             <div id="col-izq" className="min-h-screen pt-12 md:pt-20 pb-6 px-6">
                 <div id="conten-izq" className="max-w-md mx-auto mt-12">
-                    <h2 className="text-lg text-left max-w-lg text-gray-500">Bienvenido a</h2>
+                    <h2 className="text-lg text-left max-w-lg text-white">Bienvenido a</h2>
                     <h1 id="titulo-principal" className="text-4xl font-bold mb-12 text-left max-w-lg">Panda Food</h1>
                     <form className="flex flex-col" onSubmit={login}>
-                        <label className="text-lg max-w-lg text-left mb-2 text-gray-600" htmlFor="usuario">Usuario:</label>
+                        <label className="text-lg max-w-lg text-left mb-2 text-thite" htmlFor="usuario">Usuario:</label>
                         <input name="cedula"
+                            ref={cedulaInput}
                             className="loginInput"
                             placeholder="Ingresa tu cédula"
                             value={cedula}
                             onChange={loginInputChange}
                             autoComplete="off" />
-                        <label className="text-lg max-w-lg text-left mt-8 mb-2 text-gray-600" htmlFor="contraseña">Contraseña:</label>
+                        <label className="text-lg max-w-lg text-left mt-8 mb-2 text-white" htmlFor="contraseña">Contraseña:</label>
                         <input type="password" name="contraseña" className="loginInput"
                             value={contraseña}
                             onChange={loginInputChange}

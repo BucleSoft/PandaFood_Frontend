@@ -8,6 +8,8 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
 
     const [data, setData] = useState([]);
 
+    let numDatos = 0;
+
     const { bandera } = useBanderaContext();
 
     useEffect(() => {
@@ -37,7 +39,7 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
     }, [bandera]);
 
     return (
-        <table className="leading-normal w-full tabla">
+        <table className="leading-normal w-full tabla mt-2">
             <thead>
                 <tr>
                     <th
@@ -63,15 +65,17 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                 </tr>
             </thead>
             <tbody>
-                {data?.map((datos, key) => {
+                {data?.map((datos) => {
 
-                    if (mostrar === 'Todos' && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
-                        return <TablaUsuarios key={datos.uid} props={datos} />
-                    } else if (datos.estado === mostrar && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
-                        return <TablaUsuarios key={datos.uid} props={datos} />
+                    if (numDatos <= 9) {
+                        if (mostrar === 'Todos' && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
+                            numDatos += 1;
+                            return <TablaUsuarios key={datos.uid} props={datos} />
+                        } else if (datos.estado === mostrar && (datos.nombre.toLowerCase().includes(busqueda.toLowerCase()) || datos.cedula.toString().includes(busqueda))) {
+                            numDatos += 1;
+                            return <TablaUsuarios key={datos.uid} props={datos} />
+                        }
                     }
-
-                    return '';
                 })}
             </tbody>
         </table>

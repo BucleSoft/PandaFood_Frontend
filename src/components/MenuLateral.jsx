@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import logo_sidebar from '../images/logo-PandaFood.svg';
 import '../styles/menuLateral.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faUsers, faUserTie, faDollarSign, faCopy, faHamburger, faBreadSlice } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUsers, faUserTie, faDollarSign, faHamburger, faBreadSlice, faPowerOff } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { useMenuContext } from '../context/menuContext';
+import { useHistory } from 'react-router-dom';
 
 export const MenuLateral = () => {
 
     const { active, setActive } = useMenuContext();
+    // const [bandera, setBandera] = useState(false);
 
     useEffect(() => {
         const url = window.location.href;
@@ -19,8 +21,6 @@ export const MenuLateral = () => {
         } else if (url.includes('ventas')) {
             console.log("Estoy en", active)
             setActive('ventas');
-        } else if (url.includes('facturas')) {
-            setActive('facturas');
         } else if (url.includes('clientes')) {
             setActive('clientes');
         } else if (url.includes('insumos')) {
@@ -29,6 +29,15 @@ export const MenuLateral = () => {
             setActive('usuarios');
         }
     }, []);
+
+
+    const history = useHistory();
+
+    useEffect(() => {
+        if (window.localStorage.getItem('token') === null) {
+            history.push("/login");
+        }
+    }, [active]);
 
     return (
         <div id="sidebar" className="hidden md:flex md:flex-col md:h-screen">
@@ -65,16 +74,6 @@ export const MenuLateral = () => {
                         Realizar Venta
                     </li>
                 </Link>
-                <Link to="/facturas">
-                    <li
-                        className={`flex text-md mr-2 ml-2 mb-3 h-10 items-center menu-item rounded-lg ${active === "facturas" ? "activated" : ''}`}
-                        onClick={() => setActive('facturas')}>
-                        <FontAwesomeIcon
-                            className="mr-2 ml-4"
-                            icon={faCopy} />
-                        Generar Facturas
-                    </li>
-                </Link>
                 <Link to="/insumos">
                     <li
                         className={`flex text-md mr-2 ml-2 mb-3 h-10 items-center menu-item rounded-lg ${active === "insumos" ? "activated" : ''}`}
@@ -104,6 +103,17 @@ export const MenuLateral = () => {
                             className="mr-2 ml-4"
                             icon={faUserTie} />
                         Gestionar Usuarios
+                    </li>
+                </Link>
+                <Link to="/login">
+                    <li
+                        className={`flex text-md mr-2 ml-2 mb-3 h-10 items-center menu-item-logout rounded-lg`}
+                        onClick={() => window.localStorage.removeItem('token')}
+                    >
+                        <FontAwesomeIcon
+                            className="mr-2 ml-4"
+                            icon={faPowerOff} />
+                        Cerrar sesión
                     </li>
                 </Link>
             </ul>

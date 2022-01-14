@@ -1,4 +1,7 @@
 import './App.css';
+
+import ReactPDF from '@react-pdf/renderer';
+
 import { useEffect, useState } from 'react';
 import { LoginPage } from './pages/LoginPage';
 import { PerfilPage } from './pages/PerfilPage';
@@ -33,8 +36,15 @@ import { InsumosEditarPage } from './pages/insumos/InsumosEditarPage';
 import { MenuPage } from './pages/menú/MenuPage';
 import { RegistrarProductoPage } from './pages/menú/RegistrarProductoPage';
 import { EditarProductoPage } from './pages/menú/EditarProductoPage';
+
 import { VentasPage } from './pages/ventas/VentasPage';
+import { ConsultarVentasPage } from './pages/ventas/ConsultarVentasPage';
+
 import { axiosPetition, respuesta } from './helpers/Axios';
+
+import { Factura } from './reports/Factura';
+import { PDFViewer } from '@react-pdf/renderer';
+
 
 function App() {
 
@@ -61,6 +71,7 @@ function App() {
     tipoVenta: 'Restaurante',
     formaPago: 'Efectivo',
     domicilio: '',
+    direccion: '',
     consume: 'restaurante',
     mesa: '',
     cliente: '',
@@ -131,6 +142,12 @@ function App() {
                   </ConsultarProductoContext.Provider>
                   <Route exact path="/ventas">
                     <VentasPage />
+                  </Route>
+                  <Route exact path="/ventas/consultar">
+                    <ConsultarVentasPage />
+                  </Route>
+                  <Route exact path="/factura">
+                    <Factura />
                   </Route>
                 </VentaContext.Provider>
               </CarritoContext.Provider>

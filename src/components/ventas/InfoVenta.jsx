@@ -8,12 +8,13 @@ import { useForm } from '../../hooks/useForm';
 import { toast } from 'react-toastify';
 import { useVentaContext } from '../../context/ventaContext';
 
-export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setBandera }) => {
+export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setBandera, reiniciar, setReiniciar }) => {
 
 
     const { venta, setVenta } = useVentaContext();
 
     const domicilio = useRef();
+    const direccion = useRef(venta.direccion);
 
     const [tipoVenta, setTipoVenta] = useState(venta.tipoVenta);
     const [desactivados, setDesactivados] = useState(false);
@@ -22,7 +23,6 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
     const [initValues, setInitValues] = useState({
         cedula: '',
         nombre: '',
-        direccion: '',
         celular: '',
         puntos: '',
         estado: 'Activo'
@@ -30,7 +30,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
 
     const [clientesValues, handleClientesChange, resetClientes, formatearTexto, setValues] = useForm(initValues);
 
-    const { cedula, nombre, direccion, celular, puntos } = clientesValues;
+    const { cedula, nombre, celular, puntos } = clientesValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -55,6 +55,16 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
         }
     }
 
+
+    useEffect(() => {
+        if (reiniciar) {
+            limpiarCliente();
+            setTipoVenta('Restaurante');
+            setReiniciar(false);
+        }
+        obtenerMax();
+    }, [venta]);
+
     useEffect(() => {
         obtenerInfo();
         obtenerMax();
@@ -68,6 +78,15 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
 
         domicilio.current.value = venta.domicilio;
     }, [auxiliar]);
+
+    useEffect(() => {
+        if (venta.cliente !== '') {
+            if (tipoVenta !== 'Domicilio') {
+                limpiarCliente();
+            }
+            buscarCliente(venta.cliente);
+        }
+    }, [tipoVenta]);
 
 
     const buscarCliente = async (cedula) => {
@@ -91,11 +110,18 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
         setValues({
             cedula: respuesta.cliente.cedula,
             nombre: respuesta.cliente.nombre,
-            direccion: respuesta.cliente.direccion,
             celular: respuesta.cliente.celular,
             puntos: respuesta.cliente.puntos,
             estado: 'Activo'
         });
+
+        if (venta.direccion.trim() === '') {
+            direccion.current.value = respuesta.cliente.direccion;
+            venta.direccion = direccion.current.value;
+        } else {
+            direccion.current.value = venta.direccion;
+        }
+
 
         venta.cliente = respuesta.cliente.cedula;
     }
@@ -115,6 +141,15 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
         toast.success("Cliente registrado correctamente.", configMensaje);
         setDesactivados(true);
 
+    }
+
+    const limpiarCliente = () => {
+        venta.domicilio = '';
+        venta.direccion = '';
+        domicilio.current.value = '';
+        direccion.current.value = '';
+        resetClientes();
+        setDesactivados(false);
     }
 
     return (
@@ -186,6 +221,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
                         }
                     }}
                     disabled={desactivados}
+                    autoFocus
                 />
                 <input
                     type="text"
@@ -201,25 +237,25 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
                     name="celular"
                     value={celular}
                     onChange={handleClientesChange}
-                    className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""}`}
+                    className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""} ${cedula === 0 ? 'hidden' : ''}`}
                     placeholder="Celular del cliente *"
                     autoComplete="off"
                     disabled={desactivados} />
                 <input
                     type="text"
                     name="direccion"
-                    value={direccion}
-                    onChange={handleClientesChange}
-                    className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""}`}
-                    placeholder="Dirección del cliente"
+                    ref={direccion}
+                    onChange={() => venta.direccion = direccion.current.value}
+                    className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados && tipoVenta !== "Domicilio" ? "formInputInactive" : ""} ${(cedula === 0 && tipoVenta !== 'Domicilio') ? 'hidden' : ''}`}
+                    placeholder={tipoVenta === 'Domicilio' ? "Dirección del cliente*" : "Dirección del cliente"}
                     autoComplete="off"
-                    disabled={desactivados} />
+                    disabled={tipoVenta === "Domicilio" || !desactivados ? false : true} />
                 <input
                     type="number"
                     name="puntos"
                     value={puntos}
                     onChange={handleClientesChange}
-                    className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""}`}
+                    className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""} ${cedula === 0 ? 'hidden' : ''}`}
                     placeholder="Puntos del cliente"
                     autoComplete="off"
                     disabled={desactivados} />
@@ -251,10 +287,7 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
                     className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
                     onClick={() => {
                         venta.cliente = '';
-                        venta.domicilio = '';
-                        domicilio.current.value = '';
-                        resetClientes();
-                        setDesactivados(false);
+                        limpiarCliente();
                     }}>
                     Limpiar
                 </button>
