@@ -4,7 +4,7 @@ import ReactPDF from '@react-pdf/renderer';
 
 import { useEffect, useState } from 'react';
 import { LoginPage } from './pages/LoginPage';
-import { PerfilPage } from './pages/PerfilPage';
+import { PerfilPage } from './pages/perfil/PerfilPage';
 
 import { ConsultarUsuarioContext } from './context/consultarUsuarioContext';
 import { ConsultarClienteContext } from './context/consultarClienteContext';

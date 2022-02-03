@@ -25,6 +25,16 @@ export const ConsultarVentas = () => {
                         <button
                             className={`text-white px-2 py-1 rounded-xl ${filtro === 'Todos' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
                         >
+                            Hoy
+                        </button>
+                        <button
+                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Todos' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-36 outline-none`}
+                        >
+                            Rango de fechas
+                        </button>
+                        <button
+                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Todos' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
+                        >
                             Restaurante
                         </button>
                         <button
