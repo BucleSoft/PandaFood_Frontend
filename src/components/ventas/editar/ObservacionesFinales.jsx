@@ -143,6 +143,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                     <option value="llevar">Para llevar</option>
                 </select>
                 <select
+
                     name="mesa"
                     ref={mesa}
                     className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${editarVenta !== undefined ? editarVenta.tipoVenta === "Redimir" ? "hidden" : "" : ""} ${editarVenta !== undefined ? consume !== "restaurante" || editarVenta.tipoVenta === "Domicilio" ? "hidden" : "" : ""}`}
