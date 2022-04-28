@@ -9,12 +9,17 @@ import { ObservacionesFinales } from './ObservacionesFinales';
 import { useVentaContext } from '../../context/ventaContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { useEditarVentaContext } from '../../context/editarVentaContext';
+import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 export const Ventas = () => {
 
+    const { editarVenta } = useEditarVentaContext();
     const { venta, setVenta } = useVentaContext();
     const { carrito, setCarrito } = useCarritoContext();
+
+    const history = useHistory();
 
     const [pasoSeleccionado, setPasoSeleccionado] = useState(1);
     const [total, setTotal] = useState(0);
@@ -24,11 +29,20 @@ export const Ventas = () => {
     const [reiniciar, setReiniciar] = useState(false);
 
     useEffect(() => {
+        if (editarVenta !== undefined) {
+            history.push("/ventas/editar");
+        }
+    }, [editarVenta]);
+
+    useEffect(() => {
         carrito?.map((datos, index) => {
             if (datos === undefined || datos === '' || datos === null) {
                 carrito.splice(index, 1);
             }
         });
+
+        venta.vendedor = parseInt(window.localStorage.getItem("usuario"));
+        console.log(venta.vendedor);
     }, []);
 
     useEffect(() => {
@@ -48,18 +62,18 @@ export const Ventas = () => {
 
             if (descuento > 0) {
                 const decimalDescuento = descuento / 100;
-                if (venta.tipoVenta === "Domicilio" && venta.domicilio !== "") {
-                    setTotal((precioTotal - (precioTotal * decimalDescuento)) + venta.domicilio);
-                    venta.total = (precioTotal - (precioTotal * decimalDescuento)) + venta.domicilio;
+                if (venta.tipoVenta === "Domicilio" && venta.precioDomicilio !== "") {
+                    setTotal((precioTotal - (precioTotal * decimalDescuento)) + venta.precioDomicilio);
+                    venta.total = (precioTotal - (precioTotal * decimalDescuento)) + venta.precioDomicilio;
                 } else {
                     setTotal(precioTotal - (precioTotal * decimalDescuento));
                     venta.total = precioTotal - (precioTotal * decimalDescuento);
                 }
                 setPuntosGanados(Math.floor((precioTotal - (precioTotal * decimalDescuento)) / 2000));
             } else if (descuento === 0) {
-                if (venta.tipoVenta === "Domicilio" && venta.domicilio !== "") {
-                    setTotal(precioTotal + venta.domicilio);
-                    venta.total = precioTotal + venta.domicilio;
+                if (venta.tipoVenta === "Domicilio" && venta.precioDomicilio !== "") {
+                    setTotal(precioTotal + venta.precioDomicilio);
+                    venta.total = precioTotal + venta.precioDomicilio;
                 } else {
                     setTotal(precioTotal);
                     venta.total = precioTotal;
@@ -67,7 +81,7 @@ export const Ventas = () => {
                 setPuntosGanados(Math.floor(precioTotal / 2000));
             }
 
-            venta.puntos = puntosGanados;
+            venta.puntosGanados = puntosGanados;
         }
 
         calcularTotal();
@@ -113,19 +127,20 @@ export const Ventas = () => {
 
     const reiniciarVenta = () => {
         setVenta({
-            numVenta: '',
+            identificador: '',
             fecha: null,
             tipoVenta: 'Restaurante',
             formaPago: 'Efectivo',
-            domicilio: '',
-            direccion: '',
+            precioDomicilio: '',
+            direccionDomicilio: '',
             consume: 'restaurante',
-            mesa: '',
+            idMesa: '',
             cliente: '',
+            vendedor: parseInt(window.localStorage.getItem("usuario")),
             productos: [],
             observaciones: [],
             total: 0,
-            puntos: 0,
+            puntosGanados: 0,
             descuento: 0
         });
 

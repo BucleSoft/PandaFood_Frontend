@@ -1,26 +1,30 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { axiosPetition } from '../../helpers/Axios';
-import { EliminarObs } from './modales/EliminarObs';
+import { axiosPetition } from '../../../helpers/Axios';
+import { EliminarObs } from "./modales/EliminarObs";
 import { Observacion } from './Observacion';
-import { useVentaContext } from '../../context/ventaContext';
-import { useCarritoContext } from '../../context/carritoContext';
-import '../../styles/observaciones.css';
+import '../../../styles/observaciones.css';
+import { useEditarVentaContext } from '../../../context/editarVentaContext';
+import { useHistory } from 'react-router-dom';
+import { useCarritoContext } from '../../../context/carritoContext';
 
 export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) => {
 
-    const { venta, setVenta } = useVentaContext();
-    const { carrito, setCarrito } = useCarritoContext();
+    const history = useHistory();
+
+    const { editarVenta } = useEditarVentaContext();
+    const { carrito } = useCarritoContext();
 
     const observacion = useRef('');
     const mesa = useRef(-1);
 
-    const [consume, setConsume] = useState(venta?.consume);
-    const [observaciones, setObservaciones] = useState(venta?.observaciones);
+    const [consume, setConsume] = useState(editarVenta?.consume);
+    const [observaciones, setObservaciones] = useState([]);
     const [hidden, setHidden] = useState(true);
     const [indexObs, setIndexObs] = useState();
     const [mesas, setMesas] = useState([]);
+    const [bandera, setBandera] = useState(false);
 
     useEffect(() => {
         const buscarMesas = async () => {
@@ -35,6 +39,44 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
         buscarMesas();
     }, []);
 
+    useEffect(() => {
+        if (editarVenta === undefined) {
+            history.push("/ventas/consultar");
+        }
+    }, [editarVenta]);
+
+    useEffect(() => {
+
+        const bucarObservaciones = async () => {
+
+            if (editarVenta.observaciones !== undefined && editarVenta.observaciones.length !== 0) {
+
+                const obs = editarVenta.observaciones;
+
+                console.log("OBSERVACIONES", obs)
+
+                const registrarPendientes = await axiosPetition(`observaciones/registrar/${editarVenta.identificador}`, { observaciones: obs }, "POST");
+
+                if (!registrarPendientes.ok) {
+                    return toast.error(registrarPendientes.msg, configMensaje);
+                }
+
+                editarVenta.observaciones = [];
+            }
+
+            const busqueda = await axiosPetition(`observaciones/${editarVenta?.identificador}`);
+
+            if (!busqueda.ok) {
+                return toast.error(busqueda.msg, configMensaje);
+            }
+
+            setObservaciones(busqueda.observaciones);
+        }
+
+        bucarObservaciones();
+
+    }, [bandera, editarVenta]);
+
     const configMensaje = {
         position: "bottom-center",
         background: "#191c1f !important",
@@ -46,42 +88,37 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
         progress: undefined,
     };
 
-    const registrarVenta = async () => {
+    const agregarObservacion = async () => {
 
-        venta.productos = carrito;
+        const agregarObs = await axiosPetition("observaciones", { id_venta: editarVenta?.identificador, observacion: observacion.current.value }, "POST");
 
-        let peticion;
-
-        if (venta.tipoVenta === "Domicilio") {
-            peticion = await axiosPetition("ventas/domicilio", venta, "POST");
-        } else {
-            peticion = await axiosPetition("ventas", venta, "POST");
+        if (!agregarObs.ok) {
+            return toast.error(agregarObs.msg, configMensaje);
         }
 
-        if (!peticion.ok) {
-            return toast.error(peticion.msg, configMensaje);
+        setBandera(!bandera);
+        observacion.current.value = "";
+    }
+
+    const actualizarVenta = () => {
+
+        const actualizar = async () => {
+
+            console.log("CARRITO", carrito);
+
+            const peticion = await axiosPetition(`ventas/editar/${editarVenta.identificador}`, { infoVenta: editarVenta, carrito }, "PUT");
+
+            console.log(peticion);
+
+            if (!peticion.ok) {
+                return toast.error(peticion.msg, configMensaje);
+            }
+            history.push("/ventas/consultar");
+            return toast.success(peticion.msg, configMensaje);
+
         }
 
-        toast.success("Venta registrada!", configMensaje);
-        setVenta({
-            identificador: '',
-            fecha: null,
-            tipoVenta: 'Restaurante',
-            formaPago: 'Efectivo',
-            precioDomicilio: '',
-            direccionDomicilio: '',
-            consume: 'restaurante',
-            idMesa: '',
-            cliente: '',
-            vendedor: '',
-            productos: [],
-            observaciones: [],
-            total: 0,
-            puntosGanados: 0,
-            descuento: 0
-        });
-        setCarrito([]);
-        setPasoSeleccionado(1);
+        actualizar();
     }
 
     return (
@@ -90,16 +127,16 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
             <form className="mt-4 ml-16 flex flex-wrap justify-start w-full">
                 <select
                     name="consume"
-                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" || venta.tipoVenta === "Domicilio" ? "hidden" : ""}`}
+                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${editarVenta !== undefined ? (editarVenta.tipoVenta === "Redimir" || editarVenta.tipoVenta) === "Domicilio" ? "hidden" : "" : ""}`}
                     autoComplete="off"
                     value={consume}
                     onChange={(e) => {
                         if (e.target.value === "llevar") {
-                            venta.idMesa = "";
+                            editarVenta.idMesa = "";
                             mesa.current.value = -1;
                         }
                         setConsume(e.target.value);
-                        venta.consume = e.target.value;
+                        editarVenta.consume = e.target.value;
                     }}
                 >
                     <option value="restaurante" defaultValue>Comer en restaurante</option>
@@ -108,10 +145,10 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 <select
                     name="mesa"
                     ref={mesa}
-                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" ? "hidden" : ""} ${consume !== "restaurante" || venta.tipoVenta === "Domicilio" ? "hidden" : ""}`}
+                    className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${editarVenta !== undefined ? editarVenta.tipoVenta === "Redimir" ? "hidden" : "" : ""} ${editarVenta !== undefined ? consume !== "restaurante" || editarVenta.tipoVenta === "Domicilio" ? "hidden" : "" : ""}`}
                     autoComplete="off"
                     onChange={() => {
-                        venta.idMesa = mesa.current.value;
+                        editarVenta.idMesa = mesa.current.value;
                     }}
                     defaultChecked={mesa}
                 >
@@ -126,7 +163,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                     type="text"
                     name="observacion"
                     ref={observacion}
-                    className={`p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${venta.tipoVenta === "Redimir" || venta.tipoVenta === "Domicilio" ? "w-96" : "w-80"}`}
+                    className={`p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${editarVenta !== undefined ? editarVenta.tipoVenta === "Redimir" || editarVenta.tipoVenta === "Domicilio" ? "w-96" : "w-80" : ""}`}
                     placeholder="Agregar observación"
                     autoComplete="off"
                     onKeyPress={(e) => {
@@ -137,9 +174,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                             if (obs.length === 0) {
                                 toast.error("No se puede agregar una observación vacía.", configMensaje);
                             } else {
-                                setObservaciones([...observaciones, obs]);
-                                venta.observaciones.push(obs);
-                                observacion.current.value = "";
+                                agregarObservacion();
                             }
 
                         }
@@ -152,7 +187,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 <div id="contenedorObservaciones"
                     className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
                     {observaciones?.map((data, key) => {
-                        return <Observacion key={key} index={key} obs={data} hidden={hidden} setHidden={setHidden} setIndexObs={setIndexObs} />
+                        return <Observacion key={key} index={data.id} obs={data.observacion} hidden={hidden} setHidden={setHidden} setIndexObs={setIndexObs} />
                     })}
                 </div>
             </section>
@@ -176,12 +211,12 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 <button
                     type="submit"
                     className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput"
-                    onClick={registrarVenta}
+                    onClick={actualizarVenta}
                 >
                     Finalizar
                 </button>
             </div>
-            <EliminarObs hidden={hidden} setHidden={setHidden} observaciones={observaciones} index={indexObs} />
-        </div>
+            <EliminarObs hidden={hidden} setHidden={setHidden} index={indexObs} setBandera={setBandera} bandera={bandera} />
+        </div >
     );
 }

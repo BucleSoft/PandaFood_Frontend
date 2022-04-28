@@ -1,22 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import efectivo from '../../images/efectivo.svg';
-import { useForm } from '../../hooks/useForm';
-import { useVentaContext } from '../../context/ventaContext';
-import '../../styles/formaPago.css';
+import efectivo from '../../../images/efectivo.svg';
+import { useForm } from '../../../hooks/useForm';
+import '../../../styles/formaPago.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCcVisa } from '@fortawesome/free-brands-svg-icons';
-import puntos from '../../images/puntos.svg';
+import puntos from '../../../images/puntos.svg';
+import { useEditarVentaContext } from '../../../context/editarVentaContext';
+import { useHistory } from 'react-router-dom';
+import { axiosPetition } from '../../../helpers/Axios';
+import { toast } from 'react-toastify';
 
 export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setBandera, total }) => {
 
-    const { venta } = useVentaContext();
-    const [formaPago, setFormaPago] = useState(venta?.formaPago);
-    const [tipoVenta] = useState(venta?.tipoVenta);
+    const history = useHistory();
+    const { editarVenta } = useEditarVentaContext();
+
+    useEffect(() => {
+        if (editarVenta === undefined) {
+            history.push("/ventas/consultar");
+        }
+    }, [editarVenta]);
+
+    const [formaPago, setFormaPago] = useState(editarVenta?.formaPago);
+    const [tipoVenta] = useState(editarVenta?.tipoVenta);
+
 
     const [pagoValues, handlePagoChange] = useForm({
-        fecha: new Date(venta?.fecha).toLocaleDateString(),
-        identificador: venta?.identificador,
+        fecha: new Date(editarVenta?.fecha).toLocaleDateString(),
+        identificador: editarVenta?.identificador,
     });
 
     const { fecha, identificador } = pagoValues;
@@ -25,45 +37,68 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
         setBandera(!bandera);
     }, []);
 
+    const configMensaje = {
+        position: "bottom-center",
+        background: "#191c1f !important",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+    };
+
+    const actualizarFormaPago = async (pago) => {
+
+        const peticion = await axiosPetition(`ventas/${identificador}`, { formaPago: pago }, "PUT");
+
+        if (!peticion.ok) {
+            return toast.error(peticion.msg, configMensaje);
+        }
+
+        setFormaPago(pago);
+        editarVenta.formaPago = pago;
+    }
+
     return (
         <div className="w-full p-12">
             <div className="flex flex-wrap justify-center mt-4">
                 <div className="flex flex-col">
-                    <label className='text-white text-left' htmlFor='numVenta'>Número de venta:</label>
+                    <label className='text-white text-left' htmlFor='numVenta'>Número de Venta:</label>
                     <input
                         type="text"
                         name="identificador"
                         value={identificador}
-                        title="Número de venta"
+                        title="Número de Venta"
                         onChange={handlePagoChange}
                         className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                        placeholder="Número de venta"
+                        placeholder="Número de Venta"
                         autoComplete="off"
                         disabled />
                 </div>
                 <div className='flex flex-col'>
-                    <label className='text-white text-left' htmlFor='fecha'>Fecha de venta:</label>
+                    <label className='text-white text-left' htmlFor='fecha'>Fecha de Venta:</label>
                     <input
                         type="text"
                         name="fecha"
-                        title="Fecha de venta"
+                        title="Fecha de Venta"
                         value={fecha}
                         onChange={handlePagoChange}
                         className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                        placeholder="Fecha de venta"
+                        placeholder="Fecha de Venta"
                         autoComplete="off"
                         disabled />
                 </div>
                 <div className="flex flex-col">
-                    <label className='text-white text-left' htmlFor='numVenta'>Total de venta:</label>
+                    <label className='text-white text-left' htmlFor='numVenta'>Total de Venta:</label>
                     <input
                         type="text"
                         name="total"
-                        title="Total de venta"
-                        value={venta.tipoVenta === "Redimir" ? total + " pts" : total}
+                        title="Total de Venta"
+                        value={editarVenta !== undefined ? editarVenta.tipoVenta === "Redimir" ? total + " pts" : total : ""}
                         onChange={handlePagoChange}
                         className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                        placeholder="Total de venta"
+                        placeholder="Total de Venta"
                         autoComplete="off"
                         disabled />
                 </div>
@@ -72,8 +107,9 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
                 <section
                     className={`flex flex-col w-48 h-28 items-center justify-between border-4 rounded-xl cursor-pointer ${formaPago === 'Efectivo' ? 'itemPagoSeleccionado' : 'itemPago'} ${tipoVenta === "Redimir" ? "hidden" : ""} `}
                     onClick={() => {
-                        setFormaPago("Efectivo");
-                        venta.formaPago = "Efectivo";
+                        if (formaPago !== "Efectivo") {
+                            actualizarFormaPago("Efectivo");
+                        }
                     }}>
                     <img className="w-16 mt-2" src={efectivo} />
                     <h2 className="text-white">Efectivo</h2>
@@ -81,8 +117,9 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
                 <section
                     className={`flex flex-col w-48 h-28 items-center justify-between border-4 rounded-xl cursor-pointer ${formaPago === 'Tarjeta' ? 'itemPagoSeleccionado' : 'itemPago'} ${tipoVenta === "Redimir" ? "hidden" : ""}`}
                     onClick={() => {
-                        setFormaPago("Tarjeta");
-                        venta.formaPago = "Tarjeta";
+                        if (formaPago !== "Tarjeta") {
+                            actualizarFormaPago("Tarjeta");
+                        }
                     }}>
                     <FontAwesomeIcon className="text-white mt-2 text-7xl" icon={faCcVisa} />
                     <h2 className="text-white">Tarjeta</h2>
@@ -90,8 +127,9 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
                 <section
                     className={`flex flex-col w-48 h-28 items-center justify-between border-4 rounded-xl cursor-pointer ${formaPago === 'Puntos' ? 'itemPagoSeleccionado' : 'itemPago'} ${tipoVenta !== "Redimir" ? "hidden" : ""}`}
                     onClick={() => {
-                        setFormaPago("Puntos");
-                        venta.formaPago = "Puntos";
+                        if (formaPago !== "Puntos") {
+                            actualizarFormaPago("Puntos");
+                        }
                     }}>
                     <img src={puntos} />
                     <h2 className="text-white">Puntos</h2>

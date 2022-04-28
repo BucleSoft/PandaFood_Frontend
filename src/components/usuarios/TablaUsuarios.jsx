@@ -4,7 +4,7 @@ import Lapiz from '../../assets/lapiz.svg';
 import Eliminar from '../../assets/eliminar.svg';
 import { useHistory } from 'react-router-dom';
 import { useConsultarUsuarioContext } from '../../context/consultarUsuarioContext';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndoAlt } from '@fortawesome/free-solid-svg-icons';
@@ -32,25 +32,27 @@ export const TablaUsuarios = ({ props }) => {
 
     const obtenerInfoUsuario = async () => {
 
-        await axiosPetition(`usuarios/${cedula}`);
+        const busqueda = await axiosPetition(`usuarios/${cedula}`);
 
-        if (respuesta.ok) {
-            setUsuarioEditar(respuesta.usuario);
+        if (busqueda.ok) {
+            setUsuarioEditar(busqueda.usuario);
             history.push('/usuarios/editar');
         } else {
-            toast.error(respuesta.msg, configMensaje);
+            toast.error(busqueda.msg, configMensaje);
         }
     }
 
     const gestionarAcceso = async () => {
 
+        let gestionar;
+
         if (estado === 'Autorizado') {
-            await axiosPetition(`usuarios/acceso/${cedula}`, { estado: 'No autorizado' }, 'PUT');
+            gestionar = await axiosPetition(`usuarios/acceso/${cedula}`, { estado: 'No autorizado' }, 'PUT');
         } else {
-            await axiosPetition(`usuarios/acceso/${cedula}`, { estado: 'Autorizado' }, 'PUT');
+            gestionar = await axiosPetition(`usuarios/acceso/${cedula}`, { estado: 'Autorizado' }, 'PUT');
         }
 
-        if (respuesta.ok) {
+        if (gestionar.ok) {
             toast.success('Estado de usuario habilitado/deshabilitado correctamente.', configMensaje);
             if (estado === 'Autorizado') {
                 estado = 'No autorizado';

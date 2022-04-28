@@ -2,18 +2,16 @@ import React, { useEffect, useState } from 'react';
 import '../../styles/tablaUsuarios.css';
 import '../../styles/tablaInsumos.css';
 import Lapiz from '../../assets/lapiz.svg';
-import Eliminar from '../../assets/eliminar.svg';
 import { useHistory } from 'react-router-dom';
-import { axiosPetition, respuesta, resetRespuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useBanderaContext } from '../../context/banderaContext';
 import { faCoffee, faBreadSlice, faCheckCircle, faClock, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useConsultarInsumoContext } from '../../context/consultarInsumoContext';
 
 export const TablaInsumos = ({ props }) => {
 
-    let { identificador, nombre, stock, gramaje, categoria } = props;
+    let { identificador, unidades, nombre, cantidad, categoria } = props;
 
     const { setInsumoEditar } = useConsultarInsumoContext();
 
@@ -35,37 +33,36 @@ export const TablaInsumos = ({ props }) => {
     };
 
     const obtenerInfoInsumo = async () => {
-        resetRespuesta();
-        await axiosPetition(`insumos/${identificador}`);
-        if (respuesta.ok) {
-            setInsumoEditar(respuesta.insumo);
+        const insumo = await axiosPetition(`insumos/${identificador}`);
+        if (insumo.ok) {
+            setInsumoEditar(insumo.insumo);
             history.push('/insumos/editar');
         } else {
-            toast.error(respuesta.msg, configMensaje);
+            toast.error(insumo.msg, configMensaje);
         }
     }
 
     useEffect(() => {
-        if (stock !== null && categoria === 'Bebida') {
-            if (stock > 5) {
+        if (unidades === "stock" && categoria === 'Bebida') {
+            if (cantidad > 5) {
                 setDisponibilidad('Disponible');
-            } else if (stock <= 5 && stock > 0) {
+            } else if (cantidad <= 5 && cantidad > 0) {
                 setDisponibilidad('Por agotarse');
             } else {
                 setDisponibilidad('Agotado');
             }
-        } else if (stock !== null && categoria === 'Comida') {
-            if (stock > 12) {
+        } else if (unidades === "stock" && categoria === 'Comida') {
+            if (cantidad > 12) {
                 setDisponibilidad('Disponible');
-            } else if (stock <= 12 && stock > 0) {
+            } else if (cantidad <= 12 && cantidad > 0) {
                 setDisponibilidad('Por agotarse');
             } else {
                 setDisponibilidad('Agotado');
             }
-        } else if (gramaje !== null) {
-            if (gramaje > 500) {
+        } else if (unidades === "gramos") {
+            if (cantidad > 500) {
                 setDisponibilidad('Disponible');
-            } else if (gramaje <= 500 && gramaje > 0) {
+            } else if (cantidad <= 500 && cantidad > 0) {
                 setDisponibilidad('Por agotarse');
             } else {
                 setDisponibilidad('Agotado');
@@ -88,7 +85,7 @@ export const TablaInsumos = ({ props }) => {
                     </div>
                 </td>
                 <td className="px-5 py-3 text-sm text-left">
-                    <p className="text-white whitespace-no-wrap">{stock === null ? gramaje + 'g' : stock}</p>
+                    <p className="text-white whitespace-no-wrap">{unidades === "gramos" ? cantidad + 'g' : cantidad}</p>
                 </td>
                 <td className="text-white">
                     {

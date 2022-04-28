@@ -2,7 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 
 export const RegistrarInsumo = () => {
@@ -15,14 +15,13 @@ export const RegistrarInsumo = () => {
     const [insumosValues, handleInsumosChange, resetInsumos, formatearTexto] = useForm({
         nombre: '',
         unidades: 'stock',
-        stock: '',
-        gramaje: '',
+        cantidad: '',
         categoria: 'Comida',
         disponibilidad: 'Disponible',
         estado: 'Activo'
     });
 
-    const { unidades, nombre, stock, gramaje, categoria } = insumosValues;
+    const { unidades, nombre, cantidad, categoria } = insumosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -37,13 +36,13 @@ export const RegistrarInsumo = () => {
 
     useEffect(() => {
         const maxInsumo = async () => {
-            await axiosPetition("insumos/max");
+            const max = await axiosPetition("insumos/max");
 
-            if (!respuesta.ok) {
-                return toast.error(respuesta.msg, configMensaje);
+            if (!max.ok) {
+                return toast.error(max.msg, configMensaje);
             }
 
-            identificador.current.value = respuesta.maxCodigo;
+            identificador.current.value = max.maxCodigo;
         }
         maxInsumo();
     }, []);
@@ -51,30 +50,21 @@ export const RegistrarInsumo = () => {
     const registrarInsumo = async (e) => {
         e.preventDefault();
 
-        if (insumosValues.stock === '' && insumosValues.gramaje === '') {
-            toast.error('Ingresa un stock o el gramaje del insumo.', configMensaje);
-        } else if (insumosValues.stock !== '' && insumosValues.gramaje !== '') {
-            toast.error('Ingresa un stock o el gramaje, pero no ambos.', configMensaje);
-        } else {
+        insumosValues.identificador = identificador.current.value;
 
-            insumosValues.identificador = identificador.current.value;
+        const registro = await axiosPetition('insumos', insumosValues, 'POST');
 
-            await axiosPetition('insumos', insumosValues, 'POST');
+        if (registro !== undefined) {
 
-            if (respuesta !== undefined) {
-
-                if (respuesta.ok) {
-                    resetInsumos();
-                    toast.success('Insumo registrado correctamente.', configMensaje);
-                    history.push('/insumos');
-                } else {
-                    toast.error(respuesta.msg, configMensaje);
-                }
+            if (registro.ok) {
+                resetInsumos();
+                toast.success('Insumo registrado correctamente.', configMensaje);
+                history.push('/insumos');
+            } else {
+                toast.error(registro.msg, configMensaje);
             }
         }
     }
-
-
 
     return (
         <div className="flex flex-col w-full h-screen overflow-y-scroll usuarios mx-14">
@@ -124,20 +114,11 @@ export const RegistrarInsumo = () => {
                         </select>
                         <input
                             type="number"
-                            className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidadesState !== 'stock' ? 'hidden' : ''}`}
-                            name="stock"
-                            value={stock}
+                            className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput`}
+                            name="cantidad"
+                            value={cantidad}
                             onChange={handleInsumosChange}
-                            placeholder='Stock'
-                            autoComplete='off'
-                        />
-                        <input
-                            type="number"
-                            className={`w-80 p-2 pl-8 pr-8 mr-1 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${unidadesState !== 'gramos' ? 'hidden' : ''}`}
-                            name="gramaje"
-                            value={gramaje}
-                            onChange={handleInsumosChange}
-                            placeholder='Gramaje'
+                            placeholder='Cantidad'
                             autoComplete='off'
                         />
                         <div>

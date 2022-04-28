@@ -6,11 +6,13 @@ import { faUser, faUsers, faUserTie, faDollarSign, faHamburger, faBreadSlice, fa
 import { Link } from 'react-router-dom';
 import { useMenuContext } from '../context/menuContext';
 import { useHistory } from 'react-router-dom';
+import { useEditarVentaContext } from '../context/editarVentaContext';
 
 export const MenuLateral = () => {
 
-    const { active, setActive } = useMenuContext();
-    // const [bandera, setBandera] = useState(false);
+    const { editarVenta } = useEditarVentaContext();
+    const { active, setActive } = useMenuContext("menu");
+    const history = useHistory();
 
     useEffect(() => {
         const url = window.location.href;
@@ -19,7 +21,6 @@ export const MenuLateral = () => {
         } else if (url.includes('menu')) {
             setActive('menu');
         } else if (url.includes('ventas')) {
-            console.log("Estoy en", active)
             setActive('ventas');
         } else if (url.includes('clientes')) {
             setActive('clientes');
@@ -28,10 +29,7 @@ export const MenuLateral = () => {
         } else if (url.includes('usuarios')) {
             setActive('usuarios');
         }
-    }, []);
-
-
-    const history = useHistory();
+    }, [active, history]);
 
     useEffect(() => {
         if (window.localStorage.getItem('token') === null) {
@@ -64,10 +62,12 @@ export const MenuLateral = () => {
                         Menú
                     </li>
                 </Link>
-                <Link to="/ventas">
+                <Link to={editarVenta !== undefined ? "/ventas/editar" : "/ventas"}>
                     <li
                         className={`flex text-md mr-2 ml-2 mb-3 h-10 items-center menu-item rounded-lg ${active === "ventas" ? "activated" : ''}`}
-                        onClick={() => setActive('ventas')}>
+                        onClick={() => {
+                            setActive('ventas');
+                        }}>
                         <FontAwesomeIcon
                             className="mr-2 ml-4"
                             icon={faDollarSign} />

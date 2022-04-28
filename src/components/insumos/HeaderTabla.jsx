@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { TablaInsumos } from './TablaInsumos';
-import { useBanderaContext } from '../../context/banderaContext';
 
 export const HeaderTabla = ({ filtro, busqueda = '' }) => {
 
     const [data, setData] = useState([]);
 
     let numDatos = 0;
-
-    // const { bandera } = useBanderaContext();
 
     useEffect(() => {
         const buscarInsumos = async () => {
@@ -26,10 +23,10 @@ export const HeaderTabla = ({ filtro, busqueda = '' }) => {
                 progress: undefined,
             };
 
-            await axiosPetition("insumos");
-            setData(respuesta.insumos?.reverse());
+            const insumos = await axiosPetition("insumos");
+            setData(insumos.insumos?.reverse());
 
-            if (!respuesta.ok) {
+            if (!insumos.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de insumos.",
                     configMensaje
@@ -79,53 +76,53 @@ export const HeaderTabla = ({ filtro, busqueda = '' }) => {
                             case 'Todos':
                                 if (condicion) {
                                     numDatos += 1;
-                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                    return <TablaInsumos key={key} props={datos} />;
                                 }
                                 break;
                             case 'Disponibles':
-                                const minimo = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
-                                const disponible = datos.stock !== null ? (datos.stock > minimo) : (datos.gramaje > minimo);
+                                const minimo = datos.unidades === "stock" ? datos.categoria === 'Comida' ? 12 : 5 : 500;
+                                const disponible = datos.unidades === "stock" ? (datos.cantidad > minimo) : (datos.cantidad > minimo);
 
                                 if (disponible) {
                                     numDatos += 1;
-                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                    return <TablaInsumos key={key} props={datos} />;
                                 }
                                 break;
                             case 'Por agotarse':
-                                const minimo_pa = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
-                                const por_agotarse = datos.stock !== null ? (datos.stock <= minimo_pa && datos.stock > 0) : (datos.gramaje <= minimo_pa && datos.gramaje > 0);
+                                const minimo_pa = datos.unidades === "stock" ? datos.categoria === 'Comida' ? 12 : 5 : 500;
+                                const por_agotarse = datos.unidades === "stock" ? (datos.cantidad <= minimo_pa && datos.cantidad > 0) : (datos.cantidad <= minimo_pa && datos.cantidad > 0);
 
                                 if (por_agotarse) {
                                     numDatos += 1;
-                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                    return <TablaInsumos key={key} props={datos} />;
                                 }
                                 break;
                             case 'Agotados':
-                                const minimo_a = datos.stock !== null ? datos.categoria === 'Comida' ? 12 : 5 : 500;
-                                const agotado = datos.stock !== null ? (datos.stock <= minimo_a && datos.stock <= 0) : (datos.gramaje <= minimo_a && datos.gramaje <= 0);
+                                const minimo_a = datos.unidades === "stock" ? datos.categoria === 'Comida' ? 12 : 5 : 500;
+                                const agotado = datos.unidades === "stock" ? (datos.cantidad <= minimo_a && datos.cantidad <= 0) : (datos.gramos <= minimo_a && datos.cantidad <= 0);
 
                                 if (agotado) {
                                     numDatos += 1;
-                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                    return <TablaInsumos key={key} props={datos} />;
                                 }
                                 break;
                             case 'Bebida':
                             case 'Comida':
                                 if (datos.categoria === filtro && condicion) {
                                     numDatos += 1;
-                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                    return <TablaInsumos key={key} props={datos} />;
                                 }
                                 break;
                             case 'Unidades':
-                                if (datos.stock !== null && condicion) {
+                                if (datos.unidades === "stock" && condicion) {
                                     numDatos += 1;
-                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                    return <TablaInsumos key={key} props={datos} />;
                                 }
                                 break;
                             case 'Gramos':
-                                if (datos.stock == null && condicion) {
+                                if (datos.unidades == "gramos" && condicion) {
                                     numDatos += 1;
-                                    return <TablaInsumos key={datos.uid} props={datos} />;
+                                    return <TablaInsumos key={key} props={datos} />;
                                 }
                                 break;
                         }

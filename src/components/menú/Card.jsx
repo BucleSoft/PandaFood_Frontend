@@ -11,18 +11,19 @@ import picada from '../../images/picada.jpg';
 import panda from '../../images/default-image.png';
 import { useCarritoContext } from '../../context/carritoContext';
 import { useHistory } from 'react-router';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useConsultarProductoContext } from '../../context/consultarProductoContext';
 import { useVentaContext } from '../../context/ventaContext';
 import { toast } from 'react-toastify';
 
-export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', puntos = '0', nombre = 'Sin nombre', categoria = 'Hamburguesa', soloAgregados = false, bandera, setBandera, setProductoSeleccionado, setHidden }) => {
+export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', puntos = '0', nombre = 'Sin nombre', categoria_id = 0, soloAgregados = false, bandera, setBandera, setProductoSeleccionado, setHidden }) => {
 
     const [imagen, setImagen] = useState(hamburguesa);
     const [cantidad, setCantidad] = useState(1);
     const [controles, setControles] = useState(false);
     const [agregado, setAgregado] = useState(false);
     const [auxiliar, setAuxiliar] = useState(false);
+    const [nombreCategoria, setNombreCategoria] = useState("");
     const { venta } = useVentaContext();
     const { carrito, setCarrito } = useCarritoContext();
     const history = useHistory();
@@ -41,36 +42,53 @@ export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', 
     };
 
     useEffect(() => {
+        const buscarCategoria = async () => {
 
-        switch (categoria) {
-            case "Hamburguesa":
-                setImagen(hamburguesa);
-                break;
-            case "Bebida":
-                setImagen(bebida);
-                break;
-            case "Salchipapa":
-                setImagen(salchipapa);
-                break;
-            case "Entrada":
-                setImagen(entrada);
-                break;
-            case "Perro":
-                setImagen(perro);
-                break;
-            case "Picada":
-                setImagen(picada);
-                break;
-            default:
-                setImagen(panda);
+            const categoria = await axiosPetition(`categorias/${categoria_id}`);
+
+            if (!categoria.ok) {
+                return toast.error(categoria.msg, configMensaje);
+            }
+
+            const nombre = categoria.categoria.nombre;
+
+            setNombreCategoria(nombre);
+
+            switch (nombre) {
+                case "Hamburguesa":
+                    setImagen(hamburguesa);
+                    break;
+                case "Bebida":
+                    setImagen(bebida);
+                    break;
+                case "Salchipapa":
+                    setImagen(salchipapa);
+                    break;
+                case "Entrada":
+                    setImagen(entrada);
+                    break;
+                case "Perro":
+                    setImagen(perro);
+                    break;
+                case "Picada":
+                    setImagen(picada);
+                    break;
+                default:
+                    setImagen(panda);
+            }
+
         }
-    }, []);
+
+
+        buscarCategoria();
+
+    }, [bandera]);
 
     useEffect(() => {
 
         const buscarCarrito = async () => {
 
-            await carrito?.find((productos, index) => {
+            await carrito?.find((productos) => {
                 const resultado = productos?.identificador === identificador;
                 if (resultado) {
                     setAgregado(true);
@@ -78,10 +96,11 @@ export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', 
                 }
 
             });
+
         }
         buscarCarrito();
         setBandera(!bandera);
-    }, [auxiliar]);
+    }, [auxiliar, carrito]);
 
     const sumarCantidad = () => {
         setCantidad(parseInt(cantidad) + 1);
@@ -113,7 +132,7 @@ export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', 
             cantidad,
             precio,
             puntos,
-            categoria,
+            categoria_id,
             tipoUnidad
         }
         await carrito.push(producto);
@@ -157,13 +176,13 @@ export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', 
 
     const buscarProducto = async () => {
 
-        await axiosPetition(`productos/${identificador}`);
+        const busqueda = await axiosPetition(`productos/${identificador}`);
 
-        if (!respuesta.ok) {
+        if (!busqueda.ok) {
             return toast.error("Error al obtener el producto, contacte a los desarrolladores.", configMensaje);
         }
 
-        setProductos(respuesta.producto);
+        setProductos(busqueda.producto);
         history.push('/menu/editar');
     }
 
@@ -187,11 +206,11 @@ export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', 
                             {nombre}
                             <FontAwesomeIcon
                                 className='ml-3'
-                                icon={categoria === 'Bebida' ? faCoffee : faHamburger}
-                                title={categoria} />
+                                icon={nombreCategoria === 'Bebida' ? faCoffee : faHamburger}
+                                title={nombreCategoria} />
                         </h2>
                     </div>
-                    <div className="text-sm w-full text-left text-gray-500 mt-1">{categoria}</div>
+                    <div className="text-sm w-full text-left text-gray-500 mt-1">{nombreCategoria}</div>
                     <div className="text-xl text-white font-semibold mt-1">${precio}</div>
                 </div>
                 <div className='flex flex-col'>

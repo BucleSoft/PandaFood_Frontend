@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 
 export const Categoria = ({ hidden, setHidden, bandera, setBandera }) => {
 
@@ -25,10 +25,10 @@ export const Categoria = ({ hidden, setHidden, bandera, setBandera }) => {
         const categoria = { nombre: nombreCategoria.current.value.trim(), tipo: tipo.current.value }
 
         console.log(categoria)
-        await axiosPetition('categorias', categoria, 'POST');
+        const categorias = await axiosPetition('categorias', categoria, 'POST');
 
-        if (!respuesta.ok) {
-            return toast.error(respuesta.msg, configMensaje);
+        if (!categorias.ok) {
+            return toast.error(categorias.msg, configMensaje);
         }
 
         setHidden(true);

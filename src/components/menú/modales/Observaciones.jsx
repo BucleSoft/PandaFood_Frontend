@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../../helpers/Axios';
+import { axiosPetition } from '../../../helpers/Axios';
 import { useCarritoContext } from '../../../context/carritoContext';
 import { useVentaContext } from '../../../context/ventaContext';
+import { useEditarVentaContext } from '../../../context/editarVentaContext';
 import { CantidadInput } from './CantidadInput';
 
 export const Observaciones = ({ hidden = true, productoSeleccionado = 0, setHidden }) => {
 
     const { venta } = useVentaContext();
+    const { editarVenta } = useEditarVentaContext();
     const { carrito } = useCarritoContext();
     const [insumos, setInsumos] = useState([]);
     const [listaObservaciones, setListaObservaciones] = useState([]);
@@ -22,11 +24,11 @@ export const Observaciones = ({ hidden = true, productoSeleccionado = 0, setHidd
 
         const buscarInsumos = async () => {
             if (productoSeleccionado !== 0) {
-                await axiosPetition(`productos/${productoSeleccionado}`);
-                if (!respuesta.ok) {
-                    return toast.error(respuesta.msg, configMensaje);
+                const producto = await axiosPetition(`detalle_producto/${productoSeleccionado}`);
+                if (!producto.ok) {
+                    return toast.error(producto.msg, configMensaje);
                 }
-                setInsumos(respuesta.producto.insumos);
+                setInsumos(producto.insumos);
             }
         }
 
@@ -140,7 +142,20 @@ export const Observaciones = ({ hidden = true, productoSeleccionado = 0, setHidd
                                     dato.observaciones = listaObservaciones;
                                 }
                             });
-                            venta.observaciones.push(...listaObservaciones);
+
+                            if (editarVenta === undefined) {
+                                venta.observaciones.push(...listaObservaciones);
+                            } else {
+                                const obs = editarVenta.observaciones;
+
+                                if (obs === undefined) {
+
+                                    editarVenta.observaciones = [];
+
+                                }
+
+                                editarVenta.observaciones.push(...listaObservaciones);
+                            }
                         }
                         reiniciarModal();
                     }}

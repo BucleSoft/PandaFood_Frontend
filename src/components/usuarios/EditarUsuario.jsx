@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 import { useConsultarUsuarioContext } from '../../context/consultarUsuarioContext';
 
@@ -59,17 +59,19 @@ export const EditarUsuario = () => {
         e.preventDefault();
 
         if (cedula !== '') {
+            let actualizar;
 
             if (contraseñaActual.length !== 0) {
+
 
                 if (repContraseña.current.value.length === 0 || contraseña.length === 0) {
                     toast.error('Llene los campos de la contraseña nueva o borre la información de la contraseña actual.', configMensaje);
                 } else {
                     if (repContraseña.current.value === contraseña) {
-                        await axiosPetition(`usuarios/${cedula}`, usuariosValues, 'PUT');
+                        actualizar = await axiosPetition(`usuarios/${cedula}`, usuariosValues, 'PUT');
 
-                        if (respuesta.ok === false) {
-                            toast.error(respuesta.msg, configMensaje);
+                        if (actualizar.ok === false) {
+                            toast.error(actualizar.msg, configMensaje);
                         } else {
                             history.push('/usuarios');
                         }
@@ -79,10 +81,10 @@ export const EditarUsuario = () => {
                     }
                 }
             } else {
-                await axiosPetition(`usuarios/${cedula}`, usuariosValues, 'PUT');
+                actualizar = await axiosPetition(`usuarios/${cedula}`, usuariosValues, 'PUT');
 
-                if (respuesta.ok === false) {
-                    toast.error(respuesta.msg, configMensaje);
+                if (actualizar.ok === false) {
+                    toast.error(actualizar.msg, configMensaje);
                 } else {
                     history.push('/usuarios');
                 }

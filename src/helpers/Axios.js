@@ -1,9 +1,11 @@
 import axios from "axios";
 
-let respuesta = undefined;
 const baseUrl = process.env.REACT_APP_API_URL;
 
 const axiosPetition = async (endpoint, data = {}, method = "GET") => {
+
+    let respuesta = undefined;
+
     const options = {
         method,
         url: `${baseUrl}${endpoint}`,
@@ -22,10 +24,9 @@ const axiosPetition = async (endpoint, data = {}, method = "GET") => {
         .catch(function (error) {
             respuesta = error;
         });
+
+    return respuesta;
 };
 
-const resetRespuesta = () => {
-    respuesta = undefined;
-}
 
-export { axiosPetition, respuesta, resetRespuesta };
+export { axiosPetition };

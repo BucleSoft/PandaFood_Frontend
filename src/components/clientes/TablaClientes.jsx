@@ -3,7 +3,7 @@ import '../../styles/tablaUsuarios.css';
 import Lapiz from '../../assets/lapiz.svg';
 import Eliminar from '../../assets/eliminar.svg';
 import { useHistory } from 'react-router-dom';
-import { axiosPetition, respuesta, resetRespuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndoAlt } from '@fortawesome/free-solid-svg-icons';
@@ -31,25 +31,26 @@ export const TablaClientes = ({ props }) => {
     };
 
     const obtenerInfoCliente = async () => {
-        resetRespuesta();
-        await axiosPetition(`clientes/${cedula}`);
-        if (respuesta.ok) {
-            setClienteEditar(respuesta.cliente);
+        const clientes = await axiosPetition(`clientes/${cedula}`);
+        if (clientes.ok) {
+            setClienteEditar(clientes.cliente);
             history.push('/clientes/editar');
         } else {
-            toast.error(respuesta.msg, configMensaje);
+            toast.error(clientes.msg, configMensaje);
         }
     }
 
     const inhabilitarCliente = async () => {
 
+        let inhabilitar;
+
         if (estado === 'Activo') {
-            await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Inactivo' }, 'PUT');
+            inhabilitar = await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Inactivo' }, 'PUT');
         } else {
-            await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Activo' }, 'PUT');
+            inhabilitar = await axiosPetition(`clientes/estado/${cedula}`, { estado: 'Activo' }, 'PUT');
         }
 
-        if (respuesta.ok) {
+        if (inhabilitar.ok) {
             toast.success('Cliente habilitado/deshabilitado correctamente.', configMensaje);
             if (estado === 'Activo') {
                 estado = 'Inactivo';

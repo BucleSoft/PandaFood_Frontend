@@ -1,63 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { useCarritoContext } from '../../context/carritoContext';
-import { TablaProductos } from './TablaProductos';
-import '../../styles/cabeceraVenta.css';
+// import { TablaProductos } from './TablaProductos';
+import '../../../styles/cabeceraVenta.css';
 import { Link } from 'react-router-dom'
-import { useMenuContext } from '../../context/menuContext';
-import Eliminar from '../../assets/eliminar.svg';
+import { useMenuContext } from '../../../context/menuContext';
+import Eliminar from '../../../assets/eliminar.svg';
 import { toast } from 'react-toastify';
 import { Descuento } from './modales/Descuento';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { useVentaContext } from '../../context/ventaContext';
+import { useEditarVentaContext } from "../../../context/editarVentaContext";
+import { axiosPetition } from "../../../helpers/Axios";
+import { TablaProductos } from './TablaProductos';
+import { useCarritoContext } from '../../../context/carritoContext';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
-export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setBandera, descuento, setDescuento, aplicarDescuento, total, puntosGanados }) => {
+export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setBandera, descuento = 0, setDescuento, total, puntosGanados, detalles, setDetalles }) => {
 
-    const { carrito } = useCarritoContext();
+    const history = useHistory();
+    const { editarVenta } = useEditarVentaContext();
 
     const { setActive } = useMenuContext();
-    const { venta } = useVentaContext();
+
+    const { carrito } = useCarritoContext();
 
     const [hidden, setHidden] = useState(true);
     const [verPuntos, setVerPuntos] = useState(false);
     const [msgHidden, setMsgHidden] = useState(true);
     const [verificarAlRedimir, setVerificarAlRedimir] = useState(false);
 
+
     useEffect(() => {
-        if (venta.tipoVenta === "Redimir") {
+        if (editarVenta === undefined) {
+            history.push("/ventas/consultar");
+        }
+    }, [editarVenta]);
+
+    useEffect(() => {
+        if (editarVenta.tipoVenta === "Redimir") {
             setVerPuntos(true);
-            venta.descuento = 0;
+            editarVenta.descuento = 0;
             setDescuento(0);
         }
         setBandera(!bandera);
     }, []);
 
     useEffect(() => {
-        if (venta.tipoVenta === "Domicilio") {
-            if (typeof venta.precioDomicilio !== 'number') {
-                venta.precioDomicilio = 0;
+        if (editarVenta?.tipoVenta === "Domicilio") {
+            if (typeof editarVenta?.precioDomicilio !== 'number') {
+                editarVenta.precioDomicilio = 0;
             }
         }
     }, []);
-
-    useEffect(() => {
-        const verificarRedimir = async () => {
-            if (venta.tipoVenta === "Redimir") {
-                let sinPuntos = 0;
-                await carrito.map((elemento) => {
-                    if (elemento.puntos === '' || elemento.puntos === null || elemento.puntos === '0' || elemento.puntos === 0) {
-                        sinPuntos += 1;
-                    }
-                });
-                if (sinPuntos > 0) {
-                    setMsgHidden(false);
-                } else {
-                    setMsgHidden(true);
-                }
-            }
-        }
-        verificarRedimir();
-    }, [verificarAlRedimir]);
 
     const configMensaje = {
         position: "bottom-center",
@@ -73,13 +66,9 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
     return (
         <div className="w-full">
             <div className="p-12">
-                <table className={`leading-normal w-full tabla ${carrito.length <= 0 ? "hidden" : ""}`}>
+                <table className={`leading-normal w-full tabla `}>
                     <thead>
                         <tr>
-                            <th
-                                className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                #
-                            </th>
                             <th
                                 className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                                 Identificador
@@ -113,17 +102,23 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                     </thead>
                     <tbody>
                         {
-                            carrito?.map((datos, key) => {
-                                return <TablaProductos key={key} props={datos} index={key} bandera={bandera} setBandera={setBandera} verPuntos={verPuntos} verificarAlRedimir={verificarAlRedimir} setVerificarAlRedimir={setVerificarAlRedimir} />
+                            detalles?.map((detalle, index) => {
+                                detalle.identificador = detalle.id_producto;
+                                return <TablaProductos props={detalle} index={index} verPuntos={verPuntos} key={index} fuente="BD" bandera={bandera} setBandera={setBandera} />
                             })
                         }
+                    </tbody>
+                    <tbody>
+                        {
+                            carrito?.map((producto, index) => {
+                                return <TablaProductos props={producto} index={index} verPuntos={verPuntos} key={index} fuente="Carrito" bandera={bandera} setBandera={setBandera} />
+                            })
+                        }
+                    </tbody>
+                    <tbody>
                         {
                             descuento !== 0 ?
                                 <tr className="border-b-2">
-                                    {/* NÚMERO */}
-                                    <td className="px-5 py-3 text-sm text-left">
-                                        <p className="text-white font-semibold whitespace-no-wrap">{carrito.length + 1}</p>
-                                    </td>
                                     {/* IDENTIFICADOR */}
                                     <td className="px-5 py-3 text-sm text-left">
                                         <p className="text-white font-semibold whitespace-no-wrap">-</p>
@@ -149,7 +144,7 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                                         <img
                                             className="tablaItem" src={Eliminar}
                                             onClick={() => {
-                                                venta.descuento = 0;
+                                                editarVenta.descuento = 0;
                                                 setDescuento(0);
                                                 setBandera(!bandera);
                                             }}
@@ -161,12 +156,8 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                                 ''
                         }
                         {
-                            venta.tipoVenta === "Domicilio" ?
+                            editarVenta?.tipoVenta === "Domicilio" ?
                                 <tr className="border-b-2">
-                                    {/* NÚMERO */}
-                                    <td className="px-5 py-3 text-sm text-left">
-                                        <p className="text-white font-semibold whitespace-no-wrap">{descuento !== 0 ? carrito.length + 2 : carrito.length + 1}</p>
-                                    </td>
                                     {/* IDENTIFICADOR */}
                                     <td className="px-5 py-3 text-sm text-left">
                                         <p className="text-white font-semibold whitespace-no-wrap">-</p>
@@ -185,7 +176,7 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                                     </td>
                                     {/* SUBTOTAL */}
                                     <td className="px-5 py-3 text-sm text-left">
-                                        <p className="text-white whitespace-no-wrap">{venta.precioDomicilio}</p>
+                                        <p className="text-white whitespace-no-wrap">{editarVenta.precioDomicilio}</p>
                                     </td>
                                     {/* ACCIONES */}
                                     <td className="flex px-10 py-3 text-sm justify-left">
@@ -198,21 +189,18 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                     </tbody>
                 </table>
                 <div className="flex mt-4 justify-between">
-                    <h2 className={`text-white text-lg ${carrito.length <= 0 ? "hidden" : ""}`}>Total: {verPuntos ? total + " pts" : "$" + total}</h2>
-                    <h2 className={`text-white text-lg ${carrito.length <= 0 || verPuntos === true ? "hidden" : ""}`}>Puntos: {puntosGanados} pts</h2>
+                    <h2 className={`text-white text-lg`}>Total: {verPuntos ? total + " pts" : "$" + total}</h2>
+                    <h2 className={`text-white text-lg `}>Puntos: {puntosGanados} pts</h2>
                 </div>
                 <div>
                     <h2
                         id="descuento"
-                        className={`flex mt-2 underline cursor-pointer ${carrito.length <= 0 || verPuntos === true ? "hidden" : ""}`}
+                        className={`flex mt-2 underline cursor-pointer`}
                         onClick={() => {
                             if (descuento !== 0) {
                                 return toast.error("Ya se encuentra aplicado un descuento, borre el anterior.", configMensaje);
                             }
 
-                            if (carrito.length <= 0) {
-                                return toast.error("Primero ingresa productos a la venta, por favor.", configMensaje);
-                            }
                             setHidden(false);
                         }}>Aplicar descuento</h2>
                 </div>
@@ -242,7 +230,7 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                     </button>
                 </div>
             </div>
-            <Descuento hidden={hidden} setHidden={setHidden} setDescuento={aplicarDescuento} />
+
         </div>
     )
 }

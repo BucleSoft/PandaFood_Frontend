@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 import { useConsultarClienteContext } from '../../context/consultarClienteContext';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
@@ -50,9 +50,9 @@ export const EditarCliente = () => {
         e.preventDefault();
         if (cedula !== '') {
             const data = { ...clientesValues, puntos: puntosCliente }
-            await axiosPetition(`clientes/${cedula}`, data, 'PUT');
-            if (respuesta.ok === false) {
-                toast.error(respuesta.msg, configMensaje);
+            const actualizar = await axiosPetition(`clientes/${cedula}`, data, 'PUT');
+            if (actualizar.ok === false) {
+                toast.error(actualizar.msg, configMensaje);
             } else {
                 history.push('/clientes');
             }

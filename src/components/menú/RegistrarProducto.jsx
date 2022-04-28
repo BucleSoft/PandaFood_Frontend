@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 import { Insumo } from './Insumo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,11 +12,9 @@ import { Categoria } from './Categoria';
 
 export const RegistrarProducto = () => {
 
-
     const [listaInsumos, setListaInsumos] = useState([]);
     const [items, setItems] = useState([]);
-    const [nuevoInsumo, setNuevoInsumo] = useState({});
-    const [categoria, setCategoria] = useState('Hamburguesa');
+    const [categoria, setCategoria] = useState(1);
     const [inputInsumo, setInputInsumo] = useState("");
     const [categorias, setCategorias] = useState([]);
     const [tipo, setTipo] = useState('Insumos');
@@ -24,6 +22,7 @@ export const RegistrarProducto = () => {
     const [bandera, setBandera] = useState(false);
     const [unidadInsumo, setUnidadInsumo] = useState('stock');
     const identificador = useRef('');
+    const [nuevoInsumo, setNuevoInsumo] = useState({});
 
     const history = useHistory();
 
@@ -33,7 +32,7 @@ export const RegistrarProducto = () => {
         puntos: '',
         stock: '',
         insumos: [],
-        categoria: '',
+        categoria_id: '',
         tipoUnidad: '',
         estado: 'Activo'
     });
@@ -41,7 +40,7 @@ export const RegistrarProducto = () => {
     const cantidad = useRef('');
     const comboCategorias = useRef('');
 
-    const { nombre, stock, puntos, precio } = productosValues;
+    const { nombre, stock, puntos, precio, insumos } = productosValues;
 
     const configMensaje = {
         position: "bottom-center",
@@ -57,17 +56,17 @@ export const RegistrarProducto = () => {
     useEffect(() => {
 
         const maxProducto = async () => {
-            await axiosPetition('productos/max');
+            const max = await axiosPetition('productos/max');
 
-            if (!respuesta.ok) {
-                return toast.error(respuesta.msg, configMensaje);
+            if (!max.ok) {
+                return toast.error(max.msg, configMensaje);
             }
 
-            identificador.current.value = respuesta.maxCodigo;
+            identificador.current.value = 'P' + max.maxCodigo;
         }
 
         maxProducto();
-    }, []);
+    }, [bandera]);
 
     useEffect(() => {
         const buscarInsumos = async () => {
@@ -82,22 +81,22 @@ export const RegistrarProducto = () => {
                 progress: undefined,
             };
 
-            await axiosPetition("insumos");
+            const insumos = await axiosPetition("insumos");
 
-            respuesta.insumos?.map((datos, key) => {
+            insumos.insumos?.map((datos, key) => {
                 datos.name = datos.nombre;
                 datos.id = key;
             });
 
 
-            if (!respuesta.ok) {
+            if (!insumos.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de insumos.",
                     configMensaje
                 );
             }
 
-            setItems(respuesta.insumos);
+            setItems(insumos.insumos);
         }
 
         buscarInsumos();
@@ -118,27 +117,26 @@ export const RegistrarProducto = () => {
                 progress: undefined,
             };
 
-            await axiosPetition('categorias');
+            const categorias = await axiosPetition('categorias');
 
-            if (!respuesta.ok) {
+            if (!categorias.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de categorias.",
                     configMensaje
                 );
             }
 
-            setCategorias(respuesta.categorias);
+            setCategorias(categorias.categorias);
+
+            setTipo(categorias.categorias[0].tipo);
         }
         buscarCategorias();
     }, [bandera]);
 
     const handleOnSelect = (item) => {
-        nuevoInsumo.identificador = item.identificador;
-        nuevoInsumo.nombre = item.nombre;
-        nuevoInsumo.unidades = item.unidades;
-        setInputInsumo(item.nombre)
-        setNuevoInsumo(nuevoInsumo);
+        nuevoInsumo.id_insumo = item.identificador;
         setUnidadInsumo(item.unidades);
+        setNuevoInsumo(nuevoInsumo);
     }
 
     const formatResult = (item) => {
@@ -146,74 +144,65 @@ export const RegistrarProducto = () => {
     }
 
     const registrarProducto = async (e) => {
+
         e.preventDefault();
 
-        if (stock === '' && listaInsumos.length === 0) {
-            return toast.error("Ingresa un stock o registre los insumos del producto.", configMensaje);
-        }
 
-        if (stock !== '' && listaInsumos.length !== 0) {
-            return toast.error("Ingresa un stock o registre los insumos pero no ambos.", configMensaje);
-        }
+        const nuevaLista = listaInsumos.filter(Boolean);
 
-        if (tipo !== 'Insumos' && typeof stock === 'string') {
-            const stockParseado = parseInt(stock);
-            if (!isNaN(stockParseado)) {
-                productosValues.stock = stockParseado;
-            }
-        }
+        insumos.push(...nuevaLista);
 
-        const listaFiltrada = listaInsumos.filter((el) => {
-            return el != null;
-        });
-
-        productosValues.identificador = identificador.current.value;
-        productosValues.categoria = categoria;
-        productosValues.insumos = listaFiltrada;
+        productosValues.categoria_id = categoria;
         productosValues.tipoUnidad = tipo;
 
-        await axiosPetition('productos', productosValues, 'POST');
-
-        if (respuesta !== undefined) {
-
-            if (respuesta.ok) {
-                resetProductos();
-                toast.success('Producto registrado correctamente.', configMensaje);
-                setListaInsumos([]);
-                history.push('/menu');
-            } else {
-                toast.error(respuesta.msg, configMensaje);
+        if (tipo === "Insumos") {
+            productosValues.stock = '';
+        } else {
+            productosValues.insumos = [];
+            if (productosValues.stock !== '') {
+                productosValues.stock = parseInt(productosValues.stock);
             }
         }
+
+
+        const id_producto = identificador.current.value.split('P');
+
+        if (productosValues.puntos === '') {
+            productosValues.puntos = 0;
+        } else {
+            productosValues.puntos = parseInt(productosValues.puntos);
+        }
+
+        const productos = await axiosPetition("productos", { identificador: id_producto[1], ...productosValues }, "POST");
+
+        if (!productos.ok) {
+            return toast.error(productos.msg, configMensaje);
+        }
+
+        resetProductos();
+        setListaInsumos([]);
+
+        history.push("/menu");
+
     }
 
     const agregarInsumo = () => {
 
-        if (inputInsumo.trim() === '') {
-            toast.error("Busque y seleccione un insumo de la lista desplegable, por favor.", configMensaje);
-        } else if (cantidad.current.value.trim() === '') {
-            toast.error("La cantidad del insumo es obligatoria.", configMensaje);
-        } else {
+        if (nuevoInsumo.id_insumo === undefined || nuevoInsumo.id_insumo === '') {
 
-            let agregado = false;
-
-            listaInsumos.map((dato) => {
-                if (dato.identificador === nuevoInsumo.identificador) {
-                    agregado = true;
-                }
-            });
-
-            if (agregado) {
-                return toast.error("El insumo ya se encuentra registrado, elimine el anterior", configMensaje);
-            }
-
-            nuevoInsumo.cantidad = cantidad.current.value;
-            listaInsumos.push(nuevoInsumo);
-            setListaInsumos(listaInsumos);
-            setNuevoInsumo({});
-            cantidad.current.value = "";
-            setInputInsumo("");
+            return toast.error("Seleccione un insumo de la lista primero, por favor", configMensaje);
         }
+
+        const cantidadInsumo = cantidad.current.value;
+
+        if (cantidadInsumo <= 0 || cantidadInsumo === '') {
+            return toast.error("La cantidad debe ser mayor que cero", configMensaje);
+        }
+
+        listaInsumos.push({ cantidad: cantidadInsumo, ...nuevoInsumo });
+        cantidad.current.value = '';
+        setBandera(!bandera);
+        setNuevoInsumo({});
     }
 
     return (
@@ -228,27 +217,22 @@ export const RegistrarProducto = () => {
                         <select
                             ref={comboCategorias}
                             className="w-80 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
-                            defaultValue="Hamburguesa"
+                            value={categoria}
                             title="Categoría del producto"
                             onChange={() => {
-                                let posicion;
+
                                 setCategoria(comboCategorias.current.value);
-                                categorias?.find((categoria, index) => {
-                                    const resultado = categoria.nombre === comboCategorias.current.value
-                                    if (resultado) {
-                                        posicion = index;
-                                    }
-                                });
-                                setTipo(categorias[posicion].tipo);
 
-                                setListaInsumos([]);
-                                productosValues.stock = '';
+                                const busqueda = categorias.find(x => x.identificador === parseInt(comboCategorias.current.value));
 
+                                if (busqueda) {
+                                    setTipo(busqueda.tipo);
+                                }
 
                             }}>
                             {
                                 categorias?.map((datos, key) => {
-                                    return <option key={datos._id} value={datos.nombre} >{datos.nombre}</option>;
+                                    return <option key={key} value={datos.identificador} >{datos.nombre}</option>;
                                 })
                             }
                         </select>
@@ -335,7 +319,7 @@ export const RegistrarProducto = () => {
                     <div id="contenedorInsumos"
                         className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
                         {listaInsumos?.map((data, key) => {
-                            return <Insumo key={key} index={key} cantidad={data.cantidad} identificador={data.identificador} insumo={data.nombre} unidades={data.unidades} listaInsumos={listaInsumos} setListaInsumos={setListaInsumos} />
+                            return <Insumo key={key} index={key} insumo={data} listaInsumos={listaInsumos} setListaInsumos={setListaInsumos} />
                         })}
                     </div>
                 </section>
@@ -360,6 +344,7 @@ export const RegistrarProducto = () => {
                         onClick={() => {
                             resetProductos();
                             setListaInsumos([]);
+                            setCategoria(1);
                         }}
                     >
                         Limpiar

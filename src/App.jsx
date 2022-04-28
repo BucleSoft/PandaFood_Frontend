@@ -13,6 +13,8 @@ import { ConsultarProductoContext } from './context/consultarProductoContext';
 import { CarritoContext } from './context/carritoContext';
 import { MenuContext } from './context/menuContext';
 import { VentaContext } from './context/ventaContext';
+import { EditarVentaContext } from './context/editarVentaContext';
+import { UsuarioContext } from './context/usuarioContext';
 
 import {
   BrowserRouter as Router,
@@ -40,10 +42,11 @@ import { EditarProductoPage } from './pages/menú/EditarProductoPage';
 import { VentasPage } from './pages/ventas/VentasPage';
 import { ConsultarVentasPage } from './pages/ventas/ConsultarVentasPage';
 
-import { axiosPetition, respuesta } from './helpers/Axios';
+import { axiosPetition } from './helpers/Axios';
 
 import { Factura } from './reports/Factura';
 import { PDFViewer } from '@react-pdf/renderer';
+import { EditarVenta } from './components/ventas/editar/EditarVenta';
 
 
 function App() {
@@ -55,30 +58,33 @@ function App() {
   const [carrito, setCarrito] = useState([]);
   const [active, setActive] = useState("perfil");
   const [serverInfo, setServerInfo] = useState();
+  const [infoUsuario, setInfoUsuario] = useState();
+  const [editarVenta, setEditarVenta] = useState(undefined);
 
   useEffect(() => {
     const obtenerInfo = async () => {
-      await axiosPetition("server/fecha");
-      setServerInfo(respuesta);
-      venta.fecha = respuesta.fecha;
+      const consulta = await axiosPetition("server/fecha");
+      setServerInfo(consulta);
+      venta.fecha = consulta.fecha;
     }
     obtenerInfo();
   }, []);
 
   const [venta, setVenta] = useState({
-    numVenta: '',
+    identificador: '',
     fecha: null,
     tipoVenta: 'Restaurante',
     formaPago: 'Efectivo',
-    domicilio: '',
-    direccion: '',
+    precioDomicilio: '',
+    direccionDomicilio: '',
     consume: 'restaurante',
-    mesa: '',
+    idMesa: '',
     cliente: '',
+    vendedor: '',
     productos: [],
     observaciones: [],
     total: 0,
-    puntos: 0,
+    puntosGanados: 0,
     descuento: 0
   });
 
@@ -86,73 +92,82 @@ function App() {
     <div className="App">
       <Router>
         <Switch>
-          <Route exact path="/login">
-            <LoginPage />
-          </Route>
-          <MenuContext.Provider value={{ active, setActive }}>
-            <PrivateLayout>
-              <CarritoContext.Provider value={{ carrito, setCarrito }}>
-                <Route exact path="/perfil">
-                  <PerfilPage />
-                </Route>
-                <ConsultarClienteContext.Provider value={{ clienteEditar, setClienteEditar }}>
-                  <Route exact path="/clientes">
-                    <ClientesPage />
-                  </Route>
-                  <Route exact path="/clientes/registrar">
-                    <ClientesRegistrarPage />
-                  </Route>
-                  <Route exact path="/clientes/editar">
-                    <ClientesEditarPage />
-                  </Route>
-                </ConsultarClienteContext.Provider>
-                <ConsultarUsuarioContext.Provider value={{ usuarioEditar, setUsuarioEditar }}>
-                  <Route exact path="/usuarios">
-                    <UsuariosPage />
-                  </Route>
-                  <Route exact path="/usuarios/registrar">
-                    <UsuariosRegistrarPage />
-                  </Route>
-                  <Route exact path="/usuarios/editar">
-                    <UsuariosEditarPage />
-                  </Route>
-                </ConsultarUsuarioContext.Provider>
-                <ConsultarInsumoContext.Provider value={{ insumoEditar, setInsumoEditar }}>
-                  <Route exact path="/insumos">
-                    <InsumosPage />
-                  </Route>
-                  <Route exact path="/insumos/registrar">
-                    <InsumosRegistrarPage />
-                  </Route>
-                  <Route exact path="/insumos/editar">
-                    <InsumosEditarPage />
-                  </Route>
-                </ConsultarInsumoContext.Provider>
-                <VentaContext.Provider value={{ venta, setVenta }}>
-                  <ConsultarProductoContext.Provider value={{ productos, setProductos }}>
-                    <Route exact path="/menu">
-                      <MenuPage />
+          <UsuarioContext.Provider value={{ infoUsuario, setInfoUsuario }}>
+            <Route exact path="/login">
+              <LoginPage />
+            </Route>
+            <MenuContext.Provider value={{ active, setActive }}>
+              <EditarVentaContext.Provider value={{ editarVenta, setEditarVenta }}>
+                <CarritoContext.Provider value={{ carrito, setCarrito }}>
+                  <PrivateLayout>
+                    <Route exact path="/perfil">
+                      <PerfilPage />
                     </Route>
-                    <Route exact path="/menu/registrar">
-                      <RegistrarProductoPage />
-                    </Route>
-                    <Route exact path="/menu/editar">
-                      <EditarProductoPage />
-                    </Route>
-                  </ConsultarProductoContext.Provider>
-                  <Route exact path="/ventas">
-                    <VentasPage />
-                  </Route>
-                  <Route exact path="/ventas/consultar">
-                    <ConsultarVentasPage />
-                  </Route>
-                  <Route exact path="/factura">
-                    <Factura />
-                  </Route>
-                </VentaContext.Provider>
-              </CarritoContext.Provider>
-            </PrivateLayout>
-          </MenuContext.Provider>
+                    <ConsultarClienteContext.Provider value={{ clienteEditar, setClienteEditar }}>
+                      <Route exact path="/clientes">
+                        <ClientesPage />
+                      </Route>
+                      <Route exact path="/clientes/registrar">
+                        <ClientesRegistrarPage />
+                      </Route>
+                      <Route exact path="/clientes/editar">
+                        <ClientesEditarPage />
+                      </Route>
+                    </ConsultarClienteContext.Provider>
+                    <ConsultarUsuarioContext.Provider value={{ usuarioEditar, setUsuarioEditar }}>
+                      <Route exact path="/usuarios">
+                        <UsuariosPage />
+                      </Route>
+                      <Route exact path="/usuarios/registrar">
+                        <UsuariosRegistrarPage />
+                      </Route>
+                      <Route exact path="/usuarios/editar">
+                        <UsuariosEditarPage />
+                      </Route>
+                    </ConsultarUsuarioContext.Provider>
+                    <ConsultarInsumoContext.Provider value={{ insumoEditar, setInsumoEditar }}>
+                      <Route exact path="/insumos">
+                        <InsumosPage />
+                      </Route>
+                      <Route exact path="/insumos/registrar">
+                        <InsumosRegistrarPage />
+                      </Route>
+                      <Route exact path="/insumos/editar">
+                        <InsumosEditarPage />
+                      </Route>
+                    </ConsultarInsumoContext.Provider>
+
+                    <VentaContext.Provider value={{ venta, setVenta }}>
+                      <ConsultarProductoContext.Provider value={{ productos, setProductos }}>
+                        <Route exact path="/menu">
+                          <MenuPage />
+                        </Route>
+                        <Route exact path="/menu/registrar">
+                          <RegistrarProductoPage />
+                        </Route>
+                        <Route exact path="/menu/editar">
+                          <EditarProductoPage />
+                        </Route>
+                      </ConsultarProductoContext.Provider>
+                      <Route exact path="/ventas">
+                        <VentasPage />
+                      </Route>
+
+                      <Route exact path="/ventas/consultar">
+                        <ConsultarVentasPage />
+                      </Route>
+                      <Route exact path="/ventas/editar">
+                        <EditarVenta />
+                      </Route>
+                      <Route exact path="/factura">
+                        <Factura />
+                      </Route>
+                    </VentaContext.Provider>
+                  </PrivateLayout>
+                </CarritoContext.Provider>
+              </EditarVentaContext.Provider>
+            </MenuContext.Provider>
+          </UsuarioContext.Provider>
         </Switch>
       </Router>
     </div>

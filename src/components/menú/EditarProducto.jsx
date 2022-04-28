@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 import { Insumo } from './Insumo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,10 +14,10 @@ import { Categoria } from './Categoria';
 export const EditarProducto = () => {
 
     const { productos, setProductos } = useConsultarProductoContext();
-    const [insumo, setInsumo] = useState(productos?.insumos);
+    const [insumo, setInsumo] = useState([]);
     const [items, setItems] = useState([]);
     const [nuevoInsumo, setNuevoInsumo] = useState({});
-    const [categoria, setCategoria] = useState(productos?.categoria);
+    const [categoria, setCategoria] = useState(productos?.categoria_id);
     const [inputInsumo, setInputInsumo] = useState("");
     const [categorias, setCategorias] = useState([]);
     const [tipo, setTipo] = useState('Insumos');
@@ -29,20 +29,20 @@ export const EditarProducto = () => {
     const history = useHistory();
 
     const [productosValues, handleProductosChange, resetProductos, formatearTexto] = useForm({
-        identificador: productos?.identificador,
+        identificador: 'P' + productos?.identificador,
         nombre: productos?.nombre,
         precio: productos?.precio,
         puntos: productos?.puntos,
         stock: productos?.stock,
-        categoria,
-        tipoUnidad: '',
+        categoria_id: categoria,
+        tipoUnidad: productos?.tipoUnidad,
         estado: 'Activo'
     });
 
     const cantidad = useRef('');
     const comboCategorias = useRef('');
 
-    const { identificador, stock, nombre, precio, puntos } = productosValues;
+    const { identificador, stock, nombre, precio, puntos, tipoUnidad } = productosValues;
 
 
     const configMensaje = {
@@ -57,7 +57,34 @@ export const EditarProducto = () => {
     };
 
     useEffect(() => {
+        if (productos === undefined) {
+            history.push("/menu");
+        }
+    });
+
+    useEffect(() => {
+        const obtenerInsumos = async () => {
+
+            const id = identificador.split('P');
+
+            const busqueda = await axiosPetition(`detalle_producto/${id[1]}`);
+
+            if (!busqueda.ok) {
+                return toast.error(busqueda.msg, configMensaje);
+            }
+
+            setInsumo(busqueda.insumos);
+
+        }
+
+        obtenerInsumos();
+    }, [bandera]);
+
+    useEffect(() => {
         const buscarInsumos = async () => {
+
+
+
             const configMensaje = {
                 position: "bottom-center",
                 background: "#191c1f !important",
@@ -69,26 +96,30 @@ export const EditarProducto = () => {
                 progress: undefined,
             };
 
-            await axiosPetition("insumos");
+            const insumos = await axiosPetition("insumos");
 
-            respuesta.insumos?.map((datos, key) => {
+            insumos.insumos?.map((datos, key) => {
                 datos.name = datos.nombre;
                 datos.id = key;
             });
 
 
-            if (!respuesta.ok) {
+            if (!insumos.ok) {
                 toast.error(
-                    "Ha ocurrido un error al intentar obtener la lista de insumos.",
+                    insumos.msg,
                     configMensaje
                 );
             }
 
-            setItems(respuesta.insumos);
+            setItems(insumos.insumos);
+
+
+
+
         }
         buscarInsumos();
 
-    }, []);
+    }, [bandera]);
 
     useEffect(() => {
 
@@ -104,16 +135,16 @@ export const EditarProducto = () => {
                 progress: undefined,
             };
 
-            await axiosPetition('categorias');
+            const categorias = await axiosPetition('categorias');
 
-            if (!respuesta.ok) {
+            if (!categorias.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de categorias.",
                     configMensaje
                 );
             }
 
-            setCategorias(respuesta.categorias);
+            setCategorias(categorias.categorias);
             setAuxiliarTipo(!auxiliarTipo);
         }
         buscarCategorias();
@@ -122,16 +153,13 @@ export const EditarProducto = () => {
     useEffect(() => {
 
         const determinarTipo = async () => {
-            let posicion;
-            await categorias?.find((datos, index) => {
-                const resultado = datos.nombre === productos?.categoria;
 
-                if (resultado) {
-                    posicion = index;
-                    setTipo(categorias[posicion].tipo);
-                }
+            const busqueda = categorias.find(x => x.identificador === categoria);
 
-            });
+            if (busqueda) {
+                setTipo(busqueda.tipo);
+            }
+
         }
 
         determinarTipo();
@@ -154,64 +182,59 @@ export const EditarProducto = () => {
     const editarProducto = async (e) => {
         e.preventDefault();
 
-        const listaFiltrada = insumo.filter((el) => {
-            return el != null;
-        });
+        const listaFiltrada = insumo.filter(Boolean);
 
+        const id = identificador.split('P')[1];
+
+        productosValues.categoria_id = comboCategorias.current.value;
+        productosValues.tipoUnidad = tipo;
         productosValues.insumos = listaFiltrada;
 
-        if ((stock === '' || stock === null) && insumo.length === 0) {
-            return toast.error("Ingresa un stock o registre los insumos del producto.", configMensaje);
-        }
+        if (tipo === "Stock") {
 
-        if (tipo === 'Insumos' && (stock !== null || stock !== '')) {
+            productosValues.insumos = [];
+
+            if (productosValues.stock !== '') {
+                productosValues.stock = parseInt(productosValues.stock);
+            }
+        } else if (tipo === "Insumos") {
+
             productosValues.stock = '';
+
         }
 
-        if (tipo === 'Stock' && insumo.length !== 0) {
-            productosValues.insumo = [];
+        if (productosValues.puntos === '') {
+            productosValues.puntos = 0;
+        } else {
+            productosValues.puntos = parseInt(productosValues.puntos);
         }
 
-        if (tipo !== 'Insumos' && typeof stock === 'string') {
-            const stockParseado = parseInt(stock);
-            if (!isNaN(stockParseado)) {
-                productosValues.stock = stockParseado;
-            }
+        const actualizacion = await axiosPetition(`productos/${id}`, { ...productosValues, identificador: parseInt(id) }, "PUT");
+
+        if (!actualizacion.ok) {
+            return toast.error(actualizacion.msg, configMensaje);
         }
-        productosValues.categoria = categoria;
-        productosValues.tipoUnidad = tipo;
 
-        await axiosPetition(`productos/${identificador}`, productosValues, 'PUT');
+        history.push("/menu");
 
-        if (respuesta !== undefined) {
-
-            if (respuesta.ok) {
-                resetProductos();
-                toast.success('Producto registrado correctamente.', configMensaje);
-                setProductos([]);
-                history.push('/menu');
-            } else {
-                toast.error(respuesta.msg, configMensaje);
-            }
-        }
     }
 
     const buscarProducto = async () => {
 
-        await axiosPetition(`productos/${identificador}`);
+        const busqueda = await axiosPetition(`productos/${identificador}`);
 
-        if (!respuesta.ok) {
+        if (!busqueda.ok) {
             return toast.error("Error al obtener el producto, contacte a los desarrolladores.", configMensaje);
         }
 
-        setInsumo(respuesta?.producto.insumos);
+        setInsumo(busqueda?.producto.insumos);
 
     }
 
     const agregarInsumo = () => {
 
         if (inputInsumo.trim() === '') {
-            toast.error("Busque y seleccione un insumo de la lista deslplegable, por favor.", configMensaje);
+            toast.error("Busque y seleccione un insumo de la lista desplegable, por favor.", configMensaje);
         } else if (cantidad.current.value.trim() === '') {
             toast.error("La cantidad del insumo es obligatoria.", configMensaje);
         } else {
@@ -251,24 +274,14 @@ export const EditarProducto = () => {
                             value={categoria}
                             title="Categoría del producto"
                             onChange={() => {
-                                let posicion;
-                                setCategoria(comboCategorias.current.value);
-                                categorias?.find((categoria, index) => {
-                                    const resultado = categoria.nombre === comboCategorias.current.value
-                                    if (resultado) {
-                                        posicion = index;
-                                    }
-                                });
-                                const tipoCategoria = categorias[posicion].tipo;
-                                setTipo(tipoCategoria);
 
-                                setInsumo([]);
-                                productosValues.stock = '';
-
+                                setCategoria(parseInt(comboCategorias.current.value));
+                                setAuxiliarTipo(!auxiliarTipo);
+                                setBandera(!bandera);
                             }}>
                             {
                                 categorias?.map((datos, key) => {
-                                    return <option key={datos._id} value={datos.nombre} >{datos.nombre}</option>;
+                                    return <option key={key} value={datos.identificador} >{datos.nombre}</option>;
                                 })
                             }
                         </select>
@@ -313,7 +326,7 @@ export const EditarProducto = () => {
                             type="number"
                             name="stock"
                             className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${tipo === 'Insumos' ? 'hidden' : ''}`}
-                            value={stock}
+                            value={stock === null ? '' : stock}
                             onChange={handleProductosChange}
                             placeholder="Stock del producto*"
                             title="Stock del producto"
@@ -359,7 +372,8 @@ export const EditarProducto = () => {
                         id="contenedorInsumos"
                         className="w-full border-4 border-dashed rounded-md mt-4 flex flex-wrap pb-4 pt-2 px-4">
                         {insumo?.map((data, key) => {
-                            return <Insumo key={key} index={key} cantidad={data.cantidad} unidades={data.unidades} insumo={data.nombre} listaInsumos={insumo} setListaInsumos={setInsumo} />
+                            data.id_insumo = data.identificador;
+                            return <Insumo key={key} index={key} insumo={data} listaInsumos={insumo} setListaInsumos={setInsumo} />
                         })}
                     </div>
                 </div>
@@ -386,6 +400,7 @@ export const EditarProducto = () => {
                             setCategoria(productos?.categoria);
                             resetProductos();
                             setAuxiliarTipo(!auxiliarTipo);
+                            setBandera(!bandera);
                         }}
                     >
                         Restaurar

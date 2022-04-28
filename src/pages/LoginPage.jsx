@@ -2,12 +2,15 @@ import React, { useEffect, useRef } from 'react';
 import logo from '../images/logo-PandaFood.svg';
 import '../styles/login.css';
 import { useHistory } from 'react-router-dom';
-import { axiosPetition, respuesta } from '../helpers/Axios';
+import { axiosPetition } from '../helpers/Axios';
 import { useForm } from '../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUsuarioContext } from '../context/usuarioContext';
 
 export const LoginPage = () => {
+
+    const { setInfoUsuario } = useUsuarioContext();
 
     const [loginCredentials, loginInputChange, resetForm] = useForm({
         cedula: '',
@@ -38,17 +41,18 @@ export const LoginPage = () => {
 
         e.preventDefault();
 
-        await axiosPetition('login', loginCredentials, 'POST');
+        const loggeo = await axiosPetition('login', loginCredentials, 'POST');
 
-        if (respuesta !== undefined) {
+        if (loggeo !== undefined) {
 
-            if (respuesta.ok) {
-                window.localStorage.setItem('token', respuesta.token);
+            if (loggeo.ok) {
+                window.localStorage.setItem('token', loggeo.token);
+                window.localStorage.setItem('usuario', cedula);
                 resetForm();
                 history.push('/menu');
 
             } else {
-                toast.error(respuesta.msg, configMensaje);
+                toast.error(loggeo.msg, configMensaje);
                 // history.push('/login');
             }
         }

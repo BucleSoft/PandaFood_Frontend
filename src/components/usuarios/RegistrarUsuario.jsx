@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 
 export const RegistrarUsuario = () => {
@@ -38,19 +38,17 @@ export const RegistrarUsuario = () => {
         if (repContraseña.current.value.length === 0) {
             toast.error('Llene todos los campos, por favor.', configMensaje);
         } else if (repContraseña.current.value === contraseña) {
-            await axiosPetition('usuarios', usuariosValues, 'POST');
+            const registro = await axiosPetition('usuarios', usuariosValues, 'POST');
 
-            if (respuesta !== undefined) {
+            if (registro !== undefined) {
 
-                console.log(respuesta);
-
-                if (respuesta.ok) {
+                if (registro.ok) {
                     resetUsuarios();
                     repContraseña.current.value = '';
                     toast.success('Usuario registrado correctamente.', configMensaje);
                     history.push('/usuarios');
                 } else {
-                    toast.error(respuesta.msg, configMensaje);
+                    toast.error(registro.msg, configMensaje);
                 }
             }
         } else {

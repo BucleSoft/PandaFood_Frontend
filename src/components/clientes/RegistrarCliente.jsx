@@ -2,7 +2,7 @@ import React from 'react';
 import '../../styles/registrarUsuario.css';
 import { useForm } from '../../hooks/useForm';
 import { ToastContainer, toast } from 'react-toastify';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { useHistory, Link } from 'react-router-dom';
 
 export const RegistrarCliente = () => {
@@ -14,7 +14,8 @@ export const RegistrarCliente = () => {
         nombre: '',
         direccion: '',
         celular: '',
-        estado: 'Activo'
+        estado: 'Activo',
+        puntos: 0
     });
 
     const { cedula, nombre, direccion, celular } = clientesValues;
@@ -33,18 +34,16 @@ export const RegistrarCliente = () => {
     const registrarCliente = async (e) => {
         e.preventDefault();
 
-        await axiosPetition('clientes', clientesValues, 'POST');
+        const registro = await axiosPetition('clientes', clientesValues, 'POST');
 
-        if (respuesta !== undefined) {
+        if (registro !== undefined) {
 
-            console.log(respuesta);
-
-            if (respuesta.ok) {
+            if (registro.ok) {
                 resetClientes();
                 toast.success('Cliente registrado correctamente.', configMensaje);
                 history.push('/clientes');
             } else {
-                toast.error(respuesta.msg, configMensaje);
+                toast.error(registro.msg, configMensaje);
             }
         }
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TablaUsuarios } from './TablaUsuarios';
-import { axiosPetition, respuesta } from '../../helpers/Axios';
+import { axiosPetition } from '../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { useBanderaContext } from '../../context/banderaContext';
 
@@ -26,9 +26,9 @@ export const HeaderTabla = ({ mostrar, busqueda }) => {
                 progress: undefined,
             };
 
-            await axiosPetition("usuarios");
-            setData(respuesta.usuarios?.reverse());
-            if (!respuesta.ok) {
+            const usuarios = await axiosPetition("usuarios");
+            setData(usuarios.usuarios?.reverse());
+            if (!usuarios.ok) {
                 toast.error(
                     "Ha ocurrido un error al intentar obtener la lista de usuarios.",
                     configMensaje

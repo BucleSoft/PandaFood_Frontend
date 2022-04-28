@@ -1,41 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { axiosPetition, respuesta } from '../../../helpers/Axios';
+import { axiosPetition } from '../../../helpers/Axios';
 import { toast } from 'react-toastify';
 import { TablaVentas } from './TablaVentas';
 
-export const HeaderTabla = ({ filtro, busqueda = '' }) => {
+export const HeaderTabla = ({ filtro, busqueda = '', desde, hasta }) => {
 
     const [data, setData] = useState([]);
+    const [dataFecha, setDataFecha] = useState([]);
     let numDatos = 0;
 
     // const { bandera } = useBanderaContext();
+    const configMensaje = {
+        position: "bottom-center",
+        background: "#191c1f !important",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+    };
+
+    const buscarVentas = async () => {
+
+        let isMount = true;
+
+        const busqueda = await axiosPetition("ventas");
+        if (isMount) {
+            setData(busqueda.ventas?.reverse());
+        }
+
+        if (!busqueda.ok) {
+            return toast.error(
+                "Ha ocurrido un error al intentar obtener la lista de ventas.",
+                configMensaje
+            );
+        }
+
+        return () => {
+            isMount = false;
+        }
+    }
+
+    const buscarVentasFecha = async () => {
+
+        let isMount = true;
+
+        const fechaDesde = desde + " 00:00:00";
+        const fechaHasta = hasta + " 23:59:59";
+
+        const busqueda = await axiosPetition("ventas/rango", { desde: fechaDesde, hasta: fechaHasta }, "POST");
+        if (isMount) {
+            setDataFecha(busqueda.ventas?.reverse());
+        }
+
+        if (!busqueda.ok) {
+            return toast.error(
+                busqueda.msg,
+                configMensaje
+            );
+        }
+
+        return () => {
+            isMount = false;
+        }
+    }
 
     useEffect(() => {
-        const buscarVentas = async () => {
 
-            const configMensaje = {
-                position: "bottom-center",
-                background: "#191c1f !important",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: true,
-                progress: undefined,
-            };
-
-            await axiosPetition("ventas");
-            setData(respuesta.ventas?.reverse());
-
-            if (!respuesta.ok) {
-                toast.error(
-                    "Ha ocurrido un error al intentar obtener la lista de ventas.",
-                    configMensaje
-                );
-            }
+        if (filtro !== "Rango") {
+            buscarVentas();
+        } else {
+            buscarVentasFecha();
         }
-        buscarVentas();
-    }, []);
+
+    }, [filtro, desde, hasta]);
 
     return (
         <table className="leading-normal w-full tabla mb-14">
@@ -58,6 +97,10 @@ export const HeaderTabla = ({ filtro, busqueda = '' }) => {
                         Cliente
                     </th>
                     <th
+                        className={`px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider ${filtro === "Domicilio" || filtro === "Redimir" ? "hidden" : ""}`}>
+                        Mesa
+                    </th>
+                    <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Total
                     </th>
@@ -67,17 +110,52 @@ export const HeaderTabla = ({ filtro, busqueda = '' }) => {
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody className={`${filtro !== "Rango" ? '' : 'hidden'}`}>
                 {
-                    data?.map((dato, key) => {
 
-                        if (numDatos <= 9) {
+                    data?.map((datos, key) => {
+
+                        const condicion = datos.cliente?.toString().includes(busqueda);
+
+                        if (numDatos <= 9 && filtro === "Todas" && condicion) {
+
                             numDatos += 1;
-                            return <TablaVentas key={key} props={dato} />
+                            return <TablaVentas key={key} props={datos} filtro={filtro} />;
+
+                        } else if (filtro === "Consume restaurante") {
+
+                            if (datos.consume === "restaurante" && datos.tipoVenta === "Restaurante") {
+                                numDatos += 1;
+                                return <TablaVentas key={key} props={datos} filtro={filtro} />;
+                            }
+
+                        } else if (numDatos <= 9 && filtro === "Para llevar") {
+
+                            if (datos.consume === "llevar" && datos.tipoVenta === "Restaurante") {
+                                numDatos += 1;
+                                return <TablaVentas key={key} props={datos} filtro={filtro} />;
+                            }
+
+                        } else if (numDatos <= 9 && datos.tipoVenta === filtro) {
+                            if (condicion) {
+                                numDatos += 1;
+                                return <TablaVentas key={key} props={datos} filtro={filtro} />;
+                            }
                         }
                     })
                 }
             </tbody>
-        </table>
+            <tbody className={`${filtro === "Rango" ? '' : 'hidden'}`}>
+                {
+                    dataFecha?.map((dato, key) => {
+                        const condicion = dato.cliente?.toString().includes(busqueda);
+                        if (numDatos <= 9 && filtro === "Rango" && condicion) {
+                            numDatos += 1;
+                            return <TablaVentas key={key} props={dato} filtro={filtro} />;
+                        }
+                    })
+                }
+            </tbody>
+        </table >
     )
 }
