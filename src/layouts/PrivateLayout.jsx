@@ -51,6 +51,7 @@ export const PrivateLayout = ({ children }) => {
             <main className="w-full">
                 {children}
                 <ToastContainer theme="dark" onClick={() => {
+                    history.push("/ventas/consultar");
                     setEditarVenta(undefined);
                 }} />
             </main>

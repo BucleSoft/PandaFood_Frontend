@@ -69,7 +69,14 @@ export const Ventas = () => {
                     setTotal(precioTotal - (precioTotal * decimalDescuento));
                     venta.total = precioTotal - (precioTotal * decimalDescuento);
                 }
-                setPuntosGanados(Math.floor((precioTotal - (precioTotal * decimalDescuento)) / 2000));
+
+                const calculoPuntos = (precioTotal - (precioTotal * decimalDescuento)) / 2000;
+
+                if (calculoPuntos >= 200) {
+                    setPuntosGanados(200);
+                } else {
+                    setPuntosGanados(Math.floor(calculoPuntos));
+                }
             } else if (descuento === 0) {
                 if (venta.tipoVenta === "Domicilio" && venta.precioDomicilio !== "") {
                     setTotal(precioTotal + venta.precioDomicilio);
@@ -78,7 +85,14 @@ export const Ventas = () => {
                     setTotal(precioTotal);
                     venta.total = precioTotal;
                 }
-                setPuntosGanados(Math.floor(precioTotal / 2000));
+
+                const calculoPuntos = precioTotal / 2000;
+
+                if (calculoPuntos >= 200) {
+                    setPuntosGanados(200);
+                } else {
+                    setPuntosGanados(Math.floor(calculoPuntos));
+                }
             }
 
             venta.puntosGanados = puntosGanados;
@@ -141,7 +155,9 @@ export const Ventas = () => {
             observaciones: [],
             total: 0,
             puntosGanados: 0,
-            descuento: 0
+            descuento: 0,
+            plataforma: "",
+            banco: ""
         });
 
         setCarrito([]);
@@ -177,7 +193,8 @@ export const Ventas = () => {
                     <div className="flex flex-col w-48 text-white items-center justify-start">
                         <button
                             className={`w-12 h-12 mb-2 text-white font-bold text-xl rounded-full ${pasoSeleccionado === 1 ? "itemVentaActivado" : "itemVenta"} `}
-                            onClick={() => setPasoSeleccionado(1)}>
+                            onClick={() => setPasoSeleccionado(1)}
+                        >
                             1
                         </button>
                         <h2 className={`${pasoSeleccionado === 1 ? "" : "hidden"}`}>Información de la venta</h2>
@@ -185,7 +202,8 @@ export const Ventas = () => {
                     <div className="flex flex-col w-48 text-white items-center justify-start">
                         <button
                             className={`w-12 h-12 mb-2 text-white font-bold text-xl rounded-full ${pasoSeleccionado === 2 ? "itemVentaActivado" : "itemVenta"} `}
-                            onClick={() => setPasoSeleccionado(2)}>
+                            onClick={() => setPasoSeleccionado(2)}
+                            disabled={venta.tipoVenta === "Plataformas" ? true : false}>
                             2
                         </button>
                         <h2 className={`${pasoSeleccionado === 2 ? "" : "hidden"}`}>Lista de productos</h2>
@@ -193,7 +211,8 @@ export const Ventas = () => {
                     <div className="flex flex-col w-48 text-white items-center justify-start">
                         <button
                             className={`w-12 h-12 mb-2 text-white font-bold text-xl rounded-full ${pasoSeleccionado === 3 ? "itemVentaActivado" : "itemVenta"} `}
-                            onClick={() => setPasoSeleccionado(3)}>
+                            onClick={() => setPasoSeleccionado(3)}
+                            disabled={venta.tipoVenta === "Plataformas" ? true : false}>
                             3
                         </button>
                         <h2 className={`${pasoSeleccionado === 3 ? "" : "hidden"}`}>Forma de pago</h2>
@@ -201,7 +220,8 @@ export const Ventas = () => {
                     <div className="flex flex-col w-48 text-white items-center justify-start">
                         <button
                             className={`w-12 h-12 mb-2 text-white font-bold text-xl rounded-full ${pasoSeleccionado === 4 ? "itemVentaActivado" : "itemVenta"} `}
-                            onClick={() => setPasoSeleccionado(4)}>
+                            onClick={() => setPasoSeleccionado(4)}
+                            disabled={venta.tipoVenta === "Plataformas" ? true : false}>
                             4
                         </button>
                         <h2 className={`${pasoSeleccionado === 4 ? "" : "hidden"}`}>Observaciones finales</h2>

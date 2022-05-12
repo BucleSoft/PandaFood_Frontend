@@ -120,7 +120,7 @@ export const TablaInsumos = ({ props }) => {
                 </td>
                 <td className="flex px-5 py-3 text-sm justify-center">
                     <img
-                        className="tablaItem" src={Lapiz}
+                        className="cursor-pointer" src={Lapiz}
                         onClick={obtenerInfoInsumo}
                         alt="ícono lápiz"
                     ></img>

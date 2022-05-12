@@ -8,8 +8,8 @@ import { faCcVisa } from '@fortawesome/free-brands-svg-icons';
 import puntos from '../../../images/puntos.svg';
 import { useEditarVentaContext } from '../../../context/editarVentaContext';
 import { useHistory } from 'react-router-dom';
-import { axiosPetition } from '../../../helpers/Axios';
-import { toast } from 'react-toastify';
+import { faDollarSign, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+
 
 export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setBandera, total }) => {
 
@@ -47,18 +47,6 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
         draggable: true,
         progress: undefined,
     };
-
-    const actualizarFormaPago = async (pago) => {
-
-        const peticion = await axiosPetition(`ventas/${identificador}`, { formaPago: pago }, "PUT");
-
-        if (!peticion.ok) {
-            return toast.error(peticion.msg, configMensaje);
-        }
-
-        setFormaPago(pago);
-        editarVenta.formaPago = pago;
-    }
 
     return (
         <div className="w-full p-12">
@@ -108,27 +96,41 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
                     className={`flex flex-col w-48 h-28 items-center justify-between border-4 rounded-xl cursor-pointer ${formaPago === 'Efectivo' ? 'itemPagoSeleccionado' : 'itemPago'} ${tipoVenta === "Redimir" ? "hidden" : ""} `}
                     onClick={() => {
                         if (formaPago !== "Efectivo") {
-                            actualizarFormaPago("Efectivo");
+                            editarVenta.formaPago = 'Efectivo';
+                            setFormaPago(editarVenta.formaPago);
                         }
                     }}>
-                    <img className="w-16 mt-2" src={efectivo} />
+                    <FontAwesomeIcon className="text-white mt-2 text-7xl" icon={faDollarSign} />
                     <h2 className="text-white">Efectivo</h2>
                 </section>
                 <section
                     className={`flex flex-col w-48 h-28 items-center justify-between border-4 rounded-xl cursor-pointer ${formaPago === 'Tarjeta' ? 'itemPagoSeleccionado' : 'itemPago'} ${tipoVenta === "Redimir" ? "hidden" : ""}`}
                     onClick={() => {
                         if (formaPago !== "Tarjeta") {
-                            actualizarFormaPago("Tarjeta");
+                            editarVenta.formaPago = 'Tarjeta';
+                            setFormaPago(editarVenta.formaPago);
                         }
                     }}>
                     <FontAwesomeIcon className="text-white mt-2 text-7xl" icon={faCcVisa} />
                     <h2 className="text-white">Tarjeta</h2>
                 </section>
                 <section
+                    className={`flex flex-col w-48 h-28 items-center justify-between border-4 rounded-xl cursor-pointer ${formaPago === 'Transferencia' ? 'itemPagoSeleccionado' : 'itemPago'} ${tipoVenta === "Redimir" ? "hidden" : ""}`}
+                    onClick={() => {
+                        if (formaPago !== "Transferencia") {
+                            editarVenta.formaPago = 'Transferencia';
+                            setFormaPago(editarVenta.formaPago);
+                        }
+                    }}>
+                    <FontAwesomeIcon className="text-white mt-2 text-7xl" icon={faPaperPlane} />
+                    <h2 className="text-white">Transfencia</h2>
+                </section>
+                <section
                     className={`flex flex-col w-48 h-28 items-center justify-between border-4 rounded-xl cursor-pointer ${formaPago === 'Puntos' ? 'itemPagoSeleccionado' : 'itemPago'} ${tipoVenta !== "Redimir" ? "hidden" : ""}`}
                     onClick={() => {
                         if (formaPago !== "Puntos") {
-                            actualizarFormaPago("Puntos");
+                            editarVenta.formaPago = 'Puntos';
+                            setFormaPago(editarVenta.formaPago);
                         }
                     }}>
                     <img src={puntos} />

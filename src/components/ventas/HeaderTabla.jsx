@@ -199,7 +199,7 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                 </table>
                 <div className="flex mt-4 justify-between">
                     <h2 className={`text-white text-lg ${carrito.length <= 0 ? "hidden" : ""}`}>Total: {verPuntos ? total + " pts" : "$" + total}</h2>
-                    <h2 className={`text-white text-lg ${carrito.length <= 0 || verPuntos === true ? "hidden" : ""}`}>Puntos: {puntosGanados} pts</h2>
+                    <h2 className={`text-white text-lg ${carrito.length <= 0 || verPuntos === true ? "hidden" : ""}`}>Puntos: {puntosGanados >= 200 ? "200" : puntosGanados} pts</h2>
                 </div>
                 <div>
                     <h2

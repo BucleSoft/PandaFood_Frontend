@@ -187,7 +187,7 @@ export const Card = ({ identificador = '', tipoUnidad = "Insumo", precio = '0', 
     }
 
     return (
-        <div className={`text-white max-w-xs w-full shadow-md rounded-2xl card my-4 mr-6 ${soloAgregados ? agregado === false ? "hidden" : "" : ""}`}>
+        <div className={`text-white max-w-xs w-full shadow-md rounded-2xl card my-4 mr-6 ${soloAgregados ? agregado === false ? "hidden" : "" : ""} noselect`}>
 
             <img
                 src={imagen}

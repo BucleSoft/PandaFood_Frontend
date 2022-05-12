@@ -7,6 +7,7 @@ export const HeaderTabla = ({ filtro, busqueda = '', desde, hasta }) => {
 
     const [data, setData] = useState([]);
     const [dataFecha, setDataFecha] = useState([]);
+    const [bandera, setBandera] = useState(false);
     let numDatos = 0;
 
     // const { bandera } = useBanderaContext();
@@ -74,7 +75,7 @@ export const HeaderTabla = ({ filtro, busqueda = '', desde, hasta }) => {
             buscarVentasFecha();
         }
 
-    }, [filtro, desde, hasta]);
+    }, [filtro, desde, hasta, bandera]);
 
     return (
         <table className="leading-normal w-full tabla mb-14">
@@ -89,8 +90,16 @@ export const HeaderTabla = ({ filtro, busqueda = '', desde, hasta }) => {
                         Concepto
                     </th>
                     <th
+                        className=" py-3 px-5 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Plataforma
+                    </th>
+                    <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Fecha
+                    </th>
+                    <th
+                        className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Hora
                     </th>
                     <th
                         className="px-5 py-3 border-b-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -120,26 +129,26 @@ export const HeaderTabla = ({ filtro, busqueda = '', desde, hasta }) => {
                         if (numDatos <= 9 && filtro === "Todas" && condicion) {
 
                             numDatos += 1;
-                            return <TablaVentas key={key} props={datos} filtro={filtro} />;
+                            return <TablaVentas key={key} props={datos} filtro={filtro} bandera={bandera} setBandera={setBandera} />;
 
                         } else if (filtro === "Consume restaurante") {
 
                             if (datos.consume === "restaurante" && datos.tipoVenta === "Restaurante") {
                                 numDatos += 1;
-                                return <TablaVentas key={key} props={datos} filtro={filtro} />;
+                                return <TablaVentas key={key} props={datos} filtro={filtro} bandera={bandera} setBandera={setBandera} />;
                             }
 
                         } else if (numDatos <= 9 && filtro === "Para llevar") {
 
                             if (datos.consume === "llevar" && datos.tipoVenta === "Restaurante") {
                                 numDatos += 1;
-                                return <TablaVentas key={key} props={datos} filtro={filtro} />;
+                                return <TablaVentas key={key} props={datos} filtro={filtro} bandera={bandera} setBandera={setBandera} />;
                             }
 
                         } else if (numDatos <= 9 && datos.tipoVenta === filtro) {
                             if (condicion) {
                                 numDatos += 1;
-                                return <TablaVentas key={key} props={datos} filtro={filtro} />;
+                                return <TablaVentas key={key} props={datos} filtro={filtro} bandera={bandera} setBandera={setBandera} />;
                             }
                         }
                     })
@@ -151,7 +160,7 @@ export const HeaderTabla = ({ filtro, busqueda = '', desde, hasta }) => {
                         const condicion = dato.cliente?.toString().includes(busqueda);
                         if (numDatos <= 9 && filtro === "Rango" && condicion) {
                             numDatos += 1;
-                            return <TablaVentas key={key} props={dato} filtro={filtro} />;
+                            return <TablaVentas key={key} props={dato} filtro={filtro} bandera={bandera} setBandera={setBandera} />;
                         }
                     })
                 }

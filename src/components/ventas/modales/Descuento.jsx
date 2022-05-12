@@ -50,7 +50,7 @@ export const Descuento = ({ hidden, setHidden, descuento = '', setDescuento }) =
                         type="number"
                         defaultValue={descuento}
                         ref={descuentoVenta}
-                        className="focus:outline-none text-5xl text-center border-b-2 border-white w-40 formInput h-auto rounded-sm" type="number"></input>
+                        className="focus:outline-none text-5xl text-center border-b-2 border-white w-40 formInput h-auto rounded-sm"></input>
                     <div className="mt-6">
                         <button
                             type="button"

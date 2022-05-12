@@ -70,7 +70,7 @@ export const TablaProductos = ({ props, index, bandera, setBandera, verPuntos, v
                 </td>
                 <td className="flex px-10 py-3 text-sm justify-left">
                     <img
-                        className="tablaItem" src={Eliminar}
+                        className="cursor-pointer" src={Eliminar}
                         onClick={quitarDelCarrito}
                         alt="ícono eliminar"
                     ></img>

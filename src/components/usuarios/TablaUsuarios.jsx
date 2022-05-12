@@ -89,21 +89,21 @@ export const TablaUsuarios = ({ props }) => {
                 </td>
                 <td className="flex px-5 py-3   text-sm text-left">
                     <img
-                        className="tablaItem" src={Lapiz}
+                        className="cursor-pointer" src={Lapiz}
                         onClick={obtenerInfoUsuario}
                         alt="ícono-lápiz"
                     ></img>
                     {estado === 'Autorizado'
                         ?
                         <img
-                            className="ml-3 tablaItem"
+                            className="ml-3 cursor-pointer"
                             src={Eliminar}
                             onClick={gestionarAcceso}
                             alt="ícono-eliminar"></img>
                         :
 
                         <FontAwesomeIcon
-                            className='ml-2 text-blue-500 tablaItem recoverIcon'
+                            className='ml-2 text-blue-500 cursor-pointer recoverIcon'
                             icon={faUndoAlt}
                             onClick={gestionarAcceso} />
                     }

@@ -121,10 +121,10 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado }) => {
                     <h2 className="text-white ">Redimir Puntos</h2>
                 </section>
                 <section
-                    className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl ${tipoVenta === "Venta en linea" ? "itemTipoSeleccionado" : "itemTipo"}`}
+                    className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl ${tipoVenta === "Plataformas" ? "itemTipoSeleccionado" : "itemTipo"}`}
                 >
                     <img className="w-16 mt-4 mb-2" src={eshop} />
-                    <h2 className="text-white">Ventas en línea</h2>
+                    <h2 className="text-white">Pataformas</h2>
                 </section>
             </div>
             <form className="mt-16 mx-28 flex flex-wrap justify-start w-full">

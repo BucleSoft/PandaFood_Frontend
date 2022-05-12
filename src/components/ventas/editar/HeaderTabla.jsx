@@ -9,12 +9,11 @@ import { Descuento } from './modales/Descuento';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { useEditarVentaContext } from "../../../context/editarVentaContext";
-import { axiosPetition } from "../../../helpers/Axios";
 import { TablaProductos } from './TablaProductos';
 import { useCarritoContext } from '../../../context/carritoContext';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { useHistory } from 'react-router-dom';
 
-export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setBandera, descuento = 0, setDescuento, total, puntosGanados, detalles, setDetalles }) => {
+export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setBandera, descuento = 0, setDescuento, total, puntosGanados, detalles, aplicarDescuento }) => {
 
     const history = useHistory();
     const { editarVenta } = useEditarVentaContext();
@@ -230,7 +229,7 @@ export const HeaderTabla = ({ pasoSeleccionado, setPasoSeleccionado, bandera, se
                     </button>
                 </div>
             </div>
-
+            <Descuento hidden={hidden} setHidden={setHidden} setDescuento={aplicarDescuento} />
         </div>
     )
 }

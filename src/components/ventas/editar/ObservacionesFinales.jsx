@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { axiosPetition } from '../../../helpers/Axios';
 import { EliminarObs } from "./modales/EliminarObs";
@@ -8,8 +7,9 @@ import '../../../styles/observaciones.css';
 import { useEditarVentaContext } from '../../../context/editarVentaContext';
 import { useHistory } from 'react-router-dom';
 import { useCarritoContext } from '../../../context/carritoContext';
+import { NuevaMesa } from '../modales/NuevaMesa';
 
-export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) => {
+export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado, calcularTotal }) => {
 
     const history = useHistory();
 
@@ -17,14 +17,16 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
     const { carrito } = useCarritoContext();
 
     const observacion = useRef('');
-    const mesa = useRef(-1);
 
     const [consume, setConsume] = useState(editarVenta?.consume);
+    const [mesa, setMesa] = useState(editarVenta?.idMesa);
     const [observaciones, setObservaciones] = useState([]);
     const [hidden, setHidden] = useState(true);
+    const [hiddenMesa, setHiddenMesa] = useState(true);
     const [indexObs, setIndexObs] = useState();
     const [mesas, setMesas] = useState([]);
     const [bandera, setBandera] = useState(false);
+    const [banderaMesa, setBanderaMesa] = useState(false);
 
     useEffect(() => {
         const buscarMesas = async () => {
@@ -37,7 +39,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
             setMesas(busqueda.mesas);
         }
         buscarMesas();
-    }, []);
+    }, [banderaMesa]);
 
     useEffect(() => {
         if (editarVenta === undefined) {
@@ -76,6 +78,10 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
         bucarObservaciones();
 
     }, [bandera, editarVenta]);
+
+    useEffect(() => {
+        calcularTotal();
+    }, []);
 
     const configMensaje = {
         position: "bottom-center",
@@ -145,13 +151,20 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 <select
 
                     name="mesa"
-                    ref={mesa}
+                    value={mesa}
                     className={`w-80 p-2 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${editarVenta !== undefined ? editarVenta.tipoVenta === "Redimir" ? "hidden" : "" : ""} ${editarVenta !== undefined ? consume !== "restaurante" || editarVenta.tipoVenta === "Domicilio" ? "hidden" : "" : ""}`}
                     autoComplete="off"
-                    onChange={() => {
-                        editarVenta.idMesa = mesa.current.value;
+                    onChange={(e) => {
+
+                        const value = e.target.value;
+                        setMesa(value);
+                        if (value.trim() !== "-1") {
+                            editarVenta.idMesa = e.target.value;
+                        } else {
+                            editarVenta.idMesa = null;
+                        }
+
                     }}
-                    defaultChecked={mesa}
                 >
                     <option value={-1}>Selecciona una mesa</option>
                     {
@@ -201,14 +214,13 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 >
                     Anterior
                 </button>
-                <Link to="/factura">
-                    <button
-                        type="button"
-                        className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
-                    >
-                        Imprimir comanda
-                    </button>
-                </Link>
+                <button
+                    type="button"
+                    className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
+                    onClick={() => setHiddenMesa(false)}
+                >
+                    Registrar mesas
+                </button>
                 <button
                     type="submit"
                     className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput"
@@ -218,6 +230,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 </button>
             </div>
             <EliminarObs hidden={hidden} setHidden={setHidden} index={indexObs} setBandera={setBandera} bandera={bandera} />
+            <NuevaMesa hidden={hiddenMesa} setHidden={setHiddenMesa} bandera={banderaMesa} setBandera={setBanderaMesa} />
         </div >
     );
 }

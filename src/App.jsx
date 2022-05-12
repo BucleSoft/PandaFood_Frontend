@@ -85,7 +85,9 @@ function App() {
     observaciones: [],
     total: 0,
     puntosGanados: 0,
-    descuento: 0
+    descuento: 0,
+    plataforma: "",
+    banco: ""
   });
 
   return (

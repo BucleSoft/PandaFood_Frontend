@@ -58,7 +58,7 @@ export const CantidadInput = ({ identificador, nombre, insumoEnLista, max, setBa
     }
 
     return (
-        <tr className="bordeFilas">
+        <tr className="bordeFilas noselect">
             <td className='py-3 text-left pl-4'>
                 <input name="checkbox" type="checkbox" checked={insumoEnLista}
                     onChange={() => excepciones(insumoEnLista, identificador, cantidadExcepcion)} />

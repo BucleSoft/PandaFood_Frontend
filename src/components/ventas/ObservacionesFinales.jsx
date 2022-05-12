@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { axiosPetition } from '../../helpers/Axios';
 import { EliminarObs } from './modales/EliminarObs';
@@ -7,6 +6,7 @@ import { Observacion } from './Observacion';
 import { useVentaContext } from '../../context/ventaContext';
 import { useCarritoContext } from '../../context/carritoContext';
 import '../../styles/observaciones.css';
+import { NuevaMesa } from './modales/NuevaMesa';
 
 export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) => {
 
@@ -19,8 +19,10 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
     const [consume, setConsume] = useState(venta?.consume);
     const [observaciones, setObservaciones] = useState(venta?.observaciones);
     const [hidden, setHidden] = useState(true);
+    const [hiddenMesa, setHiddenMesa] = useState(true);
     const [indexObs, setIndexObs] = useState();
     const [mesas, setMesas] = useState([]);
+    const [bandera, setBandera] = useState(false);
 
     useEffect(() => {
         const buscarMesas = async () => {
@@ -33,7 +35,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
             setMesas(busqueda.mesas);
         }
         buscarMesas();
-    }, []);
+    }, [bandera]);
 
     const configMensaje = {
         position: "bottom-center",
@@ -78,7 +80,9 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
             observaciones: [],
             total: 0,
             puntosGanados: 0,
-            descuento: 0
+            descuento: 0,
+            plataforma: "",
+            banco: ""
         });
         setCarrito([]);
         setPasoSeleccionado(1);
@@ -165,14 +169,13 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 >
                     Anterior
                 </button>
-                <Link to="/factura">
-                    <button
-                        type="button"
-                        className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
-                    >
-                        Imprimir comanda
-                    </button>
-                </Link>
+                <button
+                    type="button"
+                    className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
+                    onClick={() => setHiddenMesa(false)}
+                >
+                    Registrar mesas
+                </button>
                 <button
                     type="submit"
                     className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput"
@@ -182,6 +185,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
                 </button>
             </div>
             <EliminarObs hidden={hidden} setHidden={setHidden} observaciones={observaciones} index={indexObs} />
+            <NuevaMesa hidden={hiddenMesa} setHidden={setHiddenMesa} bandera={bandera} setBandera={setBandera} />
         </div>
     );
 }

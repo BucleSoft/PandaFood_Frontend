@@ -87,14 +87,14 @@ export const TablaClientes = ({ props }) => {
                 </td>
                 <td className="flex px-5 py-3 text-sm justify-center">
                     <img
-                        className="tablaItem" src={Lapiz}
+                        className="cursor-pointer" src={Lapiz}
                         onClick={obtenerInfoCliente}
                         alt="ícono lápiz"
                     ></img>
                     {estado === 'Activo'
                         ?
                         <img
-                            className="ml-3 tablaItem"
+                            className="ml-3 cursor-pointer"
                             src={Eliminar}
                             alt="ícono eliminar"
                             onClick={inhabilitarCliente}

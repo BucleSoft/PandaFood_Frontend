@@ -67,9 +67,12 @@ export const EditarVenta = () => {
             setDetalles([...detalle]);
         }
 
-        buscarDetalle();
+        if (editarVenta !== undefined) {
+            buscarDetalle();
+        }
 
     }, []);
+
 
     useEffect(() => {
         if (editarVenta?.descuento === 0) {
@@ -80,55 +83,64 @@ export const EditarVenta = () => {
 
     useEffect(() => {
 
-        const calcularTotal = () => {
-            let suma = 0;
-
-            detalles?.map((detalle) => {
-                suma += detalle.subtotal;
-            });
-
-            if (carrito.length > 0) {
-                carrito.map((producto) => {
-                    suma += producto.precio * producto.cantidad;
-                });
-            }
-
-            if (editarVenta?.tipoVenta === "Domicilio") {
-                suma += editarVenta?.precioDomicilio;
-            }
-
-            if (editarVenta?.descuento !== 0 || editarVenta?.descuento !== null) {
-                const descuento = editarVenta?.descuento / 100;
-                suma -= (suma * descuento);
-            }
-
-            setTotal(suma);
-            editarVenta.total = suma;
-
-            const puntos = Math.floor(suma / 2000);
-
-            if (puntos < 200) {
-                setPuntosGanados(puntos);
-                editarVenta.puntosGanados = puntos;
-            } else {
-                setPuntosGanados(200);
-                editarVenta.puntosGanados = 200;
-            }
+        if (editarVenta !== undefined) {
+            calcularTotal();
         }
 
-        calcularTotal();
-    }, [bandera]);
+    }, [bandera, editarVenta, detalles, carrito]);
+
+    const calcularTotal = () => {
+        let suma = 0;
+
+        detalles?.map((detalle) => {
+            suma += detalle.subtotal;
+        });
+
+        if (carrito.length > 0) {
+            carrito.map((producto) => {
+                suma += producto.precio * producto.cantidad;
+            });
+        }
+
+        if (editarVenta?.tipoVenta === "Domicilio") {
+            suma += editarVenta?.precioDomicilio;
+        }
+
+        if (editarVenta?.descuento !== 0 || editarVenta?.descuento !== null) {
+            const descuento = editarVenta?.descuento / 100;
+            suma -= (suma * descuento);
+        }
+
+        setTotal(suma);
+        editarVenta.total = suma;
+
+        const puntos = Math.floor(suma / 2000);
+
+        if (puntos < 200) {
+            setPuntosGanados(puntos);
+            editarVenta.puntosGanados = puntos;
+        } else {
+            setPuntosGanados(200);
+            editarVenta.puntosGanados = 200;
+        }
+    }
+
+    const aplicarDescuento = (descuento) => {
+        setDescuento(descuento);
+        editarVenta.descuento = descuento;
+        setBandera(!bandera);
+    }
 
     const mostrarContenido = () => {
         switch (pasoSeleccionado) {
             case 1:
                 return <InfoVenta setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} reiniciar={reiniciar} setReiniciar={setReiniciar} />;
             case 2:
-                return <HeaderTabla setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} puntosGanados={puntosGanados} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} detalles={detalles} setDetalles={setDetalles} />
+                return <HeaderTabla setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} puntosGanados={puntosGanados} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} detalles={detalles} aplicarDescuento={aplicarDescuento} />
             case 3:
                 return <FormaPago setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} total={total} setTotal={setTotal} bandera={bandera} setBandera={setBandera} descuento={descuento} setDescuento={setDescuento} />
             case 4:
-                return <ObservacionesFinales setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} />
+                return <ObservacionesFinales setPasoSeleccionado={setPasoSeleccionado} pasoSeleccionado={pasoSeleccionado} calcularTotal={calcularTotal} />
         }
     }
 

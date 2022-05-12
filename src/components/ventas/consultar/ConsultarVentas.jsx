@@ -61,6 +61,12 @@ export const ConsultarVentas = () => {
                         >
                             Puntos
                         </button>
+                        <button
+                            className={`text-white px-2 py-1 rounded-xl ${filtro === 'Plataformas' ? 'filtroSeleccionado' : 'filtro'} my-2 mr-4 w-28 outline-none`}
+                            onClick={() => setFiltro("Plataformas")}
+                        >
+                            Plataformas
+                        </button>
                     </div>
                 </div>
                 <div className="flex flex-col mb-4">

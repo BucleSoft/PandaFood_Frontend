@@ -7,18 +7,24 @@ import { axiosPetition } from '../../helpers/Axios';
 import { useForm } from '../../hooks/useForm';
 import { toast } from 'react-toastify';
 import { useVentaContext } from '../../context/ventaContext';
+import { useCarritoContext } from '../../context/carritoContext';
 
 export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setBandera, reiniciar, setReiniciar }) => {
 
 
-    const { venta } = useVentaContext();
+    const { venta, setVenta } = useVentaContext();
+    const { setCarrito } = useCarritoContext();
 
     const precioDomicilio = useRef();
+    const plataforma = useRef();
+    const totalPlataforma = useRef();
     const direccion = useRef(venta.direccion);
 
     const [tipoVenta, setTipoVenta] = useState(venta.tipoVenta);
     const [desactivados, setDesactivados] = useState(false);
     const [auxiliar, setAuxiliar] = useState(false);
+    const [sumaPlataformas, setSumaPlataformas] = useState(0);
+    const [banderaPlataformas, setBanderaPlataformas] = useState(false);
 
     const [initValues, setInitValues] = useState({
         cedula: '',
@@ -54,6 +60,20 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
             venta.identificador = max.maxCodigo;
         }
     }
+
+    useEffect(() => {
+
+        const sumarPlataformas = async () => {
+
+            const sumar = await axiosPetition("ventas/plataformas");
+
+            setSumaPlataformas(sumar.suma);
+
+        }
+
+        sumarPlataformas();
+
+    }, [banderaPlataformas]);
 
     useEffect(() => {
         if (reiniciar) {
@@ -153,8 +173,58 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
         setDesactivados(false);
     }
 
+    const registrarPlataforma = async (e) => {
+
+        e.preventDefault();
+
+        const total = parseInt(totalPlataforma.current.value);
+
+        if (total <= 0 || typeof total !== "number") {
+            return toast.error("Ingresa un total válido, por favor.", configMensaje);
+        }
+
+        venta.total = totalPlataforma.current.value;
+        venta.plataforma = plataforma.current.value;
+        venta.cliente = 0;
+        venta.precioDomicilio = null;
+        venta.idMesa = null;
+        venta.vendedor = localStorage.getItem("usuario");
+
+        const registro = await axiosPetition("ventas/plataformas", venta, "POST");
+
+        if (!registro.ok) {
+            return toast.error(registro.msg, configMensaje);
+        }
+
+        toast.success("Venta registrada!", configMensaje);
+        setVenta({
+            identificador: '',
+            fecha: null,
+            tipoVenta: 'Restaurante',
+            formaPago: 'Efectivo',
+            precioDomicilio: '',
+            direccionDomicilio: '',
+            consume: 'restaurante',
+            idMesa: '',
+            cliente: '',
+            vendedor: '',
+            productos: [],
+            observaciones: [],
+            total: 0,
+            puntosGanados: 0,
+            descuento: 0,
+            plataforma: "",
+            banco: ""
+        });
+        setCarrito([]);
+        setPasoSeleccionado(1);
+        setTipoVenta("Restaurante");
+        setBanderaPlataformas(!banderaPlataformas);
+        totalPlataforma.current.value = "";
+    }
+
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full justify-center items-center">
             <div className="flex justify-center mt-10 gap-20">
                 <section
                     className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl cursor-pointer ${tipoVenta === "Domicilio" ? "itemTipoSeleccionado" : "itemTipo"}`}
@@ -195,19 +265,22 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
                     <h2 className="text-white ">Redimir Puntos</h2>
                 </section>
                 <section
-                    className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl cursor-pointer ${tipoVenta === "Venta en linea" ? "itemTipoSeleccionado" : "itemTipo"}`}
+                    className={`flex flex-col w-48 h-28 items-center justify-center border-4 rounded-xl cursor-pointer ${tipoVenta === "Plataformas" ? "itemTipoSeleccionado" : "itemTipo"}`}
                     onClick={() => {
-                        setTipoVenta("Venta en linea");
-                        venta.tipoVenta = "Venta en linea";
-                        venta.formaPago = "Efectivo";
+                        setTipoVenta("Plataformas");
+                        venta.tipoVenta = "Plataformas";
+                        venta.formaPago = "Tarjeta";
                         venta.precioDomicilio = '';
                         setAuxiliar(!auxiliar);
                     }}>
                     <img className="w-16 mt-4 mb-2" src={eshop} />
-                    <h2 className="text-white">Ventas en línea</h2>
+                    <h2 className="text-white">Plataformas</h2>
                 </section>
             </div>
-            <form className="mt-16 mx-28 flex flex-wrap justify-start w-full">
+
+            {/* VENTAS */}
+
+            <form className={`mt-16 px-28 flex flex-wrap justify-start w-full ${tipoVenta === "Plataformas" ? "hidden" : ""}`}>
                 <input
                     type="number"
                     name="cedula"
@@ -275,7 +348,41 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
                     placeholder="Precio del domicilio *"
                     autoComplete="off" />
             </form>
-            <div className="flex flex-wrap justify-center mt-6">
+
+            {/* VENTAS EN PLATAFORMAS */}
+
+            <form
+                onSubmit={registrarPlataforma}
+                className={`mt-16 mx-28 flex flex-col justify-center items-center w-full ${tipoVenta === "Plataformas" ? "" : "hidden"}`}>
+                <div className="flex flex-col mb-8">
+                    <h2 className="text-white text-xl mb-4">Total en plataformas hoy:</h2>
+                    <p className="text-white text-6xl">{sumaPlataformas}</p>
+                </div>
+                <div className='flex'>
+                    <select
+                        ref={plataforma}
+                        name="plataforma"
+                        className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""}`}
+                        placeholder="Selecciona una plataforma"
+                    >
+
+                        <option>iFood</option>
+                        <option>Rappi</option>
+                        <option>Didi</option>
+
+                    </select>
+                    <input
+                        ref={totalPlataforma}
+                        type="number"
+                        className={`w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput ${desactivados ? "formInputInactive" : ""} ${cedula === 0 ? 'hidden' : ''}`}
+                        placeholder="Total ganado"
+                        autoComplete="off"
+                    />
+                </div>
+
+            </form>
+
+            <div className={`flex flex-wrap justify-center mt-6 ${tipoVenta === "Plataformas" ? "hidden" : ""}`}>
                 <button
                     type="button"
                     className="text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonInput"
@@ -301,6 +408,13 @@ export const InfoVenta = ({ setPasoSeleccionado, pasoSeleccionado, bandera, setB
                     Siguiente
                 </button>
             </div>
-        </div>
+            <button
+                type="submit"
+                className={`text-lg mb-8 mr-8 h-12 w-80 text-white rounded-lg focus:outline-none botonPrincipalInput ${tipoVenta === "Plataformas" ? "" : "hidden"}`}
+                onClick={registrarPlataforma}
+            >
+                Finalizar
+            </button>
+        </div >
     );
 }
