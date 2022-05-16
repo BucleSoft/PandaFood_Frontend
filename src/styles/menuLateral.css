@@ -22,3 +22,9 @@
   background-color: hsla(356, 86%, 57%, 0.856);
   /* background-color: rgb(53, 53, 53, 0.8); */
 }
+
+@media print {
+  #sidebar {
+    display: none;
+  }
+}

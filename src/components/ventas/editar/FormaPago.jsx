@@ -29,9 +29,10 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
     const [pagoValues, handlePagoChange] = useForm({
         fecha: new Date(editarVenta?.fecha).toLocaleDateString(),
         identificador: editarVenta?.identificador,
+        banco: editarVenta?.banco
     });
 
-    const { fecha, identificador } = pagoValues;
+    const { fecha, identificador, banco } = pagoValues;
 
     useEffect(() => {
         setBandera(!bandera);
@@ -50,7 +51,7 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
 
     return (
         <div className="w-full p-12">
-            <div className="flex flex-wrap justify-center mt-4">
+            <div className="ml-16 flex flex-wrap mt-4">
                 <div className="flex flex-col">
                     <label className='text-white text-left' htmlFor='numVenta'>Número de Venta:</label>
                     <input
@@ -89,6 +90,22 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
                         placeholder="Total de Venta"
                         autoComplete="off"
                         disabled />
+                </div>
+                <div className={`flex flex-col ${formaPago === 'Transferencia' ? '' : 'hidden'}`}>
+                    <label className={`text-white text-left`} htmlFor='banco'>Banco:</label>
+                    <input
+                        type="text"
+                        name="banco"
+                        title="Banco de transferencia"
+                        className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
+                        placeholder="Banco del que se transfiere"
+                        autoComplete="off"
+                        value={banco}
+                        onChange={(e) => {
+                            handlePagoChange(e);
+                            editarVenta.banco = e.target.value;
+                        }}
+                    />
                 </div>
             </div>
             <div className="flex justify-center mt-10 mb-20 mr-10 gap-28">

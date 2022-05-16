@@ -152,7 +152,14 @@ export const TablaVentas = ({ props, filtro, bandera, setBandera }) => {
                                     }
                                 }}
                             ></img>
-                            <FontAwesomeIcon className={`text-white text-xl ${tipoVenta !== 'Redimir' && tipoVenta !== "Plataformas" ? "cursor-pointer" : "cursor-default opacity-5"}`} icon={faCopy} title="Imprimir factura" />
+                            <FontAwesomeIcon
+                                className={`text-white text-xl ${tipoVenta !== 'Redimir' && tipoVenta !== "Plataformas" ? "cursor-pointer" : "cursor-default opacity-5"}`}
+                                icon={faCopy}
+                                title="Imprimir factura"
+                                onClick={() => {
+                                    history.push(`/facturas?idVenta=${identificador}`);
+                                }}
+                            />
                             <FontAwesomeIcon
                                 className='text-red-500 text-xl cursor-pointer'
                                 icon={faTrashAlt}

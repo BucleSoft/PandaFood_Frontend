@@ -7,6 +7,7 @@ import { useVentaContext } from '../../context/ventaContext';
 import { useCarritoContext } from '../../context/carritoContext';
 import '../../styles/observaciones.css';
 import { NuevaMesa } from './modales/NuevaMesa';
+import { useHistory } from 'react-router-dom';
 
 export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) => {
 
@@ -23,6 +24,8 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
     const [indexObs, setIndexObs] = useState();
     const [mesas, setMesas] = useState([]);
     const [bandera, setBandera] = useState(false);
+
+    const history = useHistory();
 
     useEffect(() => {
         const buscarMesas = async () => {
@@ -65,6 +68,7 @@ export const ObservacionesFinales = ({ pasoSeleccionado, setPasoSeleccionado }) 
         }
 
         toast.success("Venta registrada!", configMensaje);
+        history.push(`/facturas?idVenta=${venta.identificador}`);
         setVenta({
             identificador: '',
             fecha: null,

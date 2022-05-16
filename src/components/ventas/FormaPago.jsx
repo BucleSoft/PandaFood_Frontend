@@ -18,9 +18,10 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
     const [pagoValues, handlePagoChange] = useForm({
         fecha: new Date(venta?.fecha).toLocaleDateString(),
         identificador: venta?.identificador,
+        banco: venta?.banco
     });
 
-    const { fecha, identificador } = pagoValues;
+    const { fecha, identificador, banco } = pagoValues;
 
     useEffect(() => {
         setBandera(!bandera);
@@ -69,7 +70,7 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
                         disabled />
                 </div>
                 <div className={`flex flex-col ${formaPago === 'Transferencia' ? '' : 'hidden'}`}>
-                    <label className={`text-white text-left`} htmlFor='numVenta'>Banco:</label>
+                    <label className={`text-white text-left`} htmlFor='banco'>Banco:</label>
                     <input
                         type="text"
                         name="banco"
@@ -77,6 +78,11 @@ export const FormaPago = ({ pasoSeleccionado, setPasoSeleccionado, bandera, setB
                         className="w-80 p-2 pl-8 pr-8 mr-8 mb-8 rounded-sm border-b-2 text-center focus:outline-none formInput"
                         placeholder="Banco del que se transfiere"
                         autoComplete="off"
+                        value={banco}
+                        onChange={(e) => {
+                            handlePagoChange(e);
+                            venta.banco = e.target.value;
+                        }}
                     />
                 </div>
             </div>

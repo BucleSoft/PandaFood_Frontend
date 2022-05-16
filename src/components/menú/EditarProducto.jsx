@@ -221,7 +221,9 @@ export const EditarProducto = () => {
 
     const buscarProducto = async () => {
 
-        const busqueda = await axiosPetition(`productos/${identificador}`);
+        const id = identificador.split('P')[1];
+
+        const busqueda = await axiosPetition(`productos/${id}`);
 
         if (!busqueda.ok) {
             return toast.error("Error al obtener el producto, contacte a los desarrolladores.", configMensaje);

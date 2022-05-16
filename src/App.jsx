@@ -44,7 +44,7 @@ import { ConsultarVentasPage } from './pages/ventas/ConsultarVentasPage';
 
 import { axiosPetition } from './helpers/Axios';
 
-import { Factura } from './reports/Factura';
+import { Factura } from './components/facturas/Factura';
 import { PDFViewer } from '@react-pdf/renderer';
 import { EditarVenta } from './components/ventas/editar/EditarVenta';
 
@@ -102,6 +102,9 @@ function App() {
               <EditarVentaContext.Provider value={{ editarVenta, setEditarVenta }}>
                 <CarritoContext.Provider value={{ carrito, setCarrito }}>
                   <PrivateLayout>
+                    <Route exact path="/facturas">
+                      <Factura />
+                    </Route>
                     <Route exact path="/perfil">
                       <PerfilPage />
                     </Route>
